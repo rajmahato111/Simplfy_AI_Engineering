@@ -1,0 +1,10 @@
+# QC renders of SVG diagrams (review artifacts, never committed)
+*.qc.png
+
+# deps / env / build
+node_modules/
+.env
+.env.*
+.next/
+dist/
+__pycache__/
