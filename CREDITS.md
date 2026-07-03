@@ -13,3 +13,11 @@ and improvements back upstream.
 
 MIT License © Om Bharatiya — see the upstream
 [LICENSE](https://github.com/ombharatiya/ai-system-design-guide/blob/main/LICENSE).
+
+## Ponytail
+
+This repo vendors the **[Ponytail](https://github.com/DietrichGebert/ponytail)** skill
+(MIT © Dietrich Gebert) at `.claude/skills/ponytail/` — a "lazy senior developer"
+efficiency mode for coding agents (YAGNI, stdlib-first, minimum working code). Its
+license is preserved alongside the skill. Usage notes:
+[docs/claude-code-efficiency.md](docs/claude-code-efficiency.md).

@@ -51,3 +51,16 @@ model: **Orchestrator → Sub-agents → Reviewer → Orchestrator approval → 
 - **Parallel safety:** briefs assign disjoint paths; two agents never write the same file.
 - **Escalation:** an agent that is blocked or must deviate from the guide reports back
   with the question instead of improvising.
+
+## Efficiency rules (Ponytail)
+
+All agents writing **code** in this repo run under the vendored
+[Ponytail skill](../.claude/skills/ponytail/SKILL.md) (MIT © Dietrich Gebert): climb
+the ladder — question the need, reuse before writing, stdlib/native/installed-dep
+before new code, one line before fifty — ship the minimum that works, mark deliberate
+shortcuts with `ponytail:` comments, and keep replies code-first with ≤3 lines of
+commentary. Orchestrator briefs for code tasks must point agents at the skill.
+Teaching **content** (chapters, walkthroughs) is governed by the
+[content style guide](./content-style-guide.md), not Ponytail — never let terseness
+degrade pedagogy. See [claude-code-efficiency.md](./claude-code-efficiency.md) for
+the full token-efficiency playbook.

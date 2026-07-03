@@ -4,9 +4,10 @@
 # Usage: bash scripts/render-diagram.sh path/to/diagram.svg [out.png]
 # Output: path/to/diagram.qc.png (2x scale) — gitignored, for review only.
 #
-# NOTE: this headless Chromium build truncates painting when the window is
-# short (content below ~y=60 goes missing). We render with a tall window and
-# crop to the SVG's declared size. Do not "simplify" this away.
+# NOTE: this headless Chromium build truncates painting near the bottom of
+# the window (~60-90px), regardless of window height. We always render with
+# generous extra headroom and crop to the SVG's declared size. Do not
+# "simplify" this away.
 set -euo pipefail
 
 SVG="$(realpath "$1")"
@@ -18,7 +19,8 @@ if [ -z "$W" ] || [ -z "$H" ]; then
   echo "ERROR: root <svg> must declare integer width/height attributes" >&2
   exit 1
 fi
-WINH=$(( H > 400 ? H : 400 ))
+# ponytail: +160px headroom clears the ~90px bottom-truncation zone for any H
+WINH=$(( H + 160 ))
 
 TMP="$(mktemp -t qc-XXXXXX.png)"
 /opt/pw-browsers/chromium --headless --disable-gpu --no-sandbox --hide-scrollbars \

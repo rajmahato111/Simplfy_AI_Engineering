@@ -1,7 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1136" height="576" viewBox="0 0 1136 576" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" width="1136" height="656" viewBox="0 0 1136 656" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
 <!--
 COORDINATE PLAN (8px grid)
-Canvas 1136x576. Title center (568,44).
+Canvas 1136x656. Title center (568,44). Content bottom y=544.
+NOTE: canvas height includes extra bottom room because the headless-Chromium
+QC renderer cannot paint the last ~96px of the window; content ends by H-112.
 Ingestion container: x=32 y=80 w=648 h=136 (32..680, 80..216), caption (48,102)
 Query container:     x=32 y=408 w=1072 h=136 (32..1104, 408..544), caption (48,430)
 
@@ -26,7 +28,7 @@ Arrows (#475569, end 2px before target edge):
   A7 Reranker->LLM        (656,480)->(718,480)
   A8 LLM->Answer          (880,480)->(942,480)
 -->
-  <rect width="1136" height="576" fill="#ffffff"/>
+  <rect width="1136" height="656" fill="#ffffff"/>
   <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
     orient="auto" markerUnits="userSpaceOnUse">
     <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>

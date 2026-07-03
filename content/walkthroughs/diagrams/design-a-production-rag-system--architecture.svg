@@ -1,6 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1144" height="560" viewBox="0 0 1144 560" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" width="1144" height="640" viewBox="0 0 1144 640" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
 <!--
 COORDINATE PLAN (8px grid; node w=152 h=48; col gap 64; row gap 32)
+Canvas H=640: content ends at y=536. The extra bottom headroom is deliberate —
+the QC renderer's headless Chromium truncates painting in the bottom ~90px of
+the window (verified empirically), so the canvas is taller than the content
+to keep the observability note fully painted in QC renders.
 Columns (x-left / center): c1=64/140  c2=280/356  c3=496/572  c4=712/788  c5=928/1004
 Rows (y-top / center):     A=96/120   B=176/200   C=312/336   D=392/416
 Title baseline: y=36, centered x=572
@@ -29,7 +33,7 @@ Arrows (orthogonal, max one L-bend, end 2px before target edge):
   A13 LLM->response          280,416 -> 218,416 (leftward)
   A14 response->user         140,392 v 140,362 (upward)
 -->
-  <rect width="1144" height="560" fill="#ffffff"/>
+  <rect width="1144" height="640" fill="#ffffff"/>
   <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
     orient="auto" markerUnits="userSpaceOnUse">
     <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
