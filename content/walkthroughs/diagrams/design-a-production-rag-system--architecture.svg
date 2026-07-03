@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1144" height="560" viewBox="0 0 1144 560" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN (8px grid; node w=152 h=48; col gap 64; row gap 32)
+Columns (x-left / center): c1=64/140  c2=280/356  c3=496/572  c4=712/788  c5=928/1004
+Rows (y-top / center):     A=96/120   B=176/200   C=312/336   D=392/416
+Title baseline: y=36, centered x=572
+Containers: ingestion x=24 y=56 w=1096 h=184 (caption 40,78)
+            query     x=24 y=272 w=1096 h=184 (caption 40,294)
+Nodes:
+  sources        c1,A orange   | parser+chunker c2,A yellow | embedder  c3,A purple
+  vector DB      c4,B green    | keyword index  c5,B green
+  user           c1,C orange   | query rewrite  c2,C indigo | perm filter c3,C red
+  hybrid retr.   c4,C indigo   | reranker       c4,D purple | context     c3,D indigo
+  LLM            c2,D purple   | response       c1,D indigo
+  observability note x=392 y=488 w=360 h=48 neutral
+Arrows (orthogonal, max one L-bend, end 2px before target edge):
+  A1  sources->parser        216,120 -> 278,120
+  A2  parser->embedder       432,120 -> 494,120
+  A3  embedder->vectorDB     572,144 v 572,200 h 710,200
+  A4  embedder->keywordIdx   648,120 h 1004,120 v 1004,174   label "raw chunk text"
+  A5  vectorDB->hybrid       788,224 v 788,310               label "dense"
+  A6  keywordIdx->hybrid     1004,224 v 1004,336 h 866,336   label "BM25"
+  A7  user->rewrite          216,336 -> 278,336
+  A8  rewrite->perm          432,336 -> 494,336
+  A9  perm->hybrid           648,336 -> 710,336
+  A10 hybrid->reranker       788,360 v 788,390               label "top 50"
+  A11 reranker->context      712,416 -> 650,416 (leftward)
+  A12 context->LLM           496,416 -> 434,416 (leftward)
+  A13 LLM->response          280,416 -> 218,416 (leftward)
+  A14 response->user         140,392 v 140,362 (upward)
+-->
+  <rect width="1144" height="560" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="572" y="36" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">Production RAG for enterprise document Q&amp;A</text>
+
+  <!-- containers -->
+  <rect x="24" y="56" width="1096" height="184" rx="12" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="40" y="78" font-size="12" fill="#64748B">Ingestion pipeline</text>
+  <rect x="24" y="272" width="1096" height="184" rx="12" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="40" y="294" font-size="12" fill="#64748B">Query path</text>
+
+  <!-- ingestion row A -->
+  <rect x="64" y="96" width="152" height="48" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="140" y="116" font-size="14" fill="#7C2D12" text-anchor="middle">Document<tspan x="140" y="133">sources</tspan></text>
+
+  <rect x="280" y="96" width="152" height="48" rx="10" fill="#FEFCE8" stroke="#CA8A04" stroke-width="1.5"/>
+  <text x="356" y="116" font-size="14" fill="#713F12" text-anchor="middle">Parser +<tspan x="356" y="133">chunker</tspan></text>
+
+  <rect x="496" y="96" width="152" height="48" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="572" y="116" font-size="14" fill="#2E1065" text-anchor="middle">Embedding<tspan x="572" y="133">model</tspan></text>
+
+  <!-- ingestion row B: stores -->
+  <rect x="712" y="176" width="152" height="48" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="788" y="205" font-size="14" fill="#064E3B" text-anchor="middle">Vector DB</text>
+
+  <rect x="928" y="176" width="152" height="48" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="1004" y="205" font-size="14" fill="#064E3B" text-anchor="middle">Keyword index</text>
+
+  <!-- query row C -->
+  <rect x="64" y="312" width="152" height="48" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="140" y="341" font-size="14" fill="#7C2D12" text-anchor="middle">User</text>
+
+  <rect x="280" y="312" width="152" height="48" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="356" y="341" font-size="14" fill="#1E1B4B" text-anchor="middle">Query rewrite</text>
+
+  <rect x="496" y="312" width="152" height="48" rx="10" fill="#FEF2F2" stroke="#DC2626" stroke-width="1.5"/>
+  <text x="572" y="332" font-size="14" fill="#7F1D1D" text-anchor="middle">Permission<tspan x="572" y="349">filter (ACL)</tspan></text>
+
+  <rect x="712" y="312" width="152" height="48" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="788" y="332" font-size="14" fill="#1E1B4B" text-anchor="middle">Hybrid<tspan x="788" y="349">retrieval</tspan></text>
+
+  <!-- query row D -->
+  <rect x="712" y="392" width="152" height="48" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="788" y="412" font-size="14" fill="#2E1065" text-anchor="middle">Cross-encoder<tspan x="788" y="429">reranker</tspan></text>
+
+  <rect x="496" y="392" width="152" height="48" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="572" y="412" font-size="14" fill="#1E1B4B" text-anchor="middle">Context<tspan x="572" y="429">assembly</tspan></text>
+
+  <rect x="280" y="392" width="152" height="48" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="356" y="412" font-size="14" fill="#2E1065" text-anchor="middle">LLM<tspan x="356" y="429">generation</tspan></text>
+
+  <rect x="64" y="392" width="152" height="48" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="140" y="412" font-size="14" fill="#1E1B4B" text-anchor="middle">Response +<tspan x="140" y="429">citations</tspan></text>
+
+  <!-- observability note -->
+  <rect x="392" y="488" width="360" height="48" rx="10" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <text x="572" y="508" font-size="12" fill="#334155" text-anchor="middle">Observability: per-stage traces — latency, cost,<tspan x="572" y="524">retrieval hit rate, sampled quality evals</tspan></text>
+
+  <!-- arrows -->
+  <line x1="216" y1="120" x2="278" y2="120" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="432" y1="120" x2="494" y2="120" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <polyline points="572,144 572,200 710,200" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <polyline points="648,120 1004,120 1004,174" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="788" y1="224" x2="788" y2="310" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <polyline points="1004,224 1004,336 866,336" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="216" y1="336" x2="278" y2="336" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="432" y1="336" x2="494" y2="336" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="648" y1="336" x2="710" y2="336" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="788" y1="360" x2="788" y2="390" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="712" y1="416" x2="650" y2="416" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="496" y1="416" x2="434" y2="416" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="280" y1="416" x2="218" y2="416" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="140" y1="392" x2="140" y2="362" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- arrow labels (white-backed) -->
+  <rect x="746" y="100" width="108" height="16" fill="#ffffff"/>
+  <text x="800" y="112" font-size="12" fill="#475569" text-anchor="middle">raw chunk text</text>
+
+  <rect x="794" y="252" width="44" height="16" fill="#ffffff"/>
+  <text x="798" y="264" font-size="12" fill="#475569">dense</text>
+
+  <rect x="1010" y="252" width="42" height="16" fill="#ffffff"/>
+  <text x="1014" y="264" font-size="12" fill="#475569">BM25</text>
+
+  <rect x="794" y="368" width="48" height="16" fill="#ffffff"/>
+  <text x="798" y="380" font-size="12" fill="#475569">top 50</text>
+</svg>
