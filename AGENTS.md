@@ -8,6 +8,7 @@
 1. Read [`docs/agent-board.md`](docs/agent-board.md) — do not edit locked paths.
 2. Read [`docs/dual-tool-coordination.md`](docs/dual-tool-coordination.md) for branch and lock rules.
 3. Update the board while working; commit messages: `[claude] T-00N:` or `[cursor] T-00N:`.
+4. **Before opening a PR:** complete [`docs/pre-pr-testing.md`](docs/pre-pr-testing.md) (automated + browser QA). Do not ask the human to merge — the reviewer agent merges.
 
 ## 2. Product
 

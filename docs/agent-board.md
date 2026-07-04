@@ -66,7 +66,7 @@ Coordination rules: [`dual-tool-coordination.md`](./dual-tool-coordination.md)
 - [x] Ponytail-minimal; CI typecheck + lint stub
 - [x] Committed and pushed
 
-**Progress:** Next.js 15 + Tailwind 4 + next-mdx-remote RSC reader; 3 pilot pages statically generated; content assets served via `/content-assets/`.
+**Browser QA:** Playwright smoke passed 2026-07-04 — B1–B8, S1–S5 green (`npm run test:browser`)
 
 ---
 

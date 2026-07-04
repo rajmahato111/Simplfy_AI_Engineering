@@ -1,5 +1,6 @@
 # QC renders of SVG diagrams (review artifacts, never committed)
 *.qc.png
+.qa/
 
 # deps / env / build
 node_modules/

@@ -38,8 +38,11 @@ model: **Orchestrator → Sub-agents → Reviewer → Orchestrator approval → 
 4. **Approve** — orchestrator applies/delegates fixes, re-checks the specific findings,
    flips `status: draft → reviewed`.
 5. **Ship** — orchestrator commits with a descriptive message and pushes to the
-   designated branch (`claude/ai-interview-platform-prd-4si5f9`). Nothing reaches GitHub
-   without steps 3–4.
+   designated branch. Nothing reaches GitHub without steps 3–4.
+6. **Pre-PR QA** — [`pre-pr-testing.md`](./pre-pr-testing.md): automated checks +
+   browser smoke (Cursor MCP or `npm run test:browser`) **before** opening a PR.
+7. **PR + merge** — implementing agent opens PR; **reviewer agent** re-runs checks,
+   merges to integration branch. Human is not asked to merge.
 
 ## Conventions
 
