@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="520" viewBox="0 0 1000 520" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN (8px grid)
+Canvas 1000x520. Title center (500,44).
+Query (orange) center top: x=400 w=200 y=80 h=64 c=(500,112)
+Container "Parallel retrieval": x=32 y=176 w=936 h=200
+  Dense path (left): Embed query (violet) x=64 w=152 y=216; Vector index (green) x=248 w=168 y=216
+  Sparse path (right): BM25 index (green) x=584 w=168 y=216; Keyword match (indigo) x=768 w=168 y=216
+RRF Fusion (yellow queue) x=376 w=248 y=408 h=64 c=(500,440)
+Top-k results (orange) x=680 w=160 y=408 h=64 c=(760,440)
+Arrows: Query->Embed, Query->BM25; Embed->Vector; Vector->RRF; BM25->RRF; RRF->Results
+-->
+  <rect width="1000" height="520" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="500" y="44" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">Hybrid search: parallel dense + sparse, fused by rank</text>
+
+  <!-- query -->
+  <rect x="400" y="80" width="200" height="64" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="500" y="117" font-size="14" fill="#7C2D12" text-anchor="middle">User query</text>
+
+  <!-- parallel container -->
+  <rect x="32" y="176" width="936" height="200" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="48" y="198" font-size="12" fill="#64748B">Parallel retrieval (run both; wait for slower arm)</text>
+
+  <!-- dense arm -->
+  <text x="64" y="228" font-size="12" fill="#64748B">Dense (semantic)</text>
+  <rect x="64" y="240" width="152" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="140" y="269" font-size="14" fill="#2E1065" text-anchor="middle">Embed<tspan x="140" dy="17">query</tspan></text>
+  <rect x="248" y="240" width="168" height="64" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="332" y="277" font-size="14" fill="#064E3B" text-anchor="middle">Vector index</text>
+  <text x="332" y="328" font-size="12" fill="#64748B" text-anchor="middle">top-50 by cosine</text>
+
+  <!-- sparse arm -->
+  <text x="584" y="228" font-size="12" fill="#64748B">Sparse (keyword)</text>
+  <rect x="584" y="240" width="168" height="64" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="668" y="277" font-size="14" fill="#064E3B" text-anchor="middle">BM25 index</text>
+  <rect x="768" y="240" width="168" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="852" y="277" font-size="14" fill="#1E1B4B" text-anchor="middle">Token match</text>
+  <text x="668" y="328" font-size="12" fill="#64748B" text-anchor="middle">top-50 by BM25</text>
+
+  <!-- fusion + output -->
+  <rect x="376" y="408" width="248" height="64" rx="10" fill="#FEFCE8" stroke="#CA8A04" stroke-width="1.5"/>
+  <text x="500" y="437" font-size="14" fill="#713F12" text-anchor="middle">RRF fusion</text>
+  <text x="500" y="454" font-size="12" fill="#713F12" text-anchor="middle">merge ranked lists</text>
+
+  <rect x="680" y="408" width="160" height="64" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="760" y="445" font-size="14" fill="#7C2D12" text-anchor="middle">Top-k chunks</text>
+
+  <!-- arrows -->
+  <line x1="440" y1="144" x2="140" y2="238" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="560" y1="144" x2="668" y2="238" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="216" y1="272" x2="246" y2="272" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="332" y1="304" x2="332" y2="360" stroke="#475569" stroke-width="1.5"/>
+  <polyline points="332,360 500,360 500,406" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <polyline points="668,304 668,360 500,360" fill="none" stroke="#475569" stroke-width="1.5"/>
+  <line x1="624" y1="440" x2="678" y2="440" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="508" y="348" width="72" height="18" fill="#ffffff"/>
+  <text x="544" y="361" font-size="12" fill="#475569" text-anchor="middle">k = 60</text>
+</svg>

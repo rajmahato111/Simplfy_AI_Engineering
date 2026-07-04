@@ -1,7 +1,8 @@
 #!/usr/bin/env npx tsx
 /**
- * Upgrade draft MDX chapters to full style-guide structure + minimal diagram.
- * Sets status: reviewed. Skips already-reviewed files.
+ * Scaffold missing style-guide section headings on draft MDX only.
+ * Does NOT mark reviewed, does NOT invent analogies/diagrams — human rewrite required.
+ * Skips reviewed/approved files.
  */
 import fs from "fs";
 import path from "path";
@@ -75,20 +76,6 @@ function interviewBlock(text: string) {
   return "- What tradeoffs would you highlight in an interview?\n- How would you measure success in production?\n- What failure modes would you design for?";
 }
 
-function minimalSvg(title: string) {
-  const label = title.slice(0, 18).replace(/[<>&]/g, "");
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 100" font-family="system-ui,sans-serif">
-  <rect x="10" y="28" width="110" height="44" rx="6" fill="#eef2ff" stroke="#6366f1"/>
-  <text x="65" y="55" text-anchor="middle" font-size="11" fill="#312e81">${label}</text>
-  <path d="M120 50 H155" stroke="#64748b" stroke-width="2" marker-end="url(#a)"/>
-  <rect x="160" y="28" width="110" height="44" rx="6" fill="#f0fdf4" stroke="#22c55e"/>
-  <text x="215" y="55" text-anchor="middle" font-size="11" fill="#14532d">Pipeline</text>
-  <path d="M270 50 H305" stroke="#64748b" stroke-width="2" marker-end="url(#a)"/>
-  <rect x="310" y="28" width="110" height="44" rx="6" fill="#fef3c7" stroke="#f59e0b"/>
-  <text x="365" y="55" text-anchor="middle" font-size="11" fill="#78350f">Output</text>
-  <defs><marker id="a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#64748b"/></marker></defs>
-</svg>\n`;
-}
 
 function enhanceConcept(title: string, sections: Map<string, string>) {
   const main =
@@ -103,7 +90,7 @@ function enhanceConcept(title: string, sections: Map<string, string>) {
   if (!sections.has("The analogy")) {
     sections.set(
       "The analogy",
-      `Think of **${title}** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.`,
+      `<!-- TODO: write a chapter-specific analogy with mapping table (see content-style-guide.md) -->`,
     );
   }
   if (!sections.has("How it actually works") && main) {
@@ -194,45 +181,25 @@ for (const file of walkMdx(CONTENT)) {
   const { data, content } = matter(raw);
   if (data.status === "reviewed" || data.status === "approved") continue;
 
-  const relDir = path.dirname(path.relative(CONTENT, file));
   const slug = data.slug as string;
   const title = data.title as string;
   const type = data.type as string;
-  const diagramName = `diagrams/${slug}--overview.svg`;
-  const diagramPath = path.join(path.dirname(file), diagramName);
 
   const sections = splitSections(content);
   const body =
     type === "walkthrough" ? enhanceWalkthrough(title, sections) : enhanceConcept(title, sections);
 
-  fs.mkdirSync(path.dirname(diagramPath), { recursive: true });
-  if (!fs.existsSync(diagramPath)) {
-    fs.writeFileSync(diagramPath, minimalSvg(title));
-  }
-
-  const diagramRef = diagramName;
-  const diagrams = Array.isArray(data.diagrams) && data.diagrams.length ? data.diagrams : [diagramRef];
+  const diagrams = Array.isArray(data.diagrams) ? data.diagrams : [];
 
   const updated = {
     ...data,
     diagrams,
-    source_attribution: ATTRIBUTION,
-    last_reviewed: "2026-07-04",
-    status: "reviewed",
+    source_attribution: data.source_attribution ?? ATTRIBUTION,
+    status: "draft",
   };
 
-  const diagramLine = `\n\n![${title} overview](${diagramRef})\n`;
-  const mainMarker = "## How it actually works";
-  let finalBody = body;
-  if (finalBody.includes(mainMarker) && !finalBody.includes(diagramRef)) {
-    const idx = finalBody.indexOf(mainMarker);
-    const lineEnd = finalBody.indexOf("\n", idx);
-    const insertAt = lineEnd === -1 ? finalBody.length : lineEnd + 1;
-    finalBody = finalBody.slice(0, insertAt) + diagramLine + finalBody.slice(insertAt);
-  }
-
-  fs.writeFileSync(file, matter.stringify(finalBody, updated));
+  fs.writeFileSync(file, matter.stringify(body, updated));
   enhanced++;
 }
 
-console.log(`Enhanced ${enhanced} draft MDX file(s) → reviewed`);
+console.log(`Scaffolded ${enhanced} draft MDX file(s) (still draft — needs human rewrite)`);
