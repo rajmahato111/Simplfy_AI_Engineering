@@ -1,1 +1,26 @@
-[]
+[
+  {
+    "id": "q-001",
+    "slug": "design-production-rag",
+    "title": "Design a production RAG system for internal docs",
+    "topic": "retrieval",
+    "difficulty": "intermediate",
+    "role_tags": ["ml-engineer", "platform"],
+    "company_tags": [],
+    "body_md": "Design a retrieval-augmented generation system for 50k internal documents with permission-aware access, hybrid search, and freshness requirements.",
+    "interviewer_looks_for": [
+      "Both ingestion and query pipelines",
+      "Hybrid retrieval + reranking",
+      "Permission filters at query time",
+      "Eval strategy and freshness tiers"
+    ],
+    "strong_answer_covers": [
+      "Chunking strategy with tradeoffs",
+      "Vector + BM25 merge (RRF)",
+      "Cross-encoder reranker",
+      "ACL sync and cache scoping",
+      "Offline golden set + online sampling"
+    ],
+    "status": "draft"
+  }
+]

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Badge, BadgeBrand } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { listContentSlugs } from "@/lib/content";
+import { questionCount } from "@/lib/questions";
 
 const TRACKS = [
   {
@@ -9,6 +11,12 @@ const TRACKS = [
     href: "/learn/concepts/retrieval/rag-fundamentals",
     count: 3,
   },
+] as const;
+
+const STATS = [
+  { label: "Chapters", value: String(listContentSlugs().length) },
+  { label: "Questions", value: String(questionCount()) },
+  { label: "Free to read", value: "100%" },
 ] as const;
 
 const PILLARS = [
@@ -53,10 +61,21 @@ export default function HomePage() {
             <Button href="/learn" size="lg">
               Start with RAG fundamentals
             </Button>
-            <Button href="/learn/walkthroughs/design-a-production-rag-system" variant="secondary" size="lg">
+            <Button href="/search" variant="secondary" size="lg">
+              Search the library
+            </Button>
+            <Button href="/learn/walkthroughs/design-a-production-rag-system" variant="ghost" size="lg">
               Production RAG walkthrough
             </Button>
           </div>
+          <dl className="mt-10 flex flex-wrap gap-8">
+            {STATS.map((s) => (
+              <div key={s.label}>
+                <dt className="text-2xl font-semibold text-zinc-900">{s.value}</dt>
+                <dd className="text-sm text-zinc-500">{s.label}</dd>
+              </div>
+            ))}
+          </dl>
           <p className="mt-4 text-sm text-zinc-500">
             Start free. Go deep when you&apos;re ready.
           </p>

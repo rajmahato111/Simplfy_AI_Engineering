@@ -9,8 +9,11 @@ import { extractH2Headings } from "@/lib/headings";
 import { mdxComponents } from "@/lib/mdx-components";
 import { ArticleBreadcrumb, ArticleToc } from "@/components/article-chrome";
 import { ArticlePrevNext } from "@/components/article-prev-next";
+import { ChapterProgress } from "@/components/chapter-progress";
 import { Badge, BadgeBrand } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { auth } from "@/auth";
+import { ensureUser, getProgressForUser, recordChapterView } from "@/lib/progress";
 
 type Props = { params: Promise<{ slug: string[] }> };
 
@@ -68,6 +71,20 @@ export default async function LearnDocPage({ params }: Props) {
     doc.frontmatter;
   const { prev, next } = getAdjacentSlugs(slug);
 
+  const session = await auth();
+  const email = session?.user?.email;
+  let completed = false;
+  let bookmarked = false;
+  if (email) {
+    const user = await ensureUser(email, session.user?.name);
+    if (user) {
+      await recordChapterView(user.id, slug);
+      const prog = await getProgressForUser(user.id, slug);
+      completed = prog?.completed ?? false;
+      bookmarked = prog?.bookmarked ?? false;
+    }
+  }
+
   return (
     <div className="border-b border-zinc-200 bg-zinc-50/50">
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
@@ -98,6 +115,14 @@ export default async function LearnDocPage({ params }: Props) {
                   {source_attribution}
                 </p>
               )}
+              <div className="mt-4">
+                <ChapterProgress
+                  slug={slug}
+                  completed={completed}
+                  bookmarked={bookmarked}
+                  signedIn={Boolean(email)}
+                />
+              </div>
             </header>
 
             <div className="prose mx-auto mt-8 max-w-none px-1 pb-12">{MdxBody}</div>
