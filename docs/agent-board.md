@@ -16,6 +16,7 @@
 
 | PR | Task | Merged |
 |----|------|--------|
+| #19 | Tier 5: Grounded tutor, SPIDER feedback, frameworks, T-003 brief | 2026-07-04 |
 | #18 | T-040–043: Glossary, patterns, 121-question bank ingest | 2026-07-04 |
 | #15 | T-001 Claude: Pilot content batch (retrieval) | 2026-07-04 |
 | #7 | P1 Vercel deploy readiness | 2026-07-04 |
