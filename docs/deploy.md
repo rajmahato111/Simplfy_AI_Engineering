@@ -12,7 +12,7 @@
 | Variable | Required | Example |
 |----------|----------|---------|
 | `NEXT_PUBLIC_SITE_URL` | Yes | `https://your-app.vercel.app` |
-| `AUTH_SECRET` | For auth | `openssl rand -base64 32` |
+| `AUTH_SECRET` | Yes (auth) | `openssl rand -base64 32` |
 | `AUTH_GITHUB_ID` | Optional OAuth | GitHub OAuth app client ID |
 | `AUTH_GITHUB_SECRET` | Optional OAuth | GitHub OAuth app secret |
 
