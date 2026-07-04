@@ -20,7 +20,7 @@
 | #8 | P2 Reader polish (prev/next, SEO, sitemap) | 2026-07-04 |
 | #9 | P3 Auth skeleton | 2026-07-04 |
 | #10 | P4 Search | 2026-07-04 |
-| #11 | P5 Question bank shell | pending |
+| #11 | P5 Question bank shell | 2026-07-04 |
 
 ---
 
