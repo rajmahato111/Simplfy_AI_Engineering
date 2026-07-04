@@ -11,7 +11,10 @@ test.describe("progress", () => {
     await page.goto("/learn/concepts/retrieval/rag-fundamentals");
     await page.getByRole("button", { name: "Bookmark" }).click();
     await expect(page.getByRole("button", { name: "Bookmarked" })).toBeVisible();
-    await page.getByRole("button", { name: "Mark complete" }).click();
+
+    const markComplete = page.getByRole("button", { name: "Mark complete" });
+    await markComplete.scrollIntoViewIfNeeded();
+    await markComplete.click();
     await expect(page.getByRole("button", { name: "Completed ✓" })).toBeVisible();
 
     await page.goto("/dashboard");
