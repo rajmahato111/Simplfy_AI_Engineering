@@ -36,7 +36,7 @@ There are two sensible fixes. The first: sit a patient friend down and have them
 
 ![Two ways to make a visual page retrievable: vision-LLM parsing vs page-as-image](diagrams/multimodal-rag--two-paths.svg)
 
-Both paths in the diagram start from the same place: render each document page to an image (around 300 DPI). Follow the arrows left to right.
+Both paths start from the same place: render each document page to an image (around 300 DPI). Follow the arrows left to right.
 
 **Path A — vision-LLM parsing ("describe, then embed").** A vision-language model reads each page image with targeted prompts: extract every table as markdown with its headers intact; describe each chart — axes, trends, the actual data points; summarize each diagram as components and relationships. Those outputs land in an ordinary text index next to your regular prose chunks, tagged with metadata like `type=table` and the page number. Two rules make or break this path. First, a table is an atomic retrieval unit — never split one across chunk boundaries, because flattened rows torn from their headers are meaningless (see [chunking strategies](./chunking-strategies.mdx)). Second, store a *dual representation*: the text description makes the chart findable, but the original image is what you hand the generator, because descriptions always lose detail.
 
@@ -64,7 +64,7 @@ The extraction cost stings once; it then amortizes over every query. That is the
 | Unified embedding space (CLIP/SigLIP) | One index, one query path, simplest ops | Weak on charts, tables, and document pages | Corpus is documents rather than natural photos |
 | Page-as-image late interaction (ColPali) | No OCR/layout/table pipeline; best recall on visual documents | ~1,024 vectors per page; multi-vector index complexity | Storage budget is tight, or you need fine-grained text matching |
 
-The narrative version: parsing pays per page, once, and lets everything downstream stay boring. Page-as-image pays continuously in storage and index machinery but wins on documents where layout is the meaning. The unified space is the simplest and the weakest on documents. Production systems today mostly run modality-aware parsing plus fusion as the workhorse, with page-as-image retrieval gaining ground fast for PDF-heavy corpora.
+The narrative version: parsing pays per page, once, and lets everything downstream stay boring. Page-as-image pays continuously in storage and index machinery but wins where layout is the meaning. The unified space is simplest and weakest on documents. Production systems mostly run modality-aware parsing plus fusion as the workhorse, with page-as-image retrieval gaining ground fast for PDF-heavy corpora.
 
 ## Where people go wrong
 

@@ -21,9 +21,9 @@ Plain RAG (Retrieval-Augmented Generation) retrieves once and generates once —
 
 Think about how you research a topic you don't yet understand, versus how you look up a fact you already know the shape of.
 
-Looking up a fact is one trip to the shelf: you know the book, you know roughly the page, you grab it and you're done. That's plain RAG — one retrieval, one answer. Now think about researching something genuinely unfamiliar: "why did our biggest customer's usage drop last quarter?" You don't walk to one shelf. You pull the usage-metrics report first. Reading it, you realize the drop started after a support ticket spike, so *that* sends you to the support queue, not because you planned it up front but because the first answer told you where to look next. In the support queue you find an unresolved billing complaint, which sends you to the billing system. Three trips, each one chosen because the previous trip's result demanded it — and at any point, if a shelf turns out empty or the document doesn't actually answer your question, you go back and try a different shelf instead of reporting failure.
+Looking up a fact is one trip to the shelf: you know the book, roughly the page, you grab it and you're done. That's plain RAG — one retrieval, one answer. Now think about researching something genuinely unfamiliar: "why did our biggest customer's usage drop last quarter?" You don't walk to one shelf. You pull the usage-metrics report first. Reading it, you realize the drop started after a support ticket spike, so *that* sends you to the support queue — not because you planned it up front, but because the first answer told you where to look next. There you find an unresolved billing complaint, which sends you to the billing system. Three trips, each chosen because the previous result demanded it — and if a shelf turns out empty, you go back and try a different one instead of reporting failure.
 
-That back-and-forth, evidence-driven research process — not a fixed itinerary decided in advance — is agentic RAG. The discipline that keeps it from becoming an afternoon lost in the library is the same discipline a good researcher imposes on themselves: a hard cap on how many trips you'll take before you write up what you have.
+That back-and-forth, evidence-driven process — not a fixed itinerary decided in advance — is agentic RAG. The discipline that keeps it from becoming an afternoon lost in the library is the same one a good researcher imposes on themselves: a hard cap on trips before writing up what you have.
 
 | Research habit | Agentic RAG element |
 |---|---|
@@ -41,13 +41,13 @@ The diagram traces one query through the loop, with the exit ramps that keep it 
 
 ![Agentic RAG loop: a query enters a plan step, retrieves, is evaluated for relevance and support, and either exits to the generator or re-enters the loop with a revised sub-goal, bounded by a turn budget](diagrams/agentic-rag--reasoning-loop.svg)
 
-**Plan.** The agent looks at the query and decides its retrieval strategy: one search, a decomposed chain of searches, or — for queries it can answer without any lookup — no search at all. This is the router that Adaptive RAG formalizes: classify query difficulty first, and only pay for the loop when the query needs it.
+**Plan.** The agent decides its retrieval strategy: one search, a decomposed chain of searches, or — for queries it can answer without any lookup — no search at all. This is the router Adaptive RAG formalizes: classify query difficulty first, and only pay for the loop when needed.
 
 **Retrieve.** A search runs against the index (vector, hybrid, whatever the underlying system already does — agentic RAG sits on top of retrieval, it doesn't replace it).
 
-**Evaluate.** This is the step linear RAG skips entirely. Self-RAG trains the model to emit critique tokens: is this evidence *relevant* to the sub-goal, and once an answer is drafted, is it actually *supported* by the retrieved text? Corrective RAG (CRAG) runs a similar check but routes on the verdict — correct evidence goes straight to generation, ambiguous evidence gets supplemented with an external search, and incorrect evidence gets discarded in favor of a fallback source entirely.
+**Evaluate.** This is the step linear RAG skips entirely. Self-RAG trains the model to emit critique tokens: is this evidence *relevant* to the sub-goal, and is the drafted answer actually *supported* by it? Corrective RAG (CRAG) runs a similar check but routes on the verdict — correct evidence goes straight to generation, ambiguous evidence gets supplemented with an external search, incorrect evidence gets discarded for a fallback source entirely.
 
-**Loop or exit.** If evaluation says the evidence is weak, the agent updates its sub-goal and retrieves again — this is where multi-hop questions get solved: "who acquired Figma" resolves to "Adobe," which becomes the input to the next search, "who is the CEO of Adobe." If evaluation says the evidence supports an answer, the loop exits to the generator. Either way, a turn budget — typically 3 to 5 iterations — forces an exit regardless, so a stuck loop still produces an answer instead of spinning.
+**Loop or exit.** If evaluation says the evidence is weak, the agent updates its sub-goal and retrieves again — this is where multi-hop questions get solved: "who acquired Figma" resolves to "Adobe," which becomes the input to the next search, "who is the CEO of Adobe." If the evidence supports an answer, the loop exits to the generator. Either way, a turn budget — typically 3 to 5 iterations — forces an exit regardless, so a stuck loop still produces an answer instead of spinning.
 
 ## A concrete example
 
@@ -73,7 +73,7 @@ Four turns, three retrievals, roughly 9 seconds end to end at typical LLM latenc
 | Determinism | High — same query, same path | Lower — the model chooses its own path each time |
 | Cost | One retrieval + one generation | N retrievals + N reasoning turns |
 
-The determinism cost is easy to underweight until it bites: a small rewording of the same user question can send the agent down a different search path and back with an answer in a different shape. The standard mitigation is not to relax the model's freedom but to constrain the *graph of possible paths* — frameworks like LangGraph or DSPy fix which states and transitions are legal, even though which one gets picked is still the model's call. And because the loop is the expensive path, the honest default is Adaptive RAG: classify the query first, and route anything that looks like a single-fact lookup straight to the linear pipeline. Reserve the loop for compound and multi-hop questions, and cap it at 3–5 turns so a confused agent fails fast instead of burning budget in circles.
+The determinism cost is easy to underweight until it bites: a small rewording of the same question can send the agent down a different search path, back with an answer in a different shape. The mitigation isn't to relax the model's freedom but to constrain the *graph of possible paths* — frameworks like LangGraph or DSPy fix which states and transitions are legal, even though which one gets picked is still the model's call. Because the loop is the expensive path, the honest default is Adaptive RAG: classify the query first, route single-fact lookups straight to the linear pipeline, and reserve the loop — capped at 3–5 turns — for compound and multi-hop questions.
 
 ## Where people go wrong
 

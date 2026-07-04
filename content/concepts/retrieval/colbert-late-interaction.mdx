@@ -15,27 +15,25 @@ status: draft
 
 ## The 30-second version
 
-There are three ways a retrieval model can compare a query to a document, and they differ in exactly one thing: *when* the two texts are allowed to interact. A bi-encoder squashes each into one vector and compares them at the very end — fast, but everything gets averaged into a single point, so rare-but-critical words get diluted. A cross-encoder feeds query and document into the same forward pass so every token attends to every other token — highly accurate, but nothing can be precomputed, so it only works on a shortlist. Late interaction (ColBERT, "Contextualized Late Interaction over BERT") is the middle path: encode query and document independently into one vector *per token*, then score with MaxSim — for every query token, find its single best-matching document token, and sum those best matches. You get most of a cross-encoder's precision because rare words keep their own dedicated vector, at close to a bi-encoder's speed because documents are still precomputed offline. The price is storage: several times more vectors per document, brought down to roughly 2–4x a bi-encoder's footprint by ColBERTv2's compression.
+There are three ways a retrieval model can compare a query to a document, and they differ in exactly one thing: *when* the two texts interact. A bi-encoder squashes each into one vector and compares them at the very end — fast, but everything gets averaged into a single point, so rare-but-critical words get diluted. A cross-encoder feeds query and document into the same forward pass so every token attends to every other token — highly accurate, but nothing can be precomputed, so it only works on a shortlist. Late interaction (ColBERT, "Contextualized Late Interaction over BERT") is the middle path: encode query and document independently into one vector *per token*, then score with MaxSim — for every query token, find its single best-matching document token, and sum those best matches. You get most of a cross-encoder's precision, because rare words keep their own dedicated vector, at close to a bi-encoder's speed, because documents are still precomputed offline. The price is storage — several times more vectors per document — brought down to roughly 2–4x a bi-encoder's footprint by ColBERTv2's compression.
 
 ## The analogy
 
 Picture three ways a hiring committee could evaluate a stack of resumes against a job requisition.
 
-The fast, crude way: boil the entire requisition down to one sentence — "senior backend engineer, distributed systems" — and boil the entire resume down to one sentence too, then just check if the two sentences sound alike. It's instant, and it works for obvious mismatches, but a resume that's a perfect match on the one requirement that actually matters — "built a payments system that survived a 10x traffic spike" — reads as a generic near-match once compressed into one sentence, because that one critical line got averaged in with fifty other lines about lunch-and-learns and team offsites.
+The fast, crude way: boil the entire requisition down to one sentence — "senior backend engineer, distributed systems" — and the resume down to one sentence too, then check if they sound alike. It's instant, but a resume that's a perfect match on the one line that matters — "built a payments system that survived a 10x traffic spike" — reads as a generic near-match once compressed, because that line got averaged in with fifty lines about lunch-and-learns.
 
-The careful, slow way: sit a hiring panel down to read the requisition and the resume side by side, line by line, cross-referencing every requirement against every claim. This catches everything, including the payments line. But you cannot pre-schedule this for all 400 applicants — you can only afford to do it for the 5 who already look promising.
+The careful, slow way: have a panel read the requisition and resume side by side, cross-referencing every requirement against every claim. This catches everything, but you can't afford it for all 400 applicants — only the 5 who already look promising.
 
-The clever middle way, which is what a good recruiter actually does: keep the requisition as a list of individual requirements, not one sentence. Keep the resume as a list of individual claims, not one summary. For *each* requirement, scan the resume for its single best-matching claim — "distributed systems" scans the resume and locks onto "built a payments system that survived a 10x spike" specifically, without that claim's signal getting blended into anything else. Add up the best match found for each requirement, and that sum is the resume's score. Every resume can be pre-broken into its list of claims long before any requisition arrives — only the requirement list needs to be read fresh each time.
+The clever middle way, which is what a good recruiter actually does: keep the requisition as a list of individual requirements, and the resume as a list of individual claims, not summaries. For *each* requirement, scan the resume for its single best-matching claim — "distributed systems" locks onto "built a payments system that survived a 10x spike" specifically, without that signal getting blended into anything else. Sum the best match found per requirement, and that's the score. Every resume can be pre-broken into its list of claims long before any requisition arrives — only the requirement list needs a fresh read each time.
 
 | Hiring analogy | ColBERT element |
 |---|---|
-| Requisition boiled to one sentence, resume boiled to one sentence | Bi-encoder: one vector each, compared once |
-| Panel reading every line of the resume against every line of the requisition | Cross-encoder: full attention, no precomputation |
-| Keeping resumes as a list of individual claims, precomputed ahead of time | Document token embeddings (computed offline) |
-| Reading the requisition as a fresh list of requirements at score time | Query token embeddings (computed online) |
+| Requisition and resume each boiled to one sentence | Bi-encoder: one vector each, compared once |
+| Panel reading every line against every line | Cross-encoder: full attention, no precomputation |
+| Resumes pre-broken into individual claims, ahead of time | Document token embeddings (computed offline) |
 | For each requirement, find its single best-matching claim | MaxSim |
-| Summing the best match found per requirement | The MaxSim score, `Score(Q,D) = Σ max_j(qi · dj)` |
-| Pre-indexing every resume's claims so scoring 400 resumes is fast | Offline document encoding — the reason late interaction scales |
+| Summing the best match found per requirement | `Score(Q,D) = Σ max_j(qi · dj)` |
 
 ## How it actually works
 
@@ -43,23 +41,21 @@ The diagram places the three architectures on one spectrum and shows what "inter
 
 ![The retrieval architecture spectrum: bi-encoder compares one query vector to one document vector, late interaction (ColBERT) compares every query token vector to every document token vector via MaxSim, cross-encoder jointly encodes query and document with full attention](diagrams/colbert-late-interaction--spectrum.svg)
 
-**Bi-encoder.** Query and document each get compressed into one vector by an encoder, independently. At query time, a single dot product between the two vectors is the entire "interaction." This is why bi-encoders scale to billions of documents — every document vector is precomputed, and search is just nearest-neighbor lookup — but also why they blur: a document's meaning is one point in space, and a rare, important word ("Widget-X") gets averaged in with every common word around it.
+**Bi-encoder.** Query and document each get compressed into one vector, independently. A single dot product is the entire "interaction." This is why bi-encoders scale to billions of documents — every document vector is precomputed, search is nearest-neighbor lookup — but also why they blur: a rare, important word ("Widget-X") gets averaged in with every common word around it.
 
-**Cross-encoder.** Query and document are concatenated and run through one transformer together, so every token can attend to every other token, query-to-document and document-to-query, at full resolution. This produces the highest accuracy, but nothing about the document can be precomputed — every query-document pair requires a fresh forward pass, so cross-encoders only work as a reranker over a short candidate list (tens to low hundreds), never as the first-stage retriever over a whole corpus.
+**Cross-encoder.** Query and document are concatenated and run through one transformer together, so every token attends to every other token at full resolution. Highest accuracy, but nothing can be precomputed — every pair needs a fresh forward pass, so cross-encoders only work as a reranker over a short candidate list, never as first-stage retrieval over a whole corpus.
 
-**Late interaction (ColBERT).** Encode query and document independently, like a bi-encoder — but keep one vector *per token* instead of collapsing to one vector for the whole text. At query time, MaxSim runs the comparison: for each query token, take the dot product against every document token, keep only the maximum, and sum those maxima across all query tokens. Document token vectors are still precomputed offline (that's what keeps it fast); only the query needs encoding at request time, and MaxSim itself is cheap arithmetic over vectors that already exist.
+**Late interaction (ColBERT).** Encode query and document independently, like a bi-encoder — but keep one vector *per token* instead of collapsing to one vector for the whole text. MaxSim then does the comparison: for each query token, take the dot product against every document token, keep only the maximum, and sum those maxima across all query tokens. Document token vectors are precomputed offline, same as a bi-encoder; only the query needs encoding at request time, and MaxSim itself is cheap arithmetic over vectors that already exist.
 
-**Why this scores better than a bi-encoder.** In a bi-encoder, "Widget-X" and "costs" and "the" all get flattened into the same single vector, so a rare, decisive term has no way to stand out. In ColBERT, "Widget-X" keeps its own vector all the way through, so when the query contains "Widget-X," MaxSim can lock onto exactly that document token and score it highly — independent of everything else in the document diluting it.
-
-**Why it doesn't cost what a cross-encoder costs.** The expensive part of a cross-encoder is that the document has to be re-processed, jointly with the query, every single time. ColBERT never re-processes the document — its token vectors were computed once, offline. Query time work is: encode the (short) query into token vectors, then run MaxSim arithmetic against vectors that are already sitting in the index.
+**Why this beats a bi-encoder without costing what a cross-encoder costs.** In a bi-encoder, "Widget-X," "costs," and "the" all flatten into one vector, so a rare, decisive term has no way to stand out. In ColBERT, "Widget-X" keeps its own vector, so MaxSim locks onto exactly that document token, independent of everything else diluting it. And unlike a cross-encoder, which re-processes the document jointly with the query on every call, ColBERT never re-processes the document at all — its token vectors were computed once, offline.
 
 ## A concrete example
 
 Query: "What is the price of Widget-X?" Document: "Widget-X costs $200 per month for the Standard plan."
 
-A bi-encoder embeds the whole query into one vector and the whole document into one vector, and their similarity is one number, no visibility into *why*. ColBERT keeps each side as a list of token vectors and runs MaxSim: the query token "price" finds its best match against every document token and locks onto "costs" (dot product 0.89, the highest across the row); the query token "Widget-X" finds its best match and locks onto the document's own "Widget-X" token (dot product 0.95). Summed across all six query tokens, these two alone contribute 1.84 of the total score — the two terms that actually carry the query's meaning dominate the result, instead of getting diluted by "what," "is," "the," and "of."
+A bi-encoder embeds the whole query and document into one vector each, and their similarity is one number with no visibility into *why*. ColBERT keeps each side as a list of token vectors and runs MaxSim: "price" locks onto "costs" (dot product 0.89, the highest in its row); "Widget-X" locks onto the document's own "Widget-X" token (0.95). Summed across all six query tokens, these two alone contribute 1.84 of the total score — the terms that actually carry the query's meaning dominate, instead of getting diluted by "what," "is," "the," and "of."
 
-Now the storage math that comes with this precision. The original ColBERT stores a 128-dimension vector per token at 32-bit precision — 512 bytes per token. A corpus of 10 million documents averaging 200 tokens each would need roughly 1 terabyte just for token vectors. ColBERTv2's residual compression — cluster token vectors into centroids, store only a centroid ID plus a quantized residual — brings that down to about 16–32 bytes per token, roughly 64 GB for the same 10 million documents: a 16–32x compression, landing at about 2–4x a bi-encoder's storage footprint (which needs one ~3 KB vector per document, around 30 GB at that scale) rather than the 1 TB the naive version would cost. On accuracy, published NDCG@10 numbers put bi-encoders around 0.35–0.40, ColBERT around 0.39–0.44, and cross-encoders around 0.42–0.46 — ColBERT closes most of the gap to a cross-encoder while staying in the bi-encoder's speed class (tens of milliseconds per query at 10M+ document scale, via the PLAID indexing engine's staged centroid-pruning).
+Now the storage math this precision costs. Original ColBERT stores a 128-dimension, 32-bit vector per token — 512 bytes — so 10 million documents averaging 200 tokens each need roughly 1 terabyte just for token vectors. ColBERTv2's residual compression (cluster vectors into centroids, store a centroid ID plus a quantized residual) brings that to about 16–32 bytes per token, roughly 64 GB for the same corpus — landing around 2–4x a bi-encoder's footprint (~30 GB at that scale) instead of the naive 1 TB. On accuracy, published NDCG@10 numbers put bi-encoders around 0.35–0.40, ColBERT around 0.39–0.44, and cross-encoders around 0.42–0.46 — ColBERT closes most of the gap while staying in the bi-encoder's speed class, via PLAID's staged centroid-pruning.
 
 ## The tradeoffs that matter
 
@@ -72,15 +68,15 @@ Now the storage math that comes with this precision. The original ColBERT stores
 | Rare-term / jargon handling | Weak — diluted by averaging | Strong — each token keeps its own vector | Strongest |
 | Setup complexity | Medium | High (specialized index, e.g. PLAID) | Low (no index needed) |
 
-The practical rule of thumb: use a bi-encoder for first-stage retrieval at web scale where nothing else fits; use a cross-encoder only to rerank a short list you already trust is roughly right; reach for ColBERT when the corpus is domain-specific with real term-level stakes — legal clause numbers, drug names, defined contract terms, exact code identifiers — and is small enough (under roughly 100M documents) that the 2–4x storage premium over a bi-encoder is affordable. Past that scale, the common production pattern is bi-encoder or BM25 for first-stage retrieval, ColBERT as a reranking stage on the shortlist — capturing most of the term-level precision without paying full-corpus ColBERT storage.
+The practical rule: use a bi-encoder for first-stage retrieval at web scale where nothing else fits; use a cross-encoder only to rerank a short list you already trust; reach for ColBERT when the corpus is domain-specific with real term-level stakes — legal clauses, drug names, exact code identifiers — and small enough (under roughly 100M documents) that the storage premium is affordable. Past that scale, bi-encoder or BM25 for first-stage retrieval with ColBERT reranking the shortlist captures most of the precision without full-corpus storage.
 
 ## Where people go wrong
 
-1. **Treating ColBERT as strictly "a better bi-encoder."** It solves a specific failure mode — rare or critical terms getting diluted in a single vector — not general retrieval quality. If your failures aren't term-dilution failures, the accuracy gain won't show up.
-2. **Ignoring the storage multiplier until it's in production.** 2–4x a bi-encoder's footprint sounds tolerable until you compute it against your actual corpus size; check the number before committing to ColBERT as the *primary* index rather than a reranker.
-3. **Skipping PLAID-style indexing and comparing raw MaxSim cost.** Naive MaxSim scores every document token against every query token for every candidate; production ColBERT needs the staged centroid-pruning that filters 99%+ of the corpus before exact scoring — without it, "late interaction" isn't fast at all.
-4. **Assuming ColBERT replaces reranking entirely.** It's excellent as a primary retriever at moderate scale, but many production stacks still use it as a reranking layer on top of a cheaper first-stage retriever — the choice depends on corpus size, not on ColBERT being categorically "the reranker" or "the retriever."
-5. **Missing that document tokens are precomputed and query tokens aren't.** The entire speed argument rests on this asymmetry — if you find yourself re-encoding document tokens per query, you've lost the reason to use late interaction at all.
+1. **Treating ColBERT as strictly "a better bi-encoder."** It solves one specific failure mode — rare or critical terms diluted in a single vector — not general retrieval quality. If your failures aren't term-dilution failures, the accuracy gain won't show up.
+2. **Ignoring the storage multiplier until it's in production.** 2–4x a bi-encoder's footprint sounds tolerable until you compute it against your actual corpus size; check the number before committing to ColBERT as the *primary* index.
+3. **Skipping PLAID-style indexing and comparing raw MaxSim cost.** Naive MaxSim scores every document token against every query token for every candidate; production ColBERT needs staged centroid-pruning to filter 99%+ of the corpus first — without it, "late interaction" isn't fast at all.
+4. **Assuming ColBERT replaces reranking entirely.** Many stacks use it as a reranking layer on a cheaper first-stage retriever instead — the choice depends on corpus size, not on ColBERT being categorically one role or the other.
+5. **Missing that document tokens are precomputed and query tokens aren't.** The entire speed argument rests on this asymmetry — re-encoding document tokens per query loses the reason to use late interaction at all.
 
 ## The interview lens
 
@@ -90,9 +86,9 @@ A strong sound bite: *"The three architectures differ in when the query and docu
 
 Likely follow-ups:
 
-- Why can't cross-encoders serve as first-stage retrieval? (No precomputation is possible — every query-document pair needs a fresh joint forward pass, which doesn't scale past reranking a short list.)
-- How does ColBERTv2 make storage practical? (Residual compression — cluster token vectors into centroids, store only the centroid ID plus a quantized residual, cutting per-token storage by 16–32x.)
-- When would you pick ColBERT over a bi-encoder-plus-cross-encoder-reranker pipeline? (Domain-specific, term-sensitive corpora — legal, medical, code — at a scale where ColBERT's own index fits, avoiding the cross-encoder's per-pair latency entirely.)
+- Why can't cross-encoders serve as first-stage retrieval? (No precomputation — every pair needs a fresh joint forward pass.)
+- How does ColBERTv2 make storage practical? (Residual compression: centroid ID plus quantized residual, 16–32x smaller per token.)
+- When would you pick ColBERT over a bi-encoder-plus-cross-encoder-reranker pipeline? (Domain-specific, term-sensitive corpora at a scale where ColBERT's own index fits.)
 
 ## Go deeper
 

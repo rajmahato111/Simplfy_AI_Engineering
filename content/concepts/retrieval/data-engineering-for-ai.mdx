@@ -15,82 +15,82 @@ status: draft
 
 ## The 30-second version
 
-Every RAG system and every fine-tuning run gets fed by the same unglamorous machinery: detect what a document is, extract its content, clean it, deduplicate it, scrub sensitive information, filter for quality, and only then hand it to whichever consumer needs it. Most of the visible engineering effort in an AI system goes into retrieval and prompting, but most of the actual quality ceiling is set upstream, in a pipeline nobody demos. Skip a stage — trust a file extension instead of sniffing real content, skip Unicode normalization, filter too aggressively, forget to check whether your "fresh" test set is secretly in the training data — and the failure shows up as a mysteriously bad model or a RAG system that quietly served stale answers for months.
+Every RAG system and every fine-tuning run gets fed by the same unglamorous machinery: detect what a document is, extract its content, clean it, deduplicate it, scrub sensitive information, filter for quality, and only then hand it to whichever consumer needs it. Most visible engineering effort in an AI system goes into retrieval and prompting, but most of the actual quality ceiling is set upstream, in a pipeline nobody demos. Skip a stage — trust a file extension instead of sniffing real content, skip Unicode normalization, filter too aggressively, forget to check whether your "fresh" test set is secretly in the training data — and the failure shows up as a mysteriously bad model or a RAG system quietly serving stale answers for months.
 
 ## The analogy
 
-Picture a public library's technical services department — the unit nobody visits, working behind a door marked "staff only," that decides what a library card actually gets you.
+Picture a public library's technical services department — the unit nobody visits, behind a door marked "staff only," that decides what a library card actually gets you.
 
-New donations and orders arrive as a chaotic pile: hardbacks, water-damaged paperbacks, boxes of magazines, a donor's personal papers. Before anything reaches a shelf, technical services runs it through a fixed sequence. **Accessioning** figures out what each item actually is — you can't trust the label on the spine, so you open the book and check (never trust a file extension over its real content). **Cataloging** extracts the structured facts — author, subject, call number — the way a parser extracts typed elements from a raw file. **Conservation** cleans up water damage and re-binds torn pages before anything circulates. **Weeding** pulls duplicate copies and superseded editions off the shelf, because five copies of the same outdated tax guide crowd out something a patron actually needs. Anything in a donor's personal papers with a living person's medical or financial details goes into a **restricted archive** with redacted names, not the open stacks. And **collection development** actively curates what's worth keeping — an encyclopedia so old it's actively wrong should not sit next to the current edition pretending to be current.
+New donations arrive as a chaotic pile: hardbacks, water-damaged paperbacks, boxes of magazines, a donor's personal papers. Before anything reaches a shelf, technical services runs it through a fixed sequence. **Accessioning** figures out what each item actually is — you can't trust the label on the spine, so you open the book and check (never trust a file extension over its real content). **Cataloging** extracts the structured facts — author, subject, call number — the way a parser extracts typed elements from a raw file. **Conservation** cleans up water damage and re-binds torn pages before anything circulates. **Weeding** pulls duplicate copies and superseded editions off the shelf, because five copies of the same outdated tax guide crowd out what a patron actually needs. Anything in a donor's papers with a living person's medical or financial details goes into a **restricted archive** with redacted names, not the open stacks. And **collection development** actively retires what's outdated — an encyclopedia so old it's actively wrong shouldn't sit next to the current edition pretending to be current.
 
-One more discipline matters specifically for training new librarians: the sample books used in a cataloging exam can never be books the trainee has already secretly handled and memorized answers for — if they have, the exam score is meaningless. That's decontamination, and it's why a "test set" quietly overlapping the "study material" invalidates the whole exam.
+One more discipline matters for training new librarians: the sample books used in a cataloging exam can never be books the trainee already secretly handled and memorized answers for — if they have, the score is meaningless. That's decontamination, and it's why a "test set" quietly overlapping the "study material" invalidates the whole exam.
 
 | Library technical services | AI data engineering |
 |---|---|
 | Opening the book instead of trusting the spine label | Content-based (magic-byte) file-type detection, not extension |
 | Cataloging: extracting author, subject, structure | Parsing: typed elements, layout, structure extraction |
-| Conservation: repairing damage before circulation | Cleaning and normalization: boilerplate strip, encoding fixes, Unicode |
+| Conservation: repairing damage before circulation | Cleaning: boilerplate strip, encoding fixes, Unicode |
 | Weeding duplicate and superseded copies | Deduplication cascade: exact, then fuzzy, then semantic |
-| The restricted archive with redacted donor details | PII detection and redaction, consent and provenance metadata |
+| The restricted archive with redacted donor details | PII detection, redaction, consent and provenance metadata |
 | Collection development retiring outdated editions | Freshness, CDC-driven reindexing, document lifecycle |
-| Making sure exam books aren't secretly in study material | Eval-set decontamination against training and fine-tuning data |
+| Exam books aren't secretly in study material | Eval-set decontamination against training data |
 
 ## How it actually works
 
 ![The shared data pipeline: one trunk feeding both a RAG vector store and a fine-tuning training-record store](diagrams/data-engineering-for-ai--shared-pipeline.svg)
 
-Follow the diagram left to right: one pipeline, two consumers, diverging only at the very end.
+Follow the diagram left to right: one pipeline, two consumers, diverging only at the end.
 
-**Detect and parse.** Raw sources — web pages, PDFs, office documents, database exports — get identified by sniffing actual file content (magic-number detection, the same technique behind the Unix `file` command), not by trusting the extension a file happens to carry. Content type then determines the parser: text-extractable PDFs take a fast path, scanned pages get OCR (optical character recognition) or a multimodal pass (see [multimodal RAG](./multimodal-rag.mdx)), and structured office formats get format-specific handlers.
+**Detect and parse.** Raw sources — web pages, PDFs, office documents, database exports — get identified by sniffing actual file content (magic-number detection, the technique behind the Unix `file` command), not by trusting the extension a file happens to carry. Content type then determines the parser: text-extractable PDFs take a fast path, scanned pages get OCR (optical character recognition) or a multimodal pass (see [multimodal RAG](./multimodal-rag.mdx)), and office formats get format-specific handlers.
 
-**Clean and normalize.** Strip navigation chrome, ads, and boilerplate from HTML — extracting from the raw page beats extracting from someone else's pre-stripped version, which tends to leave boilerplate behind. Fix encoding issues, normalize Unicode so visually identical strings actually compare as equal, and filter by language confidence. Counterintuitively, more filtering isn't automatically better — aggressive heuristic filters can discard a meaningful share of genuinely high-quality content, so every filter needs to be validated against a downstream eval, not trusted by reputation.
+**Clean and normalize.** Strip navigation chrome, ads, and boilerplate from HTML — extracting from the raw page beats extracting from someone else's pre-stripped version, which tends to leave boilerplate behind. Fix encoding issues, normalize Unicode so visually identical strings compare as equal, and filter by language confidence. Counterintuitively, more filtering isn't automatically better — aggressive heuristic filters can discard genuinely high-quality content, so every filter needs validation against a downstream eval, not trust by reputation.
 
-**Deduplicate**, as a cascade of increasingly expensive passes: exact hashing catches verbatim copies; MinHash with locality-sensitive hashing (LSH) catches near-duplicates by estimating similarity over shingled text; semantic embedding-based dedup catches paraphrases that look nothing alike lexically but mean the same thing. This single stage pays off three separate ways downstream: RAG stops wasting context window on duplicate chunks, fine-tuning needs fewer training steps and memorizes less, and — critically — deduplicating against your own benchmarks removes train-test overlap, which means dedup doubles as decontamination.
+**Deduplicate**, as a cascade of increasingly expensive passes: exact hashing catches verbatim copies; MinHash with locality-sensitive hashing (LSH) catches near-duplicates by estimating similarity over shingled text; semantic embedding-based dedup catches paraphrases that look nothing alike lexically but mean the same thing. This pays off three ways downstream: RAG stops wasting context window on duplicate chunks, fine-tuning needs fewer steps and memorizes less, and deduplicating against your own benchmarks removes train-test overlap — dedup doubles as decontamination.
 
 **Govern.** Detect and redact personally identifiable information (PII), and attach source, license, consent, and timestamp metadata to every record from the moment it enters the pipeline — not as a final gate bolted on before shipping.
 
-**Diverge.** Only here does the pipeline split. The RAG branch chunks, enriches with metadata, embeds, and writes to a vector store kept fresh through incremental Change Data Capture (CDC) — re-processing only documents that actually changed, rather than a full re-index. The fine-tuning branch curates and labels examples, generates synthetic data where useful, decontaminates against every eval set the model will ever be judged on, and balances the result into training records.
+**Diverge.** Only here does the pipeline split. The RAG branch chunks, enriches with metadata, embeds, and writes to a vector store kept fresh through incremental Change Data Capture (CDC) — reprocessing only documents that changed, not a full re-index. The fine-tuning branch curates and labels examples, generates synthetic data where useful, decontaminates against every eval set the model will be judged on, and balances the result into training records.
 
 ## A concrete example
 
-You're standing up ingestion for a 100,000-document internal knowledge base pulled from a mix of wikis, PDFs, and old email exports.
+You're standing up ingestion for a 100,000-document knowledge base pulled from wikis, PDFs, and old email exports.
 
-- **Detection and parsing:** magic-byte sniffing routes roughly 60,000 text-native documents to a fast parser, 15,000 scanned PDFs to OCR, and 25,000 office/email documents to format-specific handlers. Cost is dominated by the OCR pass — call it a few cents per scanned page across 15,000 documents.
-- **Deduplication:** exact hashing removes an easy 8,000 verbatim duplicates (old copy-pasted wiki pages). MinHash/LSH catches another 12,000 near-duplicates (the same policy doc exported three times with minor header changes). Semantic dedup catches a further 3,000 paraphrased duplicates lexical methods miss entirely. You end up indexing roughly 77,000 genuinely distinct documents — 23% smaller than the raw pile, which is 23% less embedding cost and 23% less noise crowding out real answers in every retrieval call.
-- **PII governance:** an automated PII scan (entity recognition plus regex and checksum rules) flags roughly 4% of documents — old HR emails and support tickets with names, emails, and account numbers — for redaction before indexing, not after.
-- **Decontamination, if any of this feeds fine-tuning:** before evaluating a fine-tuned model, you check its training set against your eval benchmark using embedding similarity, not just n-gram overlap — because a rephrased or translated version of a test question slips right past exact-match checks and can quietly inflate a benchmark score to look near-frontier when the model has simply seen the answer before.
+- **Detection and parsing:** magic-byte sniffing routes ~60,000 text-native documents to a fast parser, 15,000 scanned PDFs to OCR, and 25,000 office/email documents to format-specific handlers. Cost is dominated by OCR — a few cents per scanned page across 15,000 documents.
+- **Deduplication:** exact hashing removes an easy 8,000 verbatim duplicates (copy-pasted wiki pages). MinHash/LSH catches another 12,000 near-duplicates (the same policy doc exported three times with header changes). Semantic dedup catches a further 3,000 paraphrased duplicates lexical methods miss entirely. You end up indexing roughly 77,000 genuinely distinct documents — 23% smaller, which is 23% less embedding cost and 23% less noise crowding out real answers in retrieval.
+- **PII governance:** an automated scan (entity recognition plus regex and checksum rules) flags ~4% of documents — old HR emails and support tickets with names and account numbers — for redaction before indexing, not after.
+- **Decontamination, if this feeds fine-tuning:** check the training set against your eval benchmark using embedding similarity, not just n-gram overlap — a rephrased or translated test question slips past exact-match checks and can quietly inflate a benchmark score when the model has simply seen the answer before.
 
 ## The tradeoffs that matter
 
-| Decision | What you gain | What it costs | Breaks down when |
+| Decision | Gain | Cost | Breaks down when |
 |---|---|---|---|
-| Magic-byte detection over file extensions | Correct parser routing, no silent garbage extraction | Marginal added latency per file at ingestion | Never — this is close to a strict upgrade |
-| Full dedup cascade (exact → fuzzy → semantic) | Smaller, cleaner corpus; dedup doubles as decontamination | Semantic dedup is the most compute-expensive tier | Corpus is small enough that the compute isn't worth it |
-| Aggressive heuristic quality filtering | Removes obvious junk cheaply | Can discard a real share of high-quality content as a false positive | You haven't ablated the filter against a downstream eval |
-| CDC-based incremental reindexing | Minutes-fresh index, no full-corpus reprocessing | More orchestration complexity than "just re-run everything nightly" | Change volume is so low a nightly batch job is simpler and just as fresh |
-| N-gram-only decontamination | Fast, simple, catches verbatim leaks | Misses rephrased or translated test items entirely | Any adversarial or LLM-generated paraphrase of a benchmark question exists |
+| Magic-byte detection over file extensions | Correct parser routing, no silent garbage | Marginal added latency per file | Never — close to a strict upgrade |
+| Full dedup cascade (exact → fuzzy → semantic) | Smaller corpus; dedup doubles as decontamination | Semantic dedup is the most compute-expensive tier | Corpus is small enough the compute isn't worth it |
+| Aggressive heuristic quality filtering | Removes obvious junk cheaply | Can discard high-quality content as false positives | You haven't ablated the filter against a downstream eval |
+| CDC-based incremental reindexing | Minutes-fresh index, no full reprocessing | More orchestration complexity than nightly re-run | Change volume is low enough nightly batch is just as fresh |
+| N-gram-only decontamination | Fast, simple, catches verbatim leaks | Misses rephrased or translated test items | Any paraphrase of a benchmark question exists |
 
-The honest framing: nearly every stage here trades upfront engineering effort for a failure mode that is otherwise invisible until it's expensive — a model that has quietly memorized its own exam, or an index that has been stale for a month with nobody noticing because nothing crashed.
+The honest framing: nearly every stage here trades upfront engineering effort for a failure mode otherwise invisible until it's expensive — a model that quietly memorized its own exam, or an index stale for a month with nobody noticing because nothing crashed.
 
 ## Where people go wrong
 
 1. **Trusting the file extension.** A `.pdf` that's actually a scanned image parsed with a text-only path returns empty or garbled content, with no error thrown. Detect by content, not name.
-2. **Skipping Unicode normalization.** Two visually identical strings that aren't byte-identical silently break both deduplication and exact-match filtering. This is invisible until you ask why "duplicate" documents didn't get caught.
-3. **Trusting a quality classifier by reputation.** A model-based quality filter can be miscalibrated and confidently discard content that's actually fine. Every filter needs to be ablated against a real downstream eval, not assumed to work because a paper said so.
-4. **Full reindexing instead of CDC.** Re-embedding an entire corpus on every document change is slow and expensive at scale, and it's unnecessary — track what actually changed and reprocess only that.
-5. **N-gram-only decontamination.** The comfortable assumption that exact-match overlap checking is enough is exactly what lets rephrased or translated test items slip into training data and quietly inflate benchmark scores.
+2. **Skipping Unicode normalization.** Two visually identical strings that aren't byte-identical silently break both deduplication and exact-match filtering, invisible until you ask why "duplicate" documents weren't caught.
+3. **Trusting a quality classifier by reputation.** A model-based filter can be miscalibrated and confidently discard content that's actually fine. Every filter needs ablation against a real downstream eval, not blind trust.
+4. **Full reindexing instead of CDC.** Re-embedding an entire corpus on every document change is slow and unnecessary — track what changed and reprocess only that.
+5. **N-gram-only decontamination.** Assuming exact-match overlap is enough is exactly what lets rephrased or translated test items slip into training data and inflate benchmark scores.
 
 ## The interview lens
 
-This is the part of a RAG system design interview candidates skip to get to the "interesting" retrieval architecture — and it's exactly the part that separates a mid-level answer from a senior one. Interviewers who ask "walk me through ingestion" are checking whether you treat freshness, deduplication, and governance as first-class design decisions or as an afterthought you'll "figure out later."
+This is the part of a RAG design interview candidates skip to get to the "interesting" retrieval architecture — and it's exactly what separates a mid-level answer from a senior one. Interviewers asking "walk me through ingestion" are checking whether you treat freshness, deduplication, and governance as first-class decisions or an afterthought.
 
-A strong sound bite: *"Deduplication is the highest-leverage stage in the whole pipeline, because one pass pays off three ways at once — it shrinks the RAG index, cuts fine-tuning steps and memorization, and doubles as decontamination against your own eval sets."*
+A strong sound bite: *"Deduplication is the highest-leverage stage in the pipeline — one pass shrinks the RAG index, cuts fine-tuning steps and memorization, and doubles as decontamination against your own eval sets."*
 
 Likely follow-ups:
 
-- How do you keep a RAG index fresh without a full nightly reindex? (Change Data Capture: detect changed, new, and deleted documents, and re-process only the delta.)
-- Your dedup pipeline only uses exact hashing. What's it missing, and how do you know? (Near-duplicates and paraphrases — add MinHash/LSH, then semantic dedup, and measure corpus shrinkage plus downstream retrieval quality.)
-- How would you prove a fine-tuned model didn't just memorize your eval set? (Decontaminate with embedding or LLM-based matching against every eval benchmark before trusting any score, not just n-gram overlap.)
+- How do you keep a RAG index fresh without a full nightly reindex? (Change Data Capture: detect changed, new, and deleted documents, and reprocess only the delta.)
+- Your dedup pipeline only uses exact hashing. What's it missing? (Near-duplicates and paraphrases — add MinHash/LSH, then semantic dedup, and measure corpus shrinkage.)
+- How would you prove a fine-tuned model didn't just memorize your eval set? (Decontaminate with embedding or LLM-based matching, not just n-gram overlap.)
 
 ## Go deeper
 
