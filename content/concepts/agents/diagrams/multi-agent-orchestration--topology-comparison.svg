@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN (8px grid), canvas 1200x600
+Title center (600,40)
+Left container "Supervisor pattern": x=32 y=80 w=544 h=496 (bottom=576)
+  center x=304
+  Row1 User request (orange)            x=224 y=116 w=160 h=56  center(304,144)
+  Row2 Orchestrator - decompose (indigo) x=200 y=204 w=208 h=64  center(304,236)
+  Row3 workers (violet), y=300 h=64:
+    Worker1 x=80  w=128 center(144,332)
+    Worker2 x=240 w=128 center(304,332)
+    Worker3 x=400 w=128 center(464,332)
+  Row4 Orchestrator - aggregate (indigo) x=200 y=396 w=208 h=64  center(304,428)
+  Row5 Final response (orange)           x=224 y=492 w=160 h=56  center(304,520)
+Right container "Hand-off pattern": x=624 y=80 w=544 h=496 (bottom=576)
+  center x=896
+  Row1 User request (orange)   x=816 y=116 w=160 h=56 center(896,144)
+  Row2 Agent A (violet)         x=792 y=204 w=208 h=64 center(896,236)
+  Row3 Agent B (violet)         x=792 y=300 w=208 h=64 center(896,332)
+  Row4 Agent C (violet)         x=792 y=396 w=208 h=64 center(896,428)
+  Row5 Final response (orange)  x=816 y=492 w=160 h=56 center(896,520)
+Arrows left: User->Decompose straight; Decompose->3 workers fan-out (bus y=284);
+  3 workers->Aggregate fan-in (bus y=380); Aggregate->Response straight.
+Arrows right: straight chain User->A->B->C->Response.
+-->
+  <rect width="1200" height="600" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="600" y="40" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">Two ways to split work: supervisor delegation vs. agent hand-off</text>
+
+  <!-- LEFT CONTAINER -->
+  <rect x="32" y="80" width="544" height="496" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="48" y="102" font-size="12" fill="#64748B">Supervisor pattern — one coordinator delegates and merges</text>
+
+  <rect x="224" y="116" width="160" height="56" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="304" y="149" font-size="14" fill="#7C2D12" text-anchor="middle">User request</text>
+
+  <rect x="200" y="204" width="208" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="304" y="231" font-size="14" fill="#1E1B4B" text-anchor="middle">Orchestrator</text>
+  <text x="304" y="248" font-size="12" fill="#1E1B4B" text-anchor="middle">(decompose)</text>
+
+  <rect x="80" y="300" width="128" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="144" y="337" font-size="14" fill="#2E1065" text-anchor="middle">Worker 1</text>
+  <rect x="240" y="300" width="128" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="304" y="337" font-size="14" fill="#2E1065" text-anchor="middle">Worker 2</text>
+  <rect x="400" y="300" width="128" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="464" y="337" font-size="14" fill="#2E1065" text-anchor="middle">Worker 3</text>
+
+  <rect x="200" y="396" width="208" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="304" y="423" font-size="14" fill="#1E1B4B" text-anchor="middle">Orchestrator</text>
+  <text x="304" y="440" font-size="12" fill="#1E1B4B" text-anchor="middle">(aggregate)</text>
+
+  <rect x="224" y="492" width="160" height="56" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="304" y="525" font-size="14" fill="#7C2D12" text-anchor="middle">Final response</text>
+
+  <!-- left arrows: user -> decompose -->
+  <line x1="304" y1="172" x2="304" y2="202" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <!-- decompose -> workers (fan-out: shared trunk to bus y=284, then one L-bend per branch) -->
+  <line x1="304" y1="268" x2="304" y2="284" stroke="#475569" stroke-width="1.5"/>
+  <polyline points="304,284 144,284 144,298" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="304" y1="284" x2="304" y2="298" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <polyline points="304,284 464,284 464,298" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="176" y="275" width="86" height="18" fill="#ffffff"/>
+  <text x="219" y="288" font-size="12" fill="#475569" text-anchor="middle">delegate</text>
+  <!-- workers -> aggregate (fan-in: one L-bend per branch into bus y=380, shared trunk down) -->
+  <polyline points="144,364 144,380 304,380" fill="none" stroke="#475569" stroke-width="1.5"/>
+  <line x1="304" y1="364" x2="304" y2="380" stroke="#475569" stroke-width="1.5"/>
+  <polyline points="464,364 464,380 304,380" fill="none" stroke="#475569" stroke-width="1.5"/>
+  <line x1="304" y1="380" x2="304" y2="394" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="176" y="371" width="76" height="18" fill="#ffffff"/>
+  <text x="214" y="384" font-size="12" fill="#475569" text-anchor="middle">results</text>
+  <!-- aggregate -> response -->
+  <line x1="304" y1="460" x2="304" y2="490" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- RIGHT CONTAINER -->
+  <rect x="624" y="80" width="544" height="496" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="640" y="102" font-size="12" fill="#64748B">Hand-off pattern — agents pass work directly, no center</text>
+
+  <rect x="816" y="116" width="160" height="56" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="896" y="149" font-size="14" fill="#7C2D12" text-anchor="middle">User request</text>
+
+  <rect x="792" y="204" width="208" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="896" y="231" font-size="14" fill="#2E1065" text-anchor="middle">Agent A</text>
+  <text x="896" y="248" font-size="12" fill="#2E1065" text-anchor="middle">research</text>
+
+  <rect x="792" y="300" width="208" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="896" y="327" font-size="14" fill="#2E1065" text-anchor="middle">Agent B</text>
+  <text x="896" y="344" font-size="12" fill="#2E1065" text-anchor="middle">draft</text>
+
+  <rect x="792" y="396" width="208" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="896" y="423" font-size="14" fill="#2E1065" text-anchor="middle">Agent C</text>
+  <text x="896" y="440" font-size="12" fill="#2E1065" text-anchor="middle">finalize</text>
+
+  <rect x="816" y="492" width="160" height="56" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="896" y="525" font-size="14" fill="#7C2D12" text-anchor="middle">Final response</text>
+
+  <!-- right arrows: straight chain -->
+  <line x1="896" y1="172" x2="896" y2="202" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="856" y="178" width="80" height="18" fill="#ffffff"/>
+  <text x="896" y="191" font-size="12" fill="#475569" text-anchor="middle">assign</text>
+
+  <line x1="896" y1="268" x2="896" y2="298" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="846" y="274" width="100" height="18" fill="#ffffff"/>
+  <text x="896" y="287" font-size="12" fill="#475569" text-anchor="middle">hand off</text>
+
+  <line x1="896" y1="364" x2="896" y2="394" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="846" y="370" width="100" height="18" fill="#ffffff"/>
+  <text x="896" y="383" font-size="12" fill="#475569" text-anchor="middle">hand off</text>
+
+  <line x1="896" y1="460" x2="896" y2="490" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="856" y="466" width="80" height="18" fill="#ffffff"/>
+  <text x="896" y="479" font-size="12" fill="#475569" text-anchor="middle">deliver</text>
+</svg>

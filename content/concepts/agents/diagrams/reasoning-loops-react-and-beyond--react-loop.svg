@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1064" height="632" viewBox="0 0 1064 632" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN (8px grid)
+Canvas 1064x632. Title center (532,44).
+
+Section A container (dashed): x=56 y=88 w=944 h=120 (56..1000,88..208), caption (72,110)
+  Question   (orange) x=96  y=124 w=160 -> 96..256,  124..188 c=(176,156)
+  Reasoning  (violet) x=456 y=124 w=160 -> 456..616, 124..188 c=(536,156) two-line "Reasoning"/"no tool calls"
+  Answer     (orange) x=816 y=124 w=160 -> 816..976, 124..188 c=(896,156)
+  Arrows: Question->Reasoning (256,156)->(454,156); Reasoning->Answer (616,156)->(814,156)
+
+Section B container (dashed): x=56 y=248 w=760 h=360 (56..816,248..608), caption (72,270)
+  Thought      (violet) x=348 y=296 w=176 -> 348..524, 296..360 c=(436,328)
+  Observation  (green)  x=88  y=496 w=160 -> 88..248,  496..560 c=(168,528)
+  Action       (indigo) x=576 y=496 w=160 -> 576..736, 496..560 c=(656,528)
+  Final answer (orange, outside container) x=880 y=280 w=160 -> 880..1040, 280..344 c=(960,312)
+
+  Loop arrows (orthogonal, <=1 bend, end 2px before target edge):
+    Thought->Action       polyline (524,344)->(656,344)->(656,494)
+    Action->Observation   line     (576,528)->(250,528)
+    Observation->Thought  polyline (168,496)->(168,328)->(346,328)
+    Thought->Final answer line     (524,312)->(878,312)   [exits from upper part of Thought's right edge, above the Action exit at y=344, so the two outgoing arrows diverge immediately and never overlap]
+
+Arrow labels (12px, white backing):
+  "runs & returns" centered (413,515) for Action->Observation
+  "loop exits when confident" centered (701,299) for Thought->Final answer
+-->
+  <rect width="1064" height="632" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="532" y="44" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">ReAct: reasoning interleaved with acting, vs. one-shot reasoning</text>
+
+  <!-- Section A: pure chain-of-thought -->
+  <rect x="56" y="88" width="944" height="120" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="72" y="110" font-size="12" fill="#64748B">Pure chain-of-thought — one pass, no observation</text>
+
+  <line x1="256" y1="156" x2="454" y2="156" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="616" y1="156" x2="814" y2="156" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="96" y="124" width="160" height="64" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="176" y="161" font-size="14" fill="#7C2D12" text-anchor="middle">Question</text>
+
+  <rect x="456" y="124" width="160" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="536" y="153" font-size="14" fill="#2E1065" text-anchor="middle">Reasoning<tspan x="536" dy="17" font-size="12" fill="#334155">no tool calls</tspan></text>
+
+  <rect x="816" y="124" width="160" height="64" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="896" y="161" font-size="14" fill="#7C2D12" text-anchor="middle">Answer</text>
+
+  <!-- Section B: ReAct loop -->
+  <rect x="56" y="248" width="760" height="360" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="72" y="270" font-size="12" fill="#64748B">ReAct — thought, action, observation, looped</text>
+
+  <!-- loop arrows -->
+  <polyline points="524,344 656,344 656,494" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="576" y1="528" x2="250" y2="528" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <polyline points="168,496 168,328 346,328" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="524" y1="312" x2="878" y2="312" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- arrow labels -->
+  <rect x="358" y="506" width="110" height="18" fill="#ffffff"/>
+  <text x="413" y="519" font-size="12" fill="#475569" text-anchor="middle">runs &amp; returns</text>
+
+  <rect x="616" y="290" width="170" height="18" fill="#ffffff"/>
+  <text x="701" y="303" font-size="12" fill="#475569" text-anchor="middle">loop exits when confident</text>
+
+  <!-- nodes -->
+  <rect x="348" y="296" width="176" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="436" y="333" font-size="14" fill="#2E1065" text-anchor="middle">Thought</text>
+
+  <rect x="88" y="496" width="160" height="64" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="168" y="533" font-size="14" fill="#064E3B" text-anchor="middle">Observation</text>
+
+  <rect x="576" y="496" width="160" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="656" y="533" font-size="14" fill="#1E1B4B" text-anchor="middle">Action</text>
+
+  <rect x="880" y="280" width="160" height="64" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="960" y="317" font-size="14" fill="#7C2D12" text-anchor="middle">Final answer</text>
+</svg>

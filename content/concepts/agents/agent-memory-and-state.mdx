@@ -1,171 +1,96 @@
 ---
-title: Agent Memory and State
+title: "Agent Memory and State: What to Carry, What to Store, What to Re-derive"
 slug: agent-memory-and-state
 type: concept
 area: agents
 difficulty: intermediate
-tags:
-  - agents
-  - agent
-  - memory
-  - and
-  - state
+tags: [agent-state, working-memory, checkpointing, context-window, task-memory]
 diagrams:
-  - diagrams/agent-memory-and-state--overview.svg
-est_minutes: 10
-source_attribution: >-
-  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
-  edition with interview lens. See CREDITS.md.
-last_reviewed: '2026-07-04'
+  - diagrams/agent-memory-and-state--persist-or-rederive.svg
+est_minutes: 12
+source_attribution: "Factual basis: AI System Design Guide (MIT) by Om Bharatiya; rewritten and expanded. See CREDITS.md."
+last_reviewed: 2026-07-04
 status: draft
 ---
+
 ## The 30-second version
 
-Memory is what allows an agent to learn and maintain context over time. Agent memory has matured from "Chat History" into a Multi-Tiered Cognitive Architecture with four named layers (Working, Episodic, Semantic, Procedural), each with its own write pattern, latency budget, and failure modes. Production systems (Mem0, Letta, Anthropic Memory Tool + Skills, Zep/Graphiti, LangMem) now treat memory selection as a first-class architecture decision.
+An agent working a multi-step task carries two different kinds of memory: what's live in its context window right now (the current plan, the last few tool results, a running scratchpad) and what's been written to durable state outside that window (a checkpoint, a task log, a database row) so it survives a restart or a long gap between turns. The design question at every step isn't "should I remember this?" — it's "where does this fact belong, and is it cheaper to store it or to just re-fetch it next time?" Treat agent state as a retrieval problem: the context window is a cache with a hard size limit, and everything that doesn't fit either gets persisted somewhere retrievable, or gets discarded because regenerating it later is cheaper than storing it. This chapter is scoped to state *within* one agent's task or session; for the deeper architecture of long-term, cross-session memory, see [Memory Architectures](../memory/memory-architectures.mdx).
 
 ## The analogy
 
-Think of **Agent Memory and State** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+You're moving apartments across town over a weekend — a multi-step job spread across two days.
+
+At any given moment you're holding a small number of things in your hands: the box you're carrying right now, your keys, the pizza receipt from lunch. That's working memory — fast to reach, but you can only hold so much before something drops. Everything else goes into the truck: boxes, labeled and stacked, that you're not touching right now but that exist durably and that you can walk over and pull out the moment you need them. That's persisted task state.
+
+Before anything goes in a box, though, you make a call on almost every item: is this worth hauling across town, or is it cheaper to leave it behind and buy a new one when you get there? A three-dollar spice jar isn't worth truck space — you'll just re-buy it Monday. Your grandmother's chair goes in bubble wrap, because there is no re-buying it. That's the exact decision an agent faces on every fact it produces mid-task: some things are cheap to re-derive on demand, and some aren't.
+
+The failure mode that actually costs you the weekend isn't forgetting to pack something — it's losing the inventory list. If you can't remember which box has the router in it, you're not "remembering" anymore; you're opening every box in the truck one at a time until you find it. An agent with unindexed state looks exactly like this: the fact technically exists somewhere, but finding it costs as much as never having stored it at all.
+
+| Moving weekend | Agent memory and state |
+|---|---|
+| What's in your hands right now | Context window / working memory |
+| The moving truck, boxes labeled and stacked | Persisted task state (checkpoint store, task log) |
+| Deciding what to box vs. re-buy later | Deciding what to persist vs. re-derive on demand |
+| Grandma's chair — irreplaceable, worth the space | A fact that's expensive or impossible to reconstruct (a user decision, a one-off tool result) |
+| The three-dollar spice jar you'll just re-buy | A fact that's cheap to re-fetch (today's price, current queue depth) — don't bother storing it |
+| Losing the inventory list, opening every box | Unindexed state — the fact "exists" but retrieval costs as much as never storing it |
+| Unpacking only tonight's boxes, not the whole truck | Loading only the relevant slice of task state back into context, not the whole history |
 
 ## How it actually works
 
+![At each step of an agent task, a new fact either gets discarded because it's cheap to re-derive, persisted to a durable checkpoint, or kept live in the shrinking context window](diagrams/agent-memory-and-state--persist-or-rederive.svg)
 
-![Agent Memory and State overview](diagrams/agent-memory-and-state--overview.svg)
+Follow one step of a long-running task through the diagram. The **context window** holds the active plan, the most recent tool outputs, and a scratchpad the model uses to think — fast to access, but hard-capped in tokens, and gone the instant the process restarts or the window gets trimmed. Whenever a step produces a new fact worth keeping past that step, it hits the same decision every time: **is this cheap to reproduce later?** If a tool call or a lookup can regenerate it on demand — a live price, a queue depth, anything with a current source of truth — don't store it; storing it just risks it going stale. If it isn't cheap to reproduce — a user's explicit decision, a computation that took real tool calls to produce, an answer you can't just ask for again — write it once to a **durable checkpoint** keyed by task or session ID, outside the model's context entirely.
 
-Memory is what allows an agent to learn and maintain context over time. Agent memory has matured from "Chat History" into a **Multi-Tiered Cognitive Architecture** with four named layers (Working, Episodic, Semantic, Procedural), each with its own write pattern, latency budget, and failure modes. Production systems (Mem0, Letta, Anthropic Memory Tool + Skills, Zep/Graphiti, LangMem) now treat memory selection as a first-class architecture decision.
+As the task runs longer, the context window fills up and older turns get evicted to make room for new ones. That's fine, as long as anything worth keeping was already checkpointed or summarized before it fell out — the summary is what stays in the live window (a compact one-line fact instead of the full raw output), while the full record sits in the checkpoint store, one lookup away if a later step actually needs it back. When that happens, it isn't "memory" in the human sense — it's retrieval: look the fact up by its key, pull back exactly that slice, and leave the rest of the task history where it is. That's the core reframe this chapter is built on: agent state isn't a bigger box to remember more things in, it's an index you designed well enough to find the one thing you need.
 
-The 2026 research wave shaping this chapter: A-MEM (NeurIPS 2025), HippoRAG (multi-hop graph retrieval), Multi-Layered Memory Architectures, HaluMem (operation-level memory hallucination benchmark), MINJA / MemoryGraft (query-only memory poisoning attacks), and TTT-E2E (a multi-lab effort spanning Stanford, Berkeley, UCSD, NVIDIA, and Astera), a test-time-training approach that compresses context into weights.
+This is deliberately narrow in scope. It covers state *inside* a single task or session — the plan, the scratchpad, the checkpoint that lets a crashed run resume. It is not the architecture for facts that should outlive the session and follow a user across weeks (see [Memory Architectures](../memory/memory-architectures.mdx) for that tiered model), and it isn't about optimizing what lives in the live window turn-to-turn (see [Short-Term Context Management](../memory/short-term-context.mdx) for that). The overlap is real — a checkpoint and a long-term memory store are both "state written outside the context window" — but the lifetime and the ownership are different: a checkpoint dies with the task; long-term memory is designed to outlive it.
 
 ## A concrete example
 
-Memory is what allows an agent to learn and maintain context over time. Agent memory has matured from "Chat History" into a Multi-Tiered Cognitive Architecture with four named layers (Working, Episodic, Semantic, Procedural), each with its own write pattern, latency budget, and failure modes. Production systems (Mem0, Letta, Anthropic Memory Tool + Skills, Zep/Graphiti, LangMem) now treat memory selection as a first-class architecture decision.
+An agent verifies a data migration by checking 40 database tables, one per step, comparing each table's schema before and after.
+
+**Keep everything in the live context window.** Each step's tool output (a schema diff) averages 1,500 tokens. By step 25, the running context — system prompt, plan, 25 raw diffs, scratchpad — sits around 55,000 tokens, and time-to-first-token has grown from about 400 ms at step 1 to about 1.1 seconds at step 25, purely from context size. Assuming context grows roughly linearly from 5,000 to 60,000 tokens across the 40 steps, the average call carries about 32,500 tokens of input; across 40 calls that's roughly 1.3 million input tokens. At $3 per million input tokens, that's about **$3.90** just to keep re-sending a context that mostly repeats what the model already saw.
+
+**Persist the full record, keep a summary live.** After each table check, write the full 1,500-token diff to a checkpoint keyed by `(task_id, table_name)`, and keep only a 60-token one-line summary in the live window ("orders: 2 columns added, 0 breaking"). Live context now grows by about 60 tokens per step instead of 1,500 — after 40 steps, total context is system prompt + plan + 2,400 tokens of summaries + scratchpad, roughly 6,000 tokens flat, with no growth curve. Total input across all 40 calls is about 40 × 6,000 = 240,000 tokens, or roughly **$0.72**. If step 33 needs the full diff for `orders` again — say, to double-check one column — a single checkpoint lookup returns exactly that 1,500-token record instead of re-running the check.
+
+Persisting once and summarizing in the live window costs about 5x less than keeping everything live, keeps per-step latency flat instead of climbing, and still puts the full record one lookup away the moment a later step actually needs it.
 
 ## The tradeoffs that matter
 
-| Choice | Upside | Cost |
-|--------|--------|------|
-| Simpler design | Faster to ship | Less resilient |
-| Heavier retrieval | Better grounding | More latency |
-| Bigger model | Higher quality | Higher $/query |
+| Strategy | Live-context cost | Storage cost | Recoverable after a crash? | Reach for it when |
+|---|---|---|---|---|
+| Keep everything in context | Grows every step; latency climbs | None | No — lost when context is trimmed or the process dies | Very short tasks (a handful of steps) |
+| Persist raw, nothing live | None | Highest | Yes, fully | Facts you'll need verbatim and rarely re-check |
+| Persist raw + summary live | Small, flat | Moderate | Yes — full record one lookup away | Default for multi-step tasks past ~10 steps |
+| Discard, re-derive on demand | None | None | N/A — regenerated, not restored | Fast-changing facts with a live source of truth |
+
+The number that actually matters here is the *re-derivation cost* of each fact: how expensive, in tool calls or wall-clock time, is it to reconstruct if you didn't store it? Cheap re-derivation means discarding is free insurance against staleness. Expensive re-derivation — a multi-step computation, a user's one-time answer, a tool call against an API that's since changed — means the checkpoint is the only thing standing between a mid-task crash and starting over from step 1.
 
 ## Where people go wrong
 
-- Skipping evaluation and hoping demos generalize
-- Ignoring latency/cost until production traffic arrives
-- Treating retrieval quality as a generation problem
+- **Storing everything raw with no index.** Every tool output goes to a table, but nothing is keyed for fast lookup — the store technically "has" the fact, but finding it later means scanning, which defeats the point of persisting it.
+- **Persisting nothing and hoping the context window is enough.** Works for five-step tasks, fails the moment a process restarts mid-run — there's no way back to step 30 except running it again from step 1.
+- **Persisting facts that should just be re-fetched.** Caching a live price or a queue depth "to save a call" quietly turns into serving stale data a few steps later.
+- **Confusing a task checkpoint with long-term memory.** A checkpoint exists to resume *this* run and should die with it; treating it as a place to also store durable, cross-session facts about a user mixes two systems with different lifetimes and different cleanup rules.
+- **Keeping full raw tool output live "just in case."** This is the single biggest avoidable cost in long-running agents — a one-line summary plus a checkpoint key almost always does the job a 1,500-token raw dump was doing, at a fraction of the tokens.
 
 ## The interview lens
 
-### Q: How do you handle "Conflicting Memories" in an agentic system?
+Interviewers use this topic to see whether you reach for "bigger context window" as the default fix, or whether you actually design where a fact lives.
 
-**Strong answer:**
-Conflicting memories (e.g., the user said "I like blue" last week but says "I like red" now) are handled via **Temporal Weighting** or **Explicit Disputing**. In my architecture, I assign a `timestamp` and a `confidence_score` to every memory triplet. If a new fact conflicts with an old one, the agent is prompted to "Resolve the Conflict" by asking the user for clarification or defaulting to the most recent timestamp. We also use **Decay Functions** where older, non-reinforced memories are eventually pruned from the active index.
+A strong sound bite: *"I treat everything past the current step as a retrieval problem, not a memory problem — cheap-to-refetch facts get discarded, everything expensive to reproduce gets a checkpoint key, and the live context window only ever holds a summary plus whatever the current step actually needs."*
 
-### Q: Why is the "Context Window" alone insufficient for a staff-level Agent architecture?
+Likely follow-ups:
 
-**Strong answer:**
-First, **Cost and Latency**: Filling 1M tokens of context for every turn is prohibitively expensive even with context caching. Second, **Signal-to-Noise**: Large context windows suffer from "In-context Learning" degradation: the model gets distracted by irrelevant historical turns. A Staff-level architecture uses **Selective Memory Retrieval** (RAG over history) to only pull in the 3-5 most relevant historical interactions, keeping the Reasoning Engine focused on the current sub-goal.
-
-### Q: How would you design procedural memory for a production AI agent?
-
-**Strong answer:**
-
-I would design procedural memory as a combination of a **skills registry, workflow graph, and tool-use policies**. Each procedure would define the task type, required steps, available tools, validation checks, failure modes, and escalation rules. After each run, the agent can perform reflection and update the procedure if it discovers a better approach. For example, if an NL2SQL agent repeatedly fails because it skips schema inspection, we can encode schema inspection as a required first step in the procedural memory for all SQL-generation tasks.
-
-### Q: When does episodic memory become a liability rather than an asset?
-
-**Strong answer:**
-
-Episodic memory becomes a liability in three named patterns. First, **index overload**: adding 1,000 low-quality observations buries the 10 high-quality ones in retrieval. This is catastrophic forgetting in the RAG sense. Second, the **Day-30 drift pattern**: agent quality degrades roughly 30 days into production as the episodic store fills with noise that retrieval cannot distinguish from signal. Third, **stale-context bleeding**: past trajectories that succeeded under one configuration become *wrong* context under a new one. A successful tool sequence for Stripe is actively misleading when the user has switched to Adyen.
-
-The mitigations are quality-weighted retrieval, consolidation into L3, and hard recency cutoffs for context-sensitive trajectories. The deeper lesson: episodic memory needs a *pruning policy* from day one. Without one, it is technical debt that compounds linearly with usage.
-
-### Q: How do you prevent memory poisoning when agents can write to their own long-term store?
-
-**Strong answer:**
-
-The hard part is that recent attacks (MINJA, MemoryGraft) are *query-only* - no elevated privileges required. Poison gets planted weeks before it fires. So the threat model is "every input can become a future authoritative memory." The defense has four layers:
-
-1. **Provenance at write time**: every memory carries `source` (user-stated, model-inferred, tool-output), `timestamp`, and `trust_tier`.
-2. **Write-time guardrail model**: a smaller classifier refuses suspicious instruction-shaped writes before they hit the store.
-3. **Corroboration thresholds**: high-stakes decisions cannot be made on a single low-trust memory; they require multiple independent corroborating writes.
-4. **Canary tests in CI**: synthetic poison payloads must not propagate into outputs. Run weekly.
-
-The architectural separation that matters most: the agent's tool surface and its memory write surface should not share trust. Tool outputs should pass through a sanitizer before becoming memory.
-
-### Q: Memory tier selection: where would you put each of these and why? (a) the user's API rate limit, (b) the steps to deploy our service, (c) the agent's last failed attempt at this task, (d) today's stock price.
-
-**Strong answer:**
-
-(a) **L3 semantic** with bitemporal validity. It is a tenant-scoped fact with a supersession lifetime. Not L4, because it is data, not procedure.
-
-(b) **L4 procedural** as a versioned skill or playbook. It is a multi-step recipe with conditional branches. Skills compose; semantic triples do not.
-
-(c) **L2 episodic raw**, with a *reflection hop* to L4 if the failure reveals a generalizable lesson. Raw trajectory belongs in episodic. The lesson ("never run migrations during peak hours") earns a Reflexion-style write to procedural.
-
-(d) **None - call the tool.** Fast-moving facts with a live source of truth should never enter memory. They become stale by definition.
-
-The general rule: data goes in L3, procedures in L4, observations in L2, and never store fast-moving facts that have a live source.
-
-### Q: Walk me through the consolidation policy you would design for episodic-to-semantic transition. When does an episode become a fact?
-
-**Strong answer:**
-
-I use a threshold-based graduation policy, not implicit decay:
-
-- **Frequency threshold**: N independent observations of the same pattern (3 to 5 is typical).
-- **Confidence weighting**: user-stated > tool-output > model-inferred.
-- **Judge review**: a scheduled batch consolidation job runs an LLM judge (or human reviewer for high-stakes domains) over candidate graduations.
-- **Scheduled, not synchronous**: consolidation happens out-of-band on a cron, not per-turn. This avoids write amplification.
-- **Bidirectional**: semantic facts in L3 can be re-instantiated as episodic context for specific tasks. Memory flows both ways.
-
-The trap to avoid is implicit consolidation through decay weights alone. It works at small scale and silently fails at production scale because there is no audit trail for "why did this fact appear in L3?"
-
-### Q: Your agent's memory store has 50M memories across 10K tenants. How do you guarantee cross-tenant isolation and what's your blast radius if isolation fails?
-
-**Strong answer:**
-
-The architecture has five isolation layers:
-
-1. **Physical separation at the store layer**: per-tenant collections or shards, not metadata-filtered shared indexes. The shared-index-with-tenant-id pattern fails open under bugs.
-2. **Enforcement via service-account scoping**: the application code cannot opt out of tenant scope; the database role does not have visibility to other tenants.
-3. **Separate KV-cache prefix per tenant**: prevents cached prompts from leaking between tenants.
-4. **Per-tenant encryption keys**: cross-namespace bytes are unreadable even if returned by a bug.
-5. **Audit logging of every cross-namespace query attempt**: detection in depth.
-
-**Blast radius if isolation fails**: a single bad vector query could leak the *neighborhood* of one query's embedding - potentially hundreds of records from one tenant. Field measurements show ~95% organic leakage rates in unisolated multi-tenant RAG. The mitigation is not "more careful application code"; it is structural separation that cannot be bypassed by application bugs.
-
-### Q: HaluMem shows memory hallucinations accumulate at write time, then propagate. How would you instrument production memory to catch this?
-
-**Strong answer:**
-
-The trap most teams fall into is measuring memory quality only at the QA stage (end-to-end). HaluMem demonstrates that 60-80% of memory errors originate at *extraction* (write) time and propagate. You need to instrument three separate metrics:
-
-1. **Extraction precision**: when the agent writes a fact to L3, is the fact actually supported by the source observation? Sample writes daily, evaluate with a stronger judge.
-2. **Update correctness**: when conflicting facts arrive, did the conflict-resolution logic produce the right outcome? Use bitemporal queries to detect "facts that flipped without supersession metadata."
-3. **QA accuracy**: end-to-end recall correctness.
-
-On top of that, run **shadow-mode replay**: writes go through a verifier model in shadow mode; mismatches between live writes and shadow-verifier writes flag potential hallucinations for review. **Canary facts** in CI ensure the memory system does not silently regress. **Periodic full-store audits** sample random memories and ask "is this still consistent with the source conversation?"
-
-### Q: TTT-E2E compresses context into weights via test-time training. Where does this fit in the L1-L4 hierarchy, and what new failure mode does it introduce?
-
-**Strong answer:**
-
-TTT-E2E sits *between* L1 and L4. It makes context-derived information part of the model itself for the rest of the session. The appeal is latency: constant cost regardless of context length (2.7x speedup at 128K, 35x at 2M tokens on H100 per NVIDIA's benchmarks).
-
-The new failure mode is governance. In-weights memory has:
-
-- **No audit trail**: you cannot inspect "what does this model now believe?"
-- **No eviction interface**: you cannot delete a memory once compressed into weights without rolling back the model state.
-- **GDPR right-to-be-forgotten challenges**: the regulatory framework assumes data is at rest, not in weights.
-- **Harder poisoning detection**: there is no inspectable store to scan for canary signatures.
-
-Beyond governance there is a capability failure mode: the approach reports failing needle-in-a-haystack retrieval beyond its attention window (about 6% versus 99% for full attention at 128K), so it preserves the gist of the context, not verbatim facts. That rules it out as the only memory tier for retrieval-critical work.
-
-The right framing: TTT-E2E moves memory governance from the storage layer to the training and deployment pipeline. The cost is not eliminated; it is relocated. For most production teams in 2026, this is a research direction to track, not a deployable architecture yet. The broader test-time-training family is mapped in [Research Radar, theme 12](../RESEARCH-RADAR.md#12-test-time-training-learning-at-inference).
+- How do you decide checkpoint granularity — every step, or only at milestones? (Every step if a single step's tool calls are expensive to redo; milestones if steps are cheap and frequent checkpointing just adds write overhead.)
+- What happens if the process crashes mid-task? (Resume from the last checkpoint, reload the summary trail into context, and re-verify the most recent step rather than trusting it blindly.)
+- How is a task checkpoint different from the long-term memory used for cross-session personalization? (Different lifetime and different owner — a checkpoint dies with the task; long-term memory is designed to outlive it and needs its own consolidation and eviction policy.)
 
 ## Go deeper
 
-- [Upstream chapter (Agent Memory and State)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/07-agentic-systems/05-agent-memory-and-state.md)
-- Related questions in the [question bank](/questions)
-- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)
+- [Memory Architectures](../memory/memory-architectures.mdx) — the tiered, cross-session model this chapter deliberately stays out of.
+- [Short-Term Context Management](../memory/short-term-context.mdx) — optimizing what lives in the live window turn-to-turn.
+- [Durable Execution](./durable-execution.mdx) — the checkpoint/resume machinery this chapter's persistence side depends on.
+- Upstream reference: [Agent Memory and State — AI System Design Guide](https://github.com/ombharatiya/ai-system-design-guide/blob/main/07-agentic-systems/05-agent-memory-and-state.md) (MIT; see [CREDITS](../../../CREDITS.md)).
