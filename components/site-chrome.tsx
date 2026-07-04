@@ -5,6 +5,7 @@ import { AuthNav } from "@/components/auth-nav";
 
 const NAV = [
   { href: "/learn", label: "Learn" },
+  { href: "/search", label: "Search" },
   { href: "/questions", label: "Questions" },
   { href: "/practice", label: "Practice" },
   { href: "/mock", label: "Mock Interview" },
