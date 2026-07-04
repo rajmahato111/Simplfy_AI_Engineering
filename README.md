@@ -27,11 +27,22 @@ AI-specific guided practice are the moat.
 
 ## Status
 
-📝 **Planning / PRD phase.** No application code yet — the current deliverable is the PRD
-and source analysis in [`docs/`](docs/). See the [roadmap](docs/PRD.md#13-roadmap) for
-build phases (Foundation → Free Reader → Interactive Core → AI Mock Interviewer → …).
+✅ **Bootstrap on `main`.** Next.js reader, pilot content, CI, and Playwright E2E. See [roadmap](docs/PRD.md#13-roadmap).
 
-## Attribution
+## Development
+
+```bash
+npm ci
+cp .env.example .env.local   # optional
+npm run dev                  # http://localhost:3000
+npm run test:e2e             # full E2E suite
+```
+
+## Deploy
+
+Production deploys via [Vercel](https://vercel.com). See **[docs/deploy.md](docs/deploy.md)**.
+
+---
 
 The content foundation is the MIT-licensed
 [`ombharatiya/ai-system-design-guide`](https://github.com/ombharatiya/ai-system-design-guide)

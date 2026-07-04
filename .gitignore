@@ -1,10 +1,19 @@
 # QC renders of SVG diagrams (review artifacts, never committed)
 *.qc.png
+.qa/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
 
 # deps / env / build
 node_modules/
 .env
-.env.*
+.env.local
+.env.*.local
+!.env.example
 .next/
+out/
 dist/
 __pycache__/
+*.tsbuildinfo
