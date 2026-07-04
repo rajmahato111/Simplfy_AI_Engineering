@@ -8,7 +8,7 @@
 
 | ID | Tool | Branch | Status | Paths (locks) |
 |----|------|--------|--------|---------------|
-| _(none)_ | | | | |
+| T-020–T-022 | Claude Code | `claude/t020-022-rag-cluster` | blocked (token-out) | `content/concepts/retrieval/**` |
 
 ---
 
@@ -35,6 +35,5 @@
 
 | ID | Tool | Task |
 |----|------|------|
-| T-003 | Claude Code | Content brief template |
-| T-020–T-022 | Claude Code | RAG cluster expansion |
+| T-003 | Done (Cursor) | Content brief template → `docs/content-brief-template.md` |
 | T-030–T-032 | Claude Code | Agents content batch |

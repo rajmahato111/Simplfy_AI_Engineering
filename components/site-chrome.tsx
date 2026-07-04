@@ -68,6 +68,7 @@ const FOOTER_COLUMNS = [
       { href: "/learn", label: "All tracks" },
       { href: "/learn/concepts/retrieval/rag-fundamentals", label: "RAG fundamentals" },
       { href: "/questions", label: "Question bank" },
+      { href: "/frameworks", label: "Answer frameworks" },
     ],
   },
   {
