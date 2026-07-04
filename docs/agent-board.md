@@ -8,8 +8,7 @@
 
 | ID | Tool | Branch | Status | Paths (locks) |
 |----|------|--------|--------|---------------|
-| T-051 | Cursor | `cursor/content-gap-fix-42a0` | in-review | content, questions, meta-pages, ingest scripts |
-| T-052 | Cursor | `cursor/content-quality-pilots-42a0` | in-progress | content review program, metadata, retrieval rewrite |
+| _(none — pick up from content-review-plan.md)_ | | | | |
 
 ---
 
@@ -17,7 +16,9 @@
 
 | PR | Task | Merged |
 |----|------|--------|
-| #21 | LLM wiring, mock session history, question study mode | 2026-07-04 |
+| **#26** | Content review program, metadata fixes, 3 retrieval rewrites | 2026-07-04 |
+| **#25** | Content gaps: questions, MDX corpus, meta pages, whiteboard | 2026-07-04 |
+| #22 | Meta pages, Stripe/Pro, flashcards, study plan | 2026-07-04 |
 | #20 | P3: AI mock interviewer shell (SPIDER + scorecard) | 2026-07-04 |
 | #19 | Tier 5: Grounded tutor, SPIDER feedback, frameworks, T-003 brief | 2026-07-04 |
 | #18 | T-040–043: Glossary, patterns, 121-question bank ingest | 2026-07-04 |
