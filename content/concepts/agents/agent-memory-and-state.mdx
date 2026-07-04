@@ -10,7 +10,7 @@ diagrams:
 est_minutes: 12
 source_attribution: "Factual basis: AI System Design Guide (MIT) by Om Bharatiya; rewritten and expanded. See CREDITS.md."
 last_reviewed: 2026-07-04
-status: draft
+status: reviewed
 ---
 
 ## The 30-second version
@@ -64,7 +64,7 @@ Persisting once and summarizing live costs about 5x less than keeping everything
 | Keep everything in context | Grows every step; latency climbs | None | No — lost when context is trimmed or the process dies | Very short tasks (a handful of steps) |
 | Persist raw, nothing live | None | Highest | Yes, fully | Facts you'll need verbatim and rarely re-check |
 | Persist raw + summary live | Small, flat | Moderate | Yes — full record one lookup away | Default for multi-step tasks past ~10 steps |
-| Discard, re-derive on demand | None | None | N/A — regenerated, not restored | Fast-changing facts with a live source of truth |
+| Discard, re-derive on demand | None | None | N/A — regenerated, not restored | Values that go stale fast and are cheap to look up again |
 
 The number that matters here is the *re-derivation cost* of each fact: how expensive is it, in tool calls or wall-clock time, to reconstruct if you didn't store it? Cheap re-derivation means discarding is free insurance against staleness. Expensive re-derivation — a multi-step computation, a user's one-time answer — means the checkpoint is the only thing standing between a mid-task crash and starting over from step 1.
 

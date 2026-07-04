@@ -10,7 +10,7 @@ diagrams:
 est_minutes: 12
 source_attribution: "Factual basis: AI System Design Guide (MIT) by Om Bharatiya; rewritten and expanded. See CREDITS.md."
 last_reviewed: 2026-07-04
-status: draft
+status: reviewed
 ---
 
 ## The 30-second version
@@ -40,7 +40,7 @@ The handler doesn't turn the dog loose on the whole mountain and hope. Dispatch 
 
 Follow the diagram left to right. The loop itself — reason, act, observe, repeat, the cycle covered in [reasoning-loops-react-and-beyond.mdx](./reasoning-loops-react-and-beyond.mdx) — is the part everyone designs first. What actually determines whether it's safe is the ring of checks around it, run by the harness, not the model. After every act-and-observe cycle, three checks run in parallel, and any one can end the loop. A **goal predicate** asks, deterministically, whether the task is actually done — a test suite passing, a database row present with the right values — never "the model stopped calling tools," which just means the model chose to stop, not that it succeeded. A **stagnation check** looks for no-progress patterns: the same tool called with the same arguments repeatedly, or a new plan — see [planning-and-decomposition.mdx](./planning-and-decomposition.mdx) for how that plan gets built — that's suspiciously similar to the last failed one. A **budget check** tracks iterations, wall-clock time, and dollars spent, and — critically — lives outside the agent's own code, typically at a gateway, the same principle covered for malicious calls in [agentic-security-and-sandboxing.mdx](./agentic-security-and-sandboxing.mdx): if the spend check is agent code, a manipulated agent can skip its own guardrail.
 
-If the goal predicate passes, the loop exits successfully. If stagnation or budget trips first, the loop escalates to a human with the specific state that triggered the stop, the way [human-in-the-loop-patterns.mdx](./human-in-the-loop-patterns.mdx) frames a routed approval. If none trip, the loop continues, and durable state (see [durable-execution.mdx](./durable-execution.mdx)) is what lets it continue safely across a crash instead of restarting blind. Watch **rate of spend**, not only cumulative spend: a monthly cap is too coarse to catch a loop that burns real money in twenty minutes, and a healthy agent rarely sustains high token throughput for long because it's normally waiting on tool results — a sustained spike is a reliable signal on its own.
+If the goal predicate passes, the loop exits successfully. If stagnation or budget trips first, the loop escalates to a human with the specific state that triggered the stop, the way [human-in-the-loop-patterns.mdx](./human-in-the-loop-patterns.mdx) frames a routed approval. If none trip, the loop continues, and durable state (see [durable-execution.mdx](./durable-execution.mdx)) is what lets it continue safely across a crash instead of restarting blind. Watch **rate of spend**, not only cumulative spend: a monthly cap is too coarse to catch a loop that burns real money in twenty minutes, most of an agent's wall-clock time is actually spent idle, waiting on a tool or the model, so a stretch of continuously high token generation is unusual enough by itself to treat as a warning worth checking.
 
 ## A concrete example
 
