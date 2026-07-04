@@ -9,6 +9,7 @@
 | ID | Tool | Branch | Status | Paths (locks) |
 |----|------|--------|--------|---------------|
 | T-051 | Cursor | `cursor/content-gap-fix-42a0` | in-review | content, questions, meta-pages, ingest scripts |
+| T-052 | Cursor | `cursor/content-quality-pilots-42a0` | in-progress | content review program, metadata, retrieval rewrite |
 
 ---
 

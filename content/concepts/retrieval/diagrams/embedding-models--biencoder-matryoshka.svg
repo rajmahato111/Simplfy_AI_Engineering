@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="480" viewBox="0 0 960 480" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN
+Title (480,44). Two columns: Bi-encoder left, Matryoshka right.
+Bi-encoder: Text in (orange) -> Encoder (violet) -> Single vector (green store) width bar
+Matryoshka: Text in -> Encoder -> nested bars showing dims 64/256/1536 with note "search shallow, rerank deep"
+-->
+  <rect width="960" height="480" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="480" y="44" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">Embedding models: one vector per passage vs nested resolution</text>
+
+  <!-- bi-encoder column -->
+  <rect x="32" y="72" width="424" height="360" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="48" y="94" font-size="12" fill="#64748B">Bi-encoder (standard RAG index)</text>
+
+  <rect x="64" y="120" width="120" height="56" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="124" y="153" font-size="14" fill="#7C2D12" text-anchor="middle">Chunk text</text>
+  <line x1="184" y1="148" x2="214" y2="148" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="216" y="120" width="120" height="56" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="276" y="153" font-size="14" fill="#2E1065" text-anchor="middle">Encoder</text>
+  <line x1="336" y1="148" x2="366" y2="148" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="368" y="128" width="72" height="40" rx="8" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="404" y="153" font-size="12" fill="#064E3B" text-anchor="middle">1×1536</text>
+
+  <text x="64" y="208" font-size="13" fill="#334155">Stored once at full dimensionality.</text>
+  <text x="64" y="228" font-size="13" fill="#334155">Fast ANN search, but every dim costs RAM.</text>
+  <rect x="64" y="248" width="360" height="24" rx="4" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="244" y="264" font-size="12" fill="#064E3B" text-anchor="middle">1536-d float32 vector H 6 KB / chunk</text>
+  <text x="64" y="304" font-size="13" fill="#64748B">1B chunks × 6 KB H 6 TB index RAM (HNSW)</text>
+
+  <!-- matryoshka column -->
+  <rect x="504" y="72" width="424" height="360" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="520" y="94" font-size="12" fill="#64748B">Matryoshka (MRL)  nested importance</text>
+
+  <rect x="536" y="120" width="120" height="56" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="596" y="153" font-size="14" fill="#7C2D12" text-anchor="middle">Chunk text</text>
+  <line x1="656" y1="148" x2="686" y2="148" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="688" y="120" width="120" height="56" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="748" y="153" font-size="14" fill="#2E1065" text-anchor="middle">Encoder</text>
+
+  <text x="536" y="208" font-size="13" fill="#334155">Same model; early dims carry most signal.</text>
+  <rect x="536" y="232" width="80" height="32" rx="6" fill="#FEFCE8" stroke="#CA8A04" stroke-width="1.5"/>
+  <text x="576" y="253" font-size="12" fill="#713F12" text-anchor="middle">64-d</text>
+  <rect x="624" y="224" width="120" height="48" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="684" y="253" font-size="12" fill="#1E1B4B" text-anchor="middle">256-d</text>
+  <rect x="752" y="216" width="144" height="64" rx="6" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="824" y="253" font-size="12" fill="#064E3B" text-anchor="middle">1536-d full</text>
+
+  <text x="536" y="304" font-size="13" fill="#334155">Stage 1: ANN on 64-d binary ’ top 1,000</text>
+  <text x="536" y="324" font-size="13" fill="#334155">Stage 2: rescore top 1,000 with full 1536-d</text>
+  <text x="536" y="360" font-size="13" fill="#64748B">~20× smaller index; &lt;2% accuracy loss (typical)</text>
+</svg>

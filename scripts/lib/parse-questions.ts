@@ -215,13 +215,20 @@ function capSample(text: string, max = 10_000) {
 }
 
 function inferDifficulty(topic: string, upstreamId: string): Question["difficulty"] {
-  if (topic === "rag-architecture" && upstreamId.startsWith("Q")) {
-    const n = parseInt(upstreamId.slice(1), 10);
-    if (n <= 4) return "beginner";
-    if (n <= 7) return "intermediate";
-  }
   if (upstreamId.startsWith("scenario")) return "advanced";
   if (topic === "advanced") return "advanced";
+
+  const beginner = new Set([
+    "Q1", "Q2", "Q3", "Q4",
+    "Q11", "Q12",
+    "Q18",
+    "Q22",
+    "Q27",
+    "Q34",
+    "Q38",
+  ]);
+  if (beginner.has(upstreamId)) return "beginner";
+
   return "intermediate";
 }
 

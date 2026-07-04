@@ -25,6 +25,9 @@
     "scaffold:mdx:catalog": "tsx scripts/generate-mdx-catalog.ts",
     "sanitize:mdx": "tsx scripts/sanitize-mdx.ts",
     "enhance:mdx": "tsx scripts/enhance-mdx-drafts.ts",
+    "demote:auto-enhanced": "tsx scripts/demote-auto-enhanced-mdx.ts",
+    "audit:content": "tsx scripts/audit-content-quality.ts",
+    "sync:mdx-metadata": "tsx scripts/sync-mdx-metadata.ts",
     "ingest:all": "npm run ingest:glossary && npm run ingest:patterns && npm run ingest:questions && npm run ingest:frameworks && npm run ingest:meta-pages && npm run ingest:whiteboard",
     "setup:env": "bash scripts/setup-env.sh"
   },
