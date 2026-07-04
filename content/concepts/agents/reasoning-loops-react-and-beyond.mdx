@@ -28,12 +28,12 @@ The locksmith does something that looks almost lazy by comparison but works far 
 | Locksmithing | ReAct element |
 |---|---|
 | Studying a general lock diagram | Background knowledge in the model's weights |
-| Planning the full pin sequence from an armchair, no lock in hand | Pure chain-of-thought — reasoning to an answer with no tool calls in between |
+| Planning the full pin sequence blind, no lock in hand | Pure chain-of-thought — reasoning to an answer, no tool calls |
 | Deciding which pin to try next | Thought |
 | Pushing that specific pin | Action (a tool call) |
 | Feeling whether it sets, springs back, or nothing happens | Observation |
 | Feeling, then deciding, then pushing again | The loop: thought → action → observation → thought |
-| Repeating the identical push on a pin that already failed | Looping — the failure mode of retrying a dead action |
+| Repeating the identical push on a pin that already failed | Looping — retrying a dead action |
 | Declaring the lock open the instant one pin clicks | Premature termination — mistaking partial evidence for success |
 | The cylinder actually rotating | The genuine exit condition — the goal, actually met |
 
@@ -49,7 +49,7 @@ Plain chain-of-thought reasons in one continuous pass and only touches the world
 
 ## A concrete example
 
-An agent is asked: *"Did Widget Corp's actual Q3 revenue beat the guidance they gave on their Q2 call?"* It has a `search_filings` tool.
+An agent is asked: *"Did Widget Corp's Q3 revenue beat the guidance from their Q2 call?"* It has a `search_filings` tool.
 
 - **Turn 1.** Thought: "I need the guidance number first." Action: `search_filings("Widget Corp Q3 revenue guidance")`. Observation: "Q2 call, July 14: guidance for Q3 revenue is $412M–$418M."
 - **Turn 2.** Thought: "Now I need the actual Q3 number to compare." Action: `search_filings("Widget Corp Q3 actual revenue")`. Observation: "No Q3 filing found."

@@ -29,8 +29,8 @@ Now picture a mountain nobody has climbed this season: the route above Camp 2 ha
 |---|---|
 | The ten-day summit itinerary written in advance | A static plan (plan-and-execute) |
 | Breaking "summit the peak" into base camp, Camp 2, Camp 3, summit push | Task decomposition into sub-goals |
-| A two-person rope team sent ahead to fix lines while the group rests | A parallelizable sub-task, dispatched independently |
-| Not renegotiating the route every morning on a known mountain | Committing to the plan — the payoff of upfront planning in a stable domain |
+| A rope team sent ahead to fix lines while the group rests | A parallelizable sub-task, dispatched independently |
+| Not renegotiating the route every morning on a known mountain | Committing to the plan — the payoff of upfront planning |
 | Checking the forecast and yesterday's scouting report each morning | The observation step that could trigger a replan |
 | A storm at Camp 2 scrapping the summit-day schedule entirely | Dynamic replanning — discarding the rest of the plan, not just patching it |
 | Replanning after every gust of wind, never actually climbing | Replan thrashing — over-adapting to noise |
@@ -60,11 +60,11 @@ Two replans across a 10-day climb, both triggered by a defined threshold — a t
 
 ## The tradeoffs that matter
 
-| Approach | Best when | Compute / coordination cost | Failure mode |
+| Approach | Best when | Coordination cost | Failure mode |
 |---|---|---|---|
-| Plan-and-execute (static) | The domain is well understood; steps are largely independent | Low — one planning pass, steps parallelize | Brittle: one wrong early assumption invalidates every step downstream |
-| Dynamic replanning | The environment can invalidate assumptions mid-task | Higher — a planning pass after every meaningful checkpoint | Thrashing: replanning on noise instead of on genuine threshold crossings |
-| Decomposition depth (however you plan) | Any goal too large for one step or one sub-agent to hold in context | Grows with depth; each level adds coordination overhead | Runaway recursion — decomposing a task that was already small enough to execute |
+| Plan-and-execute (static) | Domain is well understood; steps are largely independent | Low — one planning pass, steps parallelize | Brittle: one wrong early assumption invalidates every step downstream |
+| Dynamic replanning | Environment can invalidate assumptions mid-task | Higher — a planning pass per checkpoint | Thrashing: replanning on noise instead of genuine crossings |
+| Decomposition depth | Goal too large for one step or sub-agent to hold in context | Grows with depth; each level adds overhead | Runaway recursion — decomposing a task already small enough to execute |
 
 The real decision isn't "static or dynamic" in the abstract — it's how much you trust your model of the domain. A software migration against a documented API surface is the known-route mountain: plan it, parallelize it, execute it. An agent in a live production incident is the unscouted whiteout: replan constantly, because the next observation beats anything decided an hour ago. Most production systems land in between — a skeleton plan with defined checkpoints where replanning is allowed.
 
