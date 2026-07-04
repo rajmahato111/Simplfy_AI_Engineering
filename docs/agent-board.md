@@ -8,7 +8,7 @@
 
 | ID | Tool | Branch | Status | Paths (locks) |
 |----|------|--------|--------|---------------|
-| T-030–T-032 | Claude Code | `claude/t030-032-agents-cluster` | `in_progress` | `content/concepts/agents/**` (12 chapters) |
+| _(none — T-030–T-032 ready for PR)_ | | | | |
 
 ---
 
@@ -16,7 +16,8 @@
 
 | PR | Task | Merged |
 |----|------|--------|
-| **#27** | Claude T-020–022: RAG cluster (13 hand-written chapters) | pending merge |
+| T-030–T-032 | Claude: Agents cluster (12 rewritten chapters, reviewer-fixed) | pending PR |
+| **#27** | Claude T-020–022: RAG cluster (13 hand-written chapters) | 2026-07-04 |
 | **#26** | Content review program, metadata fixes, 3 retrieval rewrites | 2026-07-04 |
 | **#25** | Content gaps: questions, MDX corpus, meta pages, whiteboard | 2026-07-04 |
 | #22 | Meta pages, Stripe/Pro, flashcards, study plan | 2026-07-04 |
@@ -31,5 +32,5 @@
 
 | ID | Tool | Task |
 |----|------|------|
-| T-030–T-032 | Claude Code | Agents content batch |
-| T-052+ | Cursor | Remaining MDX rewrites (non-retrieval sections) |
+| T-040+ | Claude Code | Interview-prep meta prose review (Phase 2 of content-review-plan.md) |
+| T-052+ | Cursor | Remaining MDX rewrites (Foundations/Inference/Prompting/etc.) |
