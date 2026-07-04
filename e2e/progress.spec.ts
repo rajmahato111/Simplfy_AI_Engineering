@@ -8,13 +8,14 @@ test.describe("progress", () => {
     await page.getByRole("button", { name: /Continue as demo user/i }).click();
     await expect(page).toHaveURL(/\/dashboard/);
 
-    await page.goto("/learn/concepts/retrieval/rag-fundamentals");
-    await page.getByRole("button", { name: "Bookmark" }).click();
-    await expect(page.getByRole("button", { name: "Bookmarked" })).toBeVisible();
+    const chapter = "/learn/concepts/retrieval/rag-fundamentals";
 
-    const markComplete = page.getByRole("button", { name: "Mark complete" });
-    await markComplete.scrollIntoViewIfNeeded();
-    await markComplete.click();
+    await page.goto(chapter);
+    await page.getByRole("button", { name: "Bookmark" }).click();
+    await page.goto(chapter);
+    await expect(page.getByRole("button", { name: "Bookmarked" })).toBeVisible();
+    await page.getByRole("button", { name: "Mark complete" }).click();
+    await page.goto(chapter);
     await expect(page.getByRole("button", { name: "Completed ✓" })).toBeVisible();
 
     await page.goto("/dashboard");
