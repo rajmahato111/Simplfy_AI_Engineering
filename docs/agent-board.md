@@ -8,7 +8,7 @@
 
 | ID | Tool | Branch | Status | Paths (locks) |
 |----|------|--------|--------|---------------|
-| _(none — continue section rewrites per content-review-plan.md)_ | | | | |
+| T-030–T-032 | Claude Code | `claude/t030-032-agents-cluster` | `in_progress` | `content/concepts/agents/**` (12 chapters) |
 
 ---
 
