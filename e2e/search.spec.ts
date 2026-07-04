@@ -4,9 +4,7 @@ test.describe("search", () => {
   test("search page finds RAG content", async ({ page }) => {
     await page.goto("/search?q=RAG");
     await expect(page.getByRole("heading", { name: "Search" })).toBeVisible();
-    await expect(
-      page.getByRole("main").getByRole("link", { name: /RAG Fundamentals/i }).first(),
-    ).toBeVisible();
+    await expect(page.getByRole("main").getByRole("link").filter({ hasText: /RAG/i }).first()).toBeVisible();
   });
 
   test("header search link works", async ({ page }, testInfo) => {

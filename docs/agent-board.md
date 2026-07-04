@@ -8,7 +8,7 @@
 
 | ID | Tool | Branch | Status | Paths (locks) |
 |----|------|--------|--------|---------------|
-| _(none)_ | | | | |
+| T-040–T-043 | Cursor | `cursor/ingest-meta-content-42a0` | `in_review` | `data/*.json`, ingest scripts, meta UI |
 
 ---
 

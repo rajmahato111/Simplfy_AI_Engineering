@@ -48,7 +48,7 @@ export default async function SearchPage({ searchParams }: Props) {
         {results.map((r) => (
           <li key={r.slug}>
             <Link
-              href={`/learn/${r.slug}`}
+              href={r.href ?? `/learn/${r.slug}`}
               className="block rounded-xl border border-zinc-200 bg-white p-5 shadow-sm transition hover:border-brand/30"
             >
               <div className="flex flex-wrap gap-2">
