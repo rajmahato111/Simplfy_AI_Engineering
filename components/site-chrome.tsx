@@ -2,59 +2,60 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { MobileNav } from "@/components/mobile-nav";
 import { AuthNav } from "@/components/auth-nav";
+import { SiteLogo } from "@/components/site-logo";
 
 const NAV = [
   { href: "/learn", label: "Learn" },
-  { href: "/search", label: "Search" },
   { href: "/questions", label: "Questions" },
   { href: "/practice", label: "Practice" },
-  { href: "/mock", label: "Mock Interview" },
+  { href: "/mock", label: "Mock", title: "Mock interview" },
   { href: "/tutor", label: "Tutor" },
+  { href: "/search", label: "Search" },
 ] as const;
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-50 border-b border-zinc-200/80 bg-white/90 backdrop-blur-md">
-      <div className="relative mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6">
-        <Link href="/" className="flex shrink-0 items-center gap-2.5">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand text-sm font-bold text-white">
-            AI
-          </span>
-          <span className="hidden font-semibold tracking-tight text-zinc-900 sm:inline">
-            Simplify AI Engineering
-          </span>
-        </Link>
+    <header className="sticky top-0 z-50 border-b border-zinc-200/80 bg-white/95 backdrop-blur-md">
+      <div className="mx-auto flex h-14 max-w-7xl items-center gap-4 px-4 sm:px-6 lg:gap-8 lg:px-8">
+        <SiteLogo />
 
-        <nav className="hidden flex-1 items-center gap-1 md:flex">
-          {NAV.map(({ href, label }) => (
+        <nav
+          className="hidden min-w-0 flex-1 items-center justify-center gap-0.5 lg:flex"
+          aria-label="Main"
+        >
+          {NAV.map(({ href, label, ...rest }) => (
             <Link
               key={href}
               href={href}
-              className="rounded-md px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
+              title={"title" in rest ? rest.title : undefined}
+              className="whitespace-nowrap rounded-md px-2.5 py-2 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 xl:px-3"
             >
               {label}
             </Link>
           ))}
         </nav>
 
-        <div className="ml-auto flex items-center gap-2 sm:gap-3">
-          <MobileNav />
-          <AuthNav />
-          <Link
-            href="/dashboard"
-            className="hidden rounded-md px-3 py-2 text-sm font-medium text-zinc-600 hover:text-zinc-900 sm:inline"
-          >
-            Dashboard
-          </Link>
-          <Link
-            href="/pricing"
-            className="hidden rounded-md px-3 py-2 text-sm font-medium text-zinc-600 hover:text-zinc-900 lg:inline"
-          >
-            Pricing
-          </Link>
-          <Button href="/learn" size="sm">
-            Start learning
+        <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
+          <div className="hidden items-center gap-1 sm:flex">
+            <AuthNav />
+            <Link
+              href="/dashboard"
+              className="hidden whitespace-nowrap rounded-md px-2.5 py-2 text-sm font-medium text-zinc-600 transition-colors hover:text-zinc-900 md:inline"
+            >
+              Dashboard
+            </Link>
+            <span className="mx-1 hidden h-4 w-px bg-zinc-200 lg:inline" aria-hidden />
+            <Link
+              href="/pricing"
+              className="hidden whitespace-nowrap rounded-md px-2.5 py-2 text-sm font-medium text-zinc-600 transition-colors hover:text-zinc-900 lg:inline"
+            >
+              Pricing
+            </Link>
+          </div>
+          <Button href="/learn" size="sm" className="hidden whitespace-nowrap sm:inline-flex">
+            Get started
           </Button>
+          <MobileNav />
         </div>
       </div>
     </header>
@@ -91,19 +92,17 @@ const FOOTER_COLUMNS = [
   },
   {
     title: "Links",
-    links: [
-      { href: "/credits", label: "Credits" },
-    ],
+    links: [{ href: "/credits", label: "Credits" }],
   },
 ];
 
 export function SiteFooter() {
   return (
     <footer className="mt-auto border-t border-zinc-200 bg-zinc-50">
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-4">
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:px-8 md:grid-cols-4">
         <div className="md:col-span-1">
-          <p className="font-semibold text-zinc-900">Simplify AI Engineering</p>
-          <p className="mt-2 text-sm leading-relaxed text-zinc-600">
+          <SiteLogo />
+          <p className="mt-3 text-sm leading-relaxed text-zinc-600">
             AI-native interview prep for production AI systems — built on an open,
             attributed knowledge base.
           </p>
