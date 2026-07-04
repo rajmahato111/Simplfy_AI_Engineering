@@ -16,7 +16,7 @@
 
 | PR | Task | Merged |
 |----|------|--------|
-| T-030–T-032 | Claude: Agents cluster (12 rewritten chapters, reviewer-fixed) | pending PR |
+| **#30** | Claude T-030–032: Agents cluster (12 rewritten chapters, reviewer-fixed) + unrelated e2e/nav-label CI fix | 2026-07-04 |
 | **#27** | Claude T-020–022: RAG cluster (13 hand-written chapters) | 2026-07-04 |
 | **#26** | Content review program, metadata fixes, 3 retrieval rewrites | 2026-07-04 |
 | **#25** | Content gaps: questions, MDX corpus, meta pages, whiteboard | 2026-07-04 |
