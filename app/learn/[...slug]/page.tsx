@@ -24,7 +24,7 @@ export default async function LearnDocPage({ params }: Props) {
   if (!doc) notFound();
 
   const headings = extractH2Headings(doc.content);
-  const diagrams = (doc.frontmatter as { diagrams?: string[] }).diagrams ?? [];
+  const diagrams = doc.frontmatter.diagrams;
   const source = prepareContentForRender(doc.content, diagrams);
 
   const { content: MdxBody } = await compileMDX({

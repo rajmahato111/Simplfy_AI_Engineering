@@ -16,6 +16,8 @@ Coordination rules: [`dual-tool-coordination.md`](./dual-tool-coordination.md)
 | T-002 | Cursor | `cursor/coordination-and-foundation-42a0` | `ready_for_review` | `docs/agent-board.md`, `docs/dual-tool-coordination.md`, `AGENTS.md`, `docs/pre-pr-testing.md` |
 | T-010 | Cursor | `cursor/coordination-and-foundation-42a0` | `ready_for_review` | `app/**`, `components/**`, `lib/**`, `package.json`, `package-lock.json`, `tsconfig.json`, `next.config.ts`, `postcss.config.mjs`, `eslint.config.mjs`, `.github/workflows/ci.yml` |
 | T-012 | Cursor | `cursor/content-render-qa-42a0` | `ready_for_browser_qa` | `app/learn/**`, `lib/content-audit.ts`, `lib/mdx-components.tsx`, `scripts/content-render-qc.ts`, `e2e/content-rendering.spec.ts`, `docs/content-render-qa.md` |
+| T-011 | Cursor | `cursor/content-schema-42a0` | `ready_for_review` | `lib/content-schema.ts`, `lib/content.ts`, `scripts/validate-frontmatter.ts` |
+| T-051 | Cursor | `cursor/content-schema-42a0` | `ready_for_review` | `scripts/validate-frontmatter.ts`, `package.json`, `.github/workflows/ci.yml` |
 
 ---
 
@@ -93,15 +95,31 @@ Coordination rules: [`dual-tool-coordination.md`](./dual-tool-coordination.md)
 
 ---
 
+### T-011 + T-051 — Cursor — ready_for_review
+
+**Requirement:** Typed MDX frontmatter schema + validator script (style guide §3).
+
+**Do not touch:** `content/**` MDX source (validator reads only).
+
+**Done when:**
+
+- [x] `lib/content-schema.ts` with types + `validateFrontmatter()`
+- [x] `npm run validate:frontmatter` checks all MDX files
+- [x] CI runs frontmatter validation
+- [x] `lib/content.ts` uses typed schema
+- [ ] Committed and pushed
+
+---
+
 ## Queued (unclaimed)
 
 | ID | Tool | Task | Blocked by |
 |----|------|------|------------|
 | T-003 | Claude Code | Content brief template (`docs/briefs/`) | — |
-| T-011 | Cursor | Content schema types (`lib/content-schema.ts`) | T-010 |
+| T-011 | Cursor | Content schema types (`lib/content-schema.ts`) | — (done in T-011 branch) |
 | T-020–T-022 | Claude Code | RAG cluster expansion (hybrid search, reranking, embeddings) | T-001 merge |
 | T-030–T-032 | Claude Code | Agents content batch | — (disjoint paths) |
-| T-051 | Cursor | MDX frontmatter validator script | T-010 |
+| T-051 | Cursor | MDX frontmatter validator script | — (done in T-011 branch) |
 
 ---
 

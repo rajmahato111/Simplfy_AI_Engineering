@@ -9,7 +9,8 @@
     "typecheck": "tsc --noEmit",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "validate:content": "tsx scripts/content-render-qc.ts"
+    "validate:content": "tsx scripts/content-render-qc.ts",
+    "validate:frontmatter": "tsx scripts/validate-frontmatter.ts"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",

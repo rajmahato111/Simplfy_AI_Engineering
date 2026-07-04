@@ -1,6 +1,8 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
+import type { ContentFrontmatter } from "@/lib/content-schema";
+import { validateFrontmatter } from "@/lib/content-schema";
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
 
@@ -21,16 +23,7 @@ export function listContentSlugs(): string[] {
   return slugs.sort();
 }
 
-export type ContentFrontmatter = {
-  title?: string;
-  slug?: string;
-  type?: string;
-  area?: string;
-  difficulty?: string;
-  est_minutes?: number;
-  status?: string;
-  source_attribution?: string;
-};
+export type { ContentFrontmatter } from "@/lib/content-schema";
 
 export function getContentBySlug(slug: string) {
   const normalized = slug.replace(/^\/+|\/+$/g, "");
@@ -39,9 +32,13 @@ export function getContentBySlug(slug: string) {
 
   const raw = fs.readFileSync(filePath, "utf8");
   const { data, content } = matter(raw);
+  const validation = validateFrontmatter(data, { fileSlug: normalized });
+
   return {
     slug: normalized,
-    frontmatter: data as ContentFrontmatter,
+    frontmatter: (validation.data ?? data) as ContentFrontmatter,
+    frontmatterValid: validation.ok,
+    frontmatterIssues: validation.issues,
     content,
     dir: path.dirname(filePath),
   };

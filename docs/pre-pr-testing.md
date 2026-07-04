@@ -39,6 +39,7 @@ Run from repo root after `npm install` (app tasks) or as noted (content-only tas
 | Production build | `npm run build` | Any TS/Next change |
 | **Playwright E2E** | `npm run test:e2e` | Any `app/**`, `e2e/**`, or reader-affecting change |
 | **Content render QC** | `npm run validate:content` | Any `content/**` or reader/MDX pipeline change |
+| **Frontmatter schema** | `npm run validate:frontmatter` | Any `content/**` MDX change |
 | Diagram QC | `bash scripts/render-diagram.sh <svg>` + visual inspect PNG | Any `*.svg` change |
 | Style guide §7 + [content-render-qa.md](./content-render-qa.md) | Reviewer checklist | Any MDX change |
 
