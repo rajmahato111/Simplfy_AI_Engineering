@@ -43,6 +43,9 @@ export default async function QuestionDetailPage({ params }: Props) {
         <Button href={`/practice?question=${q.slug}`} variant="secondary" size="sm" className="mt-4">
           Open guided practice
         </Button>
+        <Button href={`/mock?question=${q.slug}`} variant="ghost" size="sm" className="mt-2">
+          Start mock interview
+        </Button>
       </section>
 
       {related.length > 0 && (
