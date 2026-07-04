@@ -37,11 +37,16 @@ Run from repo root after `npm install` (app tasks) or as noted (content-only tas
 | Typecheck | `npm run typecheck` | Any TS/Next change |
 | Lint | `npm run lint` | Any TS/Next change |
 | Production build | `npm run build` | Any TS/Next change |
+| **Playwright E2E** | `npm run test:e2e` | Any `app/**`, `e2e/**`, or reader-affecting change |
 | Content frontmatter | `node scripts/validate-content.mjs` | Any `content/**` change (when script exists) |
 | Diagram QC | `bash scripts/render-diagram.sh <svg>` + visual inspect PNG | Any `*.svg` change |
 | Style guide §7 | Reviewer checklist | Any MDX change |
 
 **Fail = fix before browser stage.** Do not open a PR on a broken build.
+
+When you add or change front-end behavior, **add or update Playwright tests** in
+`e2e/` in the same task. CI runs `npm run test:e2e` on every PR (see
+`.github/workflows/ci.yml`).
 
 ---
 
@@ -79,18 +84,25 @@ If the agent session **does not expose Browser tools** (e.g. some cloud runs):
    (implementing or reviewer agent with `@Browser`).
 5. Ask the human only if blocked — do not assume a fallback runner.
 
-### 3c. Playwright smoke (opt-in only — human approval required)
+### 3c. Playwright E2E (required — local + CI)
 
-`scripts/browser-smoke.mjs` exists in the repo **for now** as an optional helper.
-Agents **must not** run or add Playwright-based gates unless the human explicitly
-approves it for that task in chat (record on the board):
+Frontend automation lives in **`e2e/`** using `@playwright/test`. Implementing
+agents **write or update tests alongside app code** for any UI/route change.
 
-```markdown
-**Approved fallback:** Playwright smoke for T-___ (human approved 2026-07-04)
+**Local (before PR):**
+
+```bash
+npm run test:e2e          # headless; starts production server via playwright.config.ts
+npm run test:e2e:ui       # optional interactive runner
 ```
 
-If approved: `npm run dev` + `npm run test:browser`. Same smoke matrix as §4.
-This does **not** replace Cursor Browser when Browser tools are available to the agent.
+**CI:** GitHub Actions runs `npm run test:e2e` after typecheck/lint (Chromium +
+mobile-chrome projects).
+
+Tests must cover the same smoke matrix as §4 (or a focused subset when the task
+touches only specific routes — never leave changed routes untested).
+
+Record on board + PR: `Playwright E2E: passed locally <date>` when run before PR.
 
 ---
 
@@ -142,6 +154,8 @@ Copy into PR description; all boxes must be true before opening/updating PR:
 - [ ] `npm run typecheck` passed
 - [ ] `npm run lint` passed
 - [ ] `npm run build` passed
+- [ ] `npm run test:e2e` passed (or CI green on PR)
+- [ ] Playwright tests added/updated for changed routes
 - [ ] Browser smoke matrix (§4) passed in **Cursor Browser** (@Browser)
 - [ ] Screenshots / notes attached if UI changed
 - [ ] agent-board.md updated → `ready_for_review`
@@ -154,13 +168,13 @@ Copy into PR description; all boxes must be true before opening/updating PR:
 ## 6. Reviewer agent checklist (on PR)
 
 1. Check out PR branch.
-2. Re-run §2 automated checks.
+2. Re-run §2 automated checks (including `npm run test:e2e`).
 3. Re-run smoke matrix (§4) in **Cursor Browser** (`@Browser`).
 4. Code review: Ponytail (code) / style guide (content) / no Tier A doc drift.
 5. If pass → merge to integration branch; update agent-board → `merged`.
 6. If fail → `FIX REQUIRED` comment with file/line findings; do not merge.
 
-Playwright re-run only if human documented approval on the board for that PR.
+Playwright re-run is required in CI; reviewer may re-run locally if CI is pending.
 
 ---
 
@@ -172,10 +186,8 @@ When browser QA completes, add to the task block in `agent-board.md`:
 **Browser QA:** Cursor Browser passed 2026-07-04 — B1–B8, S1–S5 green (@Browser)
 ```
 
-If human approved Playwright for this task only:
-
 ```markdown
-**Browser QA:** Playwright smoke passed 2026-07-04 — human-approved fallback; B1–B8, S1–S5 green
+**Playwright E2E:** passed locally 2026-07-04 — npm run test:e2e green
 ```
 
 If waiting on desktop Browser from a cloud session:

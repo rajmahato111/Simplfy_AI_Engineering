@@ -25,6 +25,7 @@
 
 - [`.claude/skills/ponytail/SKILL.md`](.claude/skills/ponytail/SKILL.md) — minimal working code (default: full).
 - [`docs/claude-code-efficiency.md`](docs/claude-code-efficiency.md) — token hygiene.
+- **`e2e/`** — write or update Playwright tests with every front-end change; CI runs `npm run test:e2e`.
 
 ## 5. Do not edit without human approval
 

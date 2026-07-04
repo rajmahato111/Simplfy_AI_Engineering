@@ -66,15 +66,9 @@ Coordination rules: [`dual-tool-coordination.md`](./dual-tool-coordination.md)
 - [x] Ponytail-minimal; CI typecheck + lint stub
 - [x] Committed and pushed
 
-**Browser QA:** Playwright smoke passed 2026-07-04 — human-approved fallback for cloud session; B1–B8, S1–S5 green. **Re-verify in Cursor Browser (@Browser) before reviewer merge.**
+**Playwright E2E:** passed locally 2026-07-04 — 40/40 tests (chromium + mobile-chrome)
 
----
-
-### T-002 addendum — pre-PR testing policy
-
-**Browser QA policy (human confirmed 2026-07-04):** Cursor Browser is the required
-gate; Playwright is opt-in only with human approval; cloud agents use
-`ready_for_browser_qa` when Browser tools are unavailable.
+**Browser QA:** pending Cursor Browser (@Browser) re-verify before reviewer merge
 
 ---
 
