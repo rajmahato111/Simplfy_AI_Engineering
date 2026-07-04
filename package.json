@@ -10,13 +10,17 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "validate:content": "tsx scripts/content-render-qc.ts",
-    "validate:frontmatter": "tsx scripts/validate-frontmatter.ts"
+    "validate:frontmatter": "tsx scripts/validate-frontmatter.ts",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "drizzle-orm": "^0.45.2",
     "gray-matter": "^4.0.3",
     "next": "^15.5.0",
     "next-auth": "^5.0.0-beta.31",
     "next-mdx-remote": "^5.0.0",
+    "postgres": "^3.4.9",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "remark-gfm": "^4.0.1"
@@ -26,8 +30,10 @@
     "@playwright/test": "^1.51.1",
     "@tailwindcss/postcss": "^4.1.11",
     "@types/node": "^22.16.0",
+    "@types/pg": "^8.20.0",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
+    "drizzle-kit": "^0.31.10",
     "eslint": "^9.31.0",
     "eslint-config-next": "^15.5.0",
     "tailwindcss": "^4.1.11",

@@ -11,6 +11,7 @@
 
 | Variable | Required | Example |
 |----------|----------|---------|
+| `DATABASE_URL` | Yes (progress) | `postgresql://user:pass@host/db` |
 | `NEXT_PUBLIC_SITE_URL` | Yes | `https://your-app.vercel.app` |
 | `AUTH_SECRET` | Yes (auth) | `openssl rand -base64 32` |
 | `AUTH_GITHUB_ID` | Optional OAuth | GitHub OAuth app client ID |

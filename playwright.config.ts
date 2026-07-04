@@ -27,6 +27,7 @@ export default defineConfig({
     env: {
       AUTH_SECRET: process.env.AUTH_SECRET ?? "local-dev-secret",
       NEXT_PUBLIC_SITE_URL: baseURL,
+      DATABASE_URL: process.env.DATABASE_URL ?? "",
     },
   },
 });
