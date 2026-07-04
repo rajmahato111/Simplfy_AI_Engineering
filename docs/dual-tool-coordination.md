@@ -18,12 +18,12 @@
 
 ## Branch conventions
 
-| Tool | Branch pattern | Integration target |
-|------|----------------|-------------------|
-| Claude Code | `claude/<task-slug>` | `claude/ai-interview-platform-prd-4si5f9` (for now) |
-| Cursor | `cursor/<task-slug>-42a0` | same |
+| Tool | Branch pattern | PR target |
+|------|----------------|-----------|
+| Claude Code | `claude/<task-slug>` | **`main`** |
+| Cursor | `cursor/<task-slug>-42a0` | **`main`** |
 
-**Rules:** one agent per branch; `git fetch` at session start; push often; never force-push a shared branch.
+**Rules:** one agent per branch; `git fetch` at session start; push often; never force-push a shared branch. **Do not start new features until prior PRs are merged to `main`** unless the merge approver approves on the board. Merge policy: [`pr-merge-governance.md`](./pr-merge-governance.md).
 
 ---
 
