@@ -21,11 +21,11 @@ An agent is a system where the model decides its own next move, on a loop: it ob
 
 Picture three ways to get from your house to the airport.
 
-The first is cruise control: set it to 65 and it holds that speed, reacting to exactly one signal — your current speed versus the target. It has no idea there's an airport, a route, or a merge coming up in half a mile. This is the simplest kind of automation, a feedback loop with zero judgment, and it is not an agent, however clever the algorithm underneath.
+The first is cruise control: set it to 65 and it holds that speed, reacting to one signal — current speed versus target. It has no idea there's an airport, a route, or a merge coming in half a mile. It's the simplest kind of automation, a feedback loop with zero judgment, and it is not an agent, however clever the algorithm underneath.
 
-The second is a turn-by-turn navigation app. You tell it the destination once, and it computes a full route in advance. It will recalculate if you miss an exit, but the *shape* of what it can do was decided before you started driving: turn left, turn right, arrive. It never questions whether you actually want to go to the airport, and it doesn't decide to stop for gas because it noticed the tank is low — someone would have had to build that branch in ahead of time. This is a workflow: a fixed plan with a little built-in recalculation, not an open-ended decision-maker.
+The second is a turn-by-turn navigation app. You give it a destination once, and it computes a full route in advance. It recalculates if you miss an exit, but the *shape* of what it can do was decided before you started driving. It never questions whether you actually want the airport, and it won't stop for gas because it noticed the tank is low — someone would have had to build that branch in ahead of time. It's a workflow: a fixed plan with a little built-in recalculation, not an open-ended decision-maker.
 
-The third is calling a chauffeur and telling them: "Get me to the airport by 6, I have a 40-pound bag, and I'd rather pay a toll than be late." From there, the chauffeur watches the road — actual traffic, an accident two exits up, the fact that you're now running five minutes behind because you couldn't find your passport — and continuously decides what to do about it: take the toll road, skip the coffee stop, call ahead to the terminal. Nobody wrote out the full route in advance, because nobody could have. That watch-decide-act cycle, repeating for as long as the trip takes, is the agent loop. Notice what you gave up to get it: you can no longer predict exactly which streets you'll take, and if the chauffeur makes a bad call, it happens on the road, not in a spec review.
+The third is calling a chauffeur: "Get me to the airport by 6, I have a 40-pound bag, and I'd rather pay a toll than be late." The chauffeur watches the road — actual traffic, an accident two exits up, the fact you're now running five minutes behind — and continuously decides what to do: take the toll road, skip the coffee stop, call ahead to the terminal. Nobody wrote the full route in advance, because nobody could have. That watch-decide-act cycle, repeating for as long as the trip takes, is the agent loop. Notice what you gave up to get it: you can't predict exactly which streets you'll take, and if the chauffeur makes a bad call, it happens on the road, not in a spec review.
 
 | Road trip | Agent concept |
 |---|---|
@@ -43,21 +43,21 @@ The third is calling a chauffeur and telling them: "Get me to the airport by 6, 
 
 ![The agent loop: state flows from the environment into observe, across into think, down into act, and back into the environment, cycling until an exit condition fires](diagrams/agent-fundamentals--loop.svg)
 
-Follow the loop in the diagram. Everything starts at **environment**: the current state the agent has to work with — a user's request, the result of the last tool call, a file, a system alert. That state flows into **observe**, where the agent reads it. From there it flows into **think**: the model reasons over what it just observed and the goal it was given, and decides on a single next action. That decision becomes **act**: the agent calls a tool — a search, a database query, an API write, a shell command — and something actually changes or gets revealed out in the world. The result flows back into the environment, and the loop turns again.
+Follow the loop in the diagram. Everything starts at **environment**: the current state the agent has to work with — a request, the result of the last tool call, a file, an alert. That state flows into **observe**, where the agent reads it. From there it flows into **think**: the model reasons over what it just observed and the goal it was given, and decides on a single next action. That decision becomes **act**: the agent calls a tool — a search, a database query, an API write — and something actually changes or gets revealed in the world. The result flows back into the environment, and the loop turns again.
 
-The loop doesn't run forever. Two conditions end it, shown as the exit arrow leaving "think": the model decides the goal is satisfied and produces a final answer, or an external budget — a turn limit, a time limit, a cost cap — forces a stop regardless of what the model thinks. That budget is not an optional safety feature. Without it, a confused agent has no built-in reason to ever stop calling tools.
+The loop doesn't run forever. Two conditions end it, shown as the exit arrow leaving "think": the model decides the goal is satisfied and produces a final answer, or an external budget — a turn limit, a cost cap — forces a stop regardless of what the model thinks. That budget isn't optional: without it, a confused agent has no built-in reason to ever stop calling tools.
 
-The dashed boundary around the loop marks what separates an agent from a workflow: everything inside it is chosen dynamically, turn by turn, by the model itself, based on what it has seen so far. A workflow has the same observe-then-act shape, but the routing between steps is fixed by a developer ahead of time. No matter how many if/else branches you bolt on, those branches don't change based on the loop's own history the way an agent's next action does — a workflow's decision tree is drawn before the first request ever arrives.
+The dashed boundary around the loop marks what separates an agent from a workflow: everything inside it is chosen dynamically, turn by turn, by the model itself, based on what it has seen so far. A workflow has the same observe-then-act shape, but the routing between steps is fixed by a developer ahead of time — no matter how many if/else branches you bolt on, they don't change based on the loop's own history the way an agent's next action does. A workflow's decision tree is drawn before the first request ever arrives.
 
 ## A concrete example
 
 A billing team handles roughly 9,000 refund requests a month. Two designs were tried against the same ticket queue.
 
-**Fixed 3-step workflow:** look up the account, apply the standard refund percentage for the customer's plan tier, issue the refund. Three API calls, well under a second, fully deterministic — the same ticket always produces the same output. It resolved 61% of tickets correctly. The other 39% were tickets where a customer had already received a partial refund in the last 30 days, was on a grandfathered plan with different terms, or was asking for something adjacent to a refund (a plan downgrade instead of a payout). The workflow had no branch for "check refund history first," so it silently applied the wrong amount rather than failing loudly.
+**Fixed 3-step workflow:** look up the account, apply the standard refund percentage for the plan tier, issue the refund. Three API calls, under a second, fully deterministic. It resolved 61% of tickets correctly. The other 39% were tickets where the customer had already received a partial refund in the last 30 days, was on a grandfathered plan, or wanted something adjacent to a refund. The workflow had no branch for "check refund history first," so it silently applied the wrong amount instead of failing loudly.
 
-**Agent given the goal "resolve this refund request correctly per policy":** it observes the ticket, decides it needs the account's refund history before doing anything else, calls that tool, observes a prior refund issued 12 days earlier, reasons that a proration rule applies, checks the plan-tier table, computes the adjusted amount, issues the refund, and drafts a one-line explanation. That took 6 tool calls and about 21 seconds on average, at roughly 6 cents of model cost per ticket. Correctness on the same ticket sample: 89%. The remaining 11% were genuinely ambiguous edge cases that the team routed to a human instead of letting the agent guess.
+**Agent given the goal "resolve this refund request correctly per policy":** it observes the ticket, decides it needs the refund history first, calls that tool, observes a prior refund issued 12 days earlier, reasons a proration rule applies, checks the plan-tier table, computes the adjusted amount, issues the refund, and drafts a one-line explanation. That took 6 tool calls and about 21 seconds on average, at roughly 6 cents of model cost per ticket. Correctness: 89%. The remaining 11% were genuinely ambiguous cases the team routed to a human instead of letting the agent guess.
 
-The agent didn't get better tools than the workflow had access to. It got permission to decide, per ticket, which tools to check and in what order.
+The agent didn't get better tools than the workflow had. It got permission to decide, per ticket, which tools to check and in what order.
 
 ## The tradeoffs that matter
 
@@ -67,21 +67,21 @@ The agent didn't get better tools than the workflow had access to. It got permis
 | Branching workflow / rules engine | High, but only across anticipated branches | Moderate — bounded by how many branches you wrote | Low | Moderate — more branches to reason through |
 | Agent (loop) | Path varies run to run, even on similar input | Strong — reasons over cases nobody enumerated | Scales with turns; can run 5–20x a workflow's cost | Hard — needs full trace replay to see why a path was chosen |
 
-The honest framing: a workflow buys certainty, an agent buys reach. If you can enumerate the paths your task will ever need, a workflow gets you there for a fraction of the cost, with a trace anyone can audit in five minutes. Reach for a loop only when the paths themselves are the unknown — when the right next step depends on something you can't know until you've already taken the previous one.
+A workflow buys certainty, an agent buys reach. If you can enumerate the paths your task will ever need, a workflow gets you there for a fraction of the cost, with a trace anyone can audit in five minutes. Reach for a loop only when the paths themselves are the unknown — when the right next step depends on something you can't know until you've already taken the previous one.
 
 ## Where people go wrong
 
-1. **Calling anything with an LLM in it "an agent."** A single model call that classifies a ticket and hands it to a fixed pipeline is a workflow with a smart step, not an agent — nothing is choosing its own path.
+1. **Calling anything with an LLM in it "an agent."** A single model call that classifies a ticket and hands it to a fixed pipeline is a workflow with a smart step — nothing is choosing its own path.
 2. **Reaching for a loop when a script would do.** If the decision space is small and stable, an agent adds latency, cost, and unpredictability to buy flexibility you'll never use.
 3. **Shipping a loop with no turn or cost budget.** Without an exit condition that doesn't depend on the model's own judgment, a stuck agent has no reason to stop.
-4. **Assuming more autonomy is strictly an upgrade.** The freedom that lets an agent solve a case nobody anticipated is the same freedom that makes its behavior harder to guarantee under audit or compliance review.
-5. **Never benchmarking the agent against the workflow it replaced.** Teams ship the version that impressed the demo and skip the unglamorous comparison of cost, latency, and correctness against the boring deterministic baseline.
+4. **Assuming more autonomy is strictly an upgrade.** The freedom that solves a case nobody anticipated is the same freedom that makes behavior harder to guarantee under audit.
+5. **Never benchmarking the agent against the workflow it replaced.** Teams ship the version that impressed the demo and skip the comparison against the boring deterministic baseline.
 
 ## The interview lens
 
-Interviewers use this topic to see whether you reach for agents because a problem needs one, or because they're the exciting answer. The tell is whether you can name the specific uncertainty that justifies the loop.
+Interviewers use this topic to see whether you reach for agents because a problem needs one, or because they're the exciting answer. The tell: can you name the specific uncertainty that justifies the loop?
 
-A strong sound bite: *"I don't ask whether a system uses an LLM to decide if it's an agent — I ask whether the next action is chosen by the loop itself, from what it just observed, or whether a developer already knew every branch in advance. If a human could have written the full decision tree ahead of time, I'd rather ship the cheap, auditable workflow than an agent wearing the same job."*
+A strong sound bite: *"I don't ask whether a system uses an LLM to decide if it's an agent — I ask whether the next action is chosen by the loop itself, from what it just observed, or whether a developer already knew every branch in advance. If a human could have written the full decision tree ahead of time, I'd rather ship the cheap, auditable workflow."*
 
 Likely follow-ups:
 

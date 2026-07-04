@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="480" viewBox="0 0 1120 480" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN (8px grid)
+Canvas 1120x480. Title center (560,44).
+
+Main row (the workflow's activities) y=96 h=64 (96..160) c_y=128
+  Activity 1 (indigo) x=64  w=144 (64..208)   c=(136,128)
+  Activity 2 (indigo) x=272 w=144 (272..416)  c=(344,128)
+  [CRASH] red dashed vertical line at x=448, spans y=88..168; label "crash" red at (448,80)
+  Activity 3 (indigo) x=480 w=144 (480..624)  c=(552,128)
+  Activity 4 (indigo) x=688 w=144 (688..832)  c=(760,128)
+  Activity 5 (indigo) x=896 w=144 (896..1040) c=(968,128)
+
+Recovery container: x=40 y=208 w=392 h=240 (40..432, 208..448)
+  caption (56,222)
+  Event history (green, data store) x=64 w=352 y=232 h=64 (232..296) c=(240,264)
+  New worker replays log (indigo)    x=64 w=352 y=368 h=64 (368..432) c=(240,400)
+
+Arrows (#475569, start at source edge, end 2px before target edge, one L-bend max):
+  M1 Activity1->Activity2   (208,128)->(270,128)
+  M2 Activity2->crash line  (416,128)->(446,128)   [flow is cut off here — no arrow reaches Activity 3 directly]
+  M3 Activity3->Activity4   (624,128)->(686,128)
+  M4 Activity4->Activity5   (832,128)->(894,128)
+  L1 Activity1->EventHistory (136,160)->(136,230)  straight
+  L2 Activity2->EventHistory (344,160)->(344,230)  straight
+  L3 EventHistory->Replay    (240,296)->(240,366)  straight
+  L4 Replay->Activity3       (416,400)->(552,400)->(552,162)  label "resume live" [one L-bend, enters Activity 3's bottom edge]
+-->
+  <rect width="1120" height="480" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="560" y="44" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">Crash mid-workflow, then replay from the event log</text>
+
+  <!-- recovery container -->
+  <rect x="40" y="208" width="392" height="240" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="56" y="222" font-size="12" fill="#64748B">Recovery</text>
+
+  <!-- crash marker -->
+  <line x1="448" y1="88" x2="448" y2="168" stroke="#DC2626" stroke-width="2" stroke-dasharray="5 4"/>
+  <text x="448" y="80" font-size="12" font-weight="600" fill="#DC2626" text-anchor="middle">crash</text>
+
+  <!-- main row arrows -->
+  <line x1="208" y1="128" x2="270" y2="128" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="416" y1="128" x2="446" y2="128" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="624" y1="128" x2="686" y2="128" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="832" y1="128" x2="894" y2="128" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- log + replay arrows -->
+  <line x1="136" y1="160" x2="136" y2="230" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="344" y1="160" x2="344" y2="230" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="240" y1="296" x2="240" y2="366" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <polyline points="416,400 552,400 552,162" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="500" y="376" width="88" height="18" fill="#ffffff"/>
+  <text x="544" y="389" font-size="12" fill="#475569" text-anchor="middle">resume live</text>
+
+  <!-- main row nodes -->
+  <rect x="64" y="96" width="144" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="136" y="124" font-size="14" fill="#1E1B4B" text-anchor="middle">Activity 1<tspan x="136" dy="17">(model call)</tspan></text>
+
+  <rect x="272" y="96" width="144" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="344" y="124" font-size="14" fill="#1E1B4B" text-anchor="middle">Activity 2<tspan x="344" dy="17">(tool call)</tspan></text>
+
+  <rect x="480" y="96" width="144" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="552" y="124" font-size="14" fill="#1E1B4B" text-anchor="middle">Activity 3<tspan x="552" dy="17">(tool call)</tspan></text>
+
+  <rect x="688" y="96" width="144" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="760" y="133" font-size="14" fill="#1E1B4B" text-anchor="middle">Activity 4</text>
+
+  <rect x="896" y="96" width="144" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="968" y="124" font-size="14" fill="#1E1B4B" text-anchor="middle">Activity 5<tspan x="968" dy="17">(complete)</tspan></text>
+
+  <!-- recovery nodes -->
+  <rect x="64" y="232" width="352" height="64" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="240" y="260" font-size="14" fill="#064E3B" text-anchor="middle">Event history<tspan x="240" dy="17">(append-only log)</tspan></text>
+
+  <rect x="64" y="368" width="352" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="240" y="396" font-size="14" fill="#1E1B4B" text-anchor="middle">New worker<tspan x="240" dy="17">replays the log</tspan></text>
+</svg>

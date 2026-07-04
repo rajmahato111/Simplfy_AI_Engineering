@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="632" viewBox="0 0 1200 632" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="728" viewBox="0 0 1200 728" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
 <!--
 COORDINATE PLAN (8px grid)
-Canvas 1200x632. Title center (600,44).
+Canvas 1200x728. Title center (600,44).
 
 Container 1 "Single-turn evaluation (one artifact)": x=32 y=76 w=1136 h=140 (32..1168, 76..216)
   caption (48,98)
@@ -11,7 +11,7 @@ Container 1 "Single-turn evaluation (one artifact)": x=32 y=76 w=1136 h=140 (32.
     Judge1  x=480 w=160 (480..640) c=(560,144)
     Score1  x=704 w=160 (704..864) c=(784,144)
 
-Container 2 "Trajectory evaluation (the agent case)": x=32 y=248 w=1136 h=360 (32..1168, 248..608)
+Container 2 "Trajectory evaluation (the agent case)": x=32 y=248 w=1136 h=456 (32..1168, 248..704)
   caption (48,270)
   Row Steps y=288 h=64 (288..352) c_y=320
     Step 1      x=64  w=144 (64..208)  c=(136,320)
@@ -23,7 +23,8 @@ Container 2 "Trajectory evaluation (the agent case)": x=32 y=248 w=1136 h=360 (3
     Outcome reward x=688 w=176 (688..864) c=(776,448)  [under Final state]
   Row judge y=512 h=64 (512..576) c_y=544
     Trajectory judge x=460 w=200 (460..660) c=(560,544)
-    Trajectory score x=724 w=176 (724..900) c=(812,544)
+  Row score y=608 h=64 (608..672) c_y=640 [directly below judge, own edge, avoids collision with judge's side inputs]
+    Trajectory score x=460 w=200 (460..660) c=(560,640)
 
 Arrows (#475569, start at source edge, end 2px before target edge, one L-bend max):
   R1a Query->Answer     (208,144)->(270,144)
@@ -36,11 +37,11 @@ Arrows (#475569, start at source edge, end 2px before target edge, one L-bend ma
   T2  Step2->ProcTap    (344,352)->(344,416)   straight
   T3  Step3->ProcTap    (552,352)->(552,416)   straight
   T4  FinalState->OutTap(776,352)->(776,416)   straight
-  J1  ProcTap->Judge2   (344,480)->(344,544)->(458,544)
-  J2  OutTap->Judge2    (776,480)->(776,544)->(662,544)
-  J3  Judge2->Score2    (660,544)->(722,544)
+  J1  ProcTap->Judge2   (344,480)->(344,544)->(458,544)   [enters judge LEFT edge]
+  J2  OutTap->Judge2    (776,480)->(776,544)->(662,544)   [enters judge RIGHT edge]
+  J3  Judge2->Score2    (560,576)->(560,606)               [straight down, judge's own bottom edge — no collision with J1/J2]
 -->
-  <rect width="1200" height="632" fill="#ffffff"/>
+  <rect width="1200" height="728" fill="#ffffff"/>
   <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
     orient="auto" markerUnits="userSpaceOnUse">
     <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
@@ -51,7 +52,7 @@ Arrows (#475569, start at source edge, end 2px before target edge, one L-bend ma
   <rect x="32" y="76" width="1136" height="140" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
   <text x="48" y="98" font-size="12" fill="#64748B">Single-turn evaluation (one artifact)</text>
 
-  <rect x="32" y="248" width="1136" height="360" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <rect x="32" y="248" width="1136" height="456" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
   <text x="48" y="270" font-size="12" fill="#64748B">Trajectory evaluation (the agent case)</text>
 
   <!-- container 1 arrows -->
@@ -69,7 +70,7 @@ Arrows (#475569, start at source edge, end 2px before target edge, one L-bend ma
   <line x1="776" y1="352" x2="776" y2="414" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
   <polyline points="344,480 344,544 456,544" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
   <polyline points="776,480 776,544 664,544" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <line x1="660" y1="544" x2="722" y2="544" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="560" y1="576" x2="560" y2="606" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <!-- Row1 nodes -->
   <rect x="64" y="112" width="144" height="64" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
@@ -108,6 +109,6 @@ Arrows (#475569, start at source edge, end 2px before target edge, one L-bend ma
   <rect x="460" y="512" width="200" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
   <text x="560" y="540" font-size="14" fill="#2E1065" text-anchor="middle">Trajectory<tspan x="560" dy="17">judge</tspan></text>
 
-  <rect x="724" y="512" width="176" height="64" rx="10" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
-  <text x="812" y="540" font-size="14" fill="#334155" text-anchor="middle">Trajectory<tspan x="812" dy="17">score</tspan></text>
+  <rect x="460" y="608" width="200" height="64" rx="10" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <text x="560" y="636" font-size="14" fill="#334155" text-anchor="middle">Trajectory<tspan x="560" dy="17">score</tspan></text>
 </svg>
