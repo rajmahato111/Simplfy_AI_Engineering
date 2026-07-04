@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1040" height="608" viewBox="0 0 1040 608" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
 <!--
 COORDINATE PLAN (8px grid)
-Canvas 1040x608. Content bottom y=492 (legend). Extra bottom room because the
-headless-Chromium QC renderer cannot paint the last ~96px of the window.
+Canvas 1040x608. Content bottom y=492 (legend). Extra bottom margin is a legacy
+workaround for a QC-renderer bug since fixed in scripts/render-diagram.sh; harmless.
 Label column: left-aligned text at x=32 (col 32..216).
 Bar area: x=232..1000 (w=768). Bars h=32 unless noted.
 Topic guide lines (under bars): x=544 and x=784, y=128..448, #CBD5E1 dashed.
@@ -10,7 +10,8 @@ Topic guide lines (under bars): x=544 and x=784, y=128..448, #CBD5E1 dashed.
 Rows:
   Document bar  y=88..120   zones 232..544 / 544..784 / 784..1000 (dashed separators)
   Fixed-size    y=160..192  6 segments w=128: x=232,360,488,616,744,872  ann y=212
-  Sentence      y=240..272  cuts at 288,360,408,472,544,608,680,736,784,856,920  ann y=292
+  Sentence      y=240..272  cuts at 288,360,408,472,520,592,656,712,760,824,904,952
+                (none land on 544/784; one segment straddles each topic line)  ann y=292
   Semantic      y=320..352  3 segments: 232..544, 544..784, 784..1000   ann y=372
   Parent-child  parents y=400..416 (2 x w=384, dashed), children y=424..440
                 (6 x w=128, solid), ann y=460
@@ -36,7 +37,7 @@ Rows:
 
   <!-- row 1: fixed-size -->
   <text x="32" y="172" font-size="14" font-weight="600" fill="#334155">Fixed-size</text>
-  <text x="32" y="190" font-size="12" fill="#64748B">512 tokens each</text>
+  <text x="32" y="190" font-size="12" fill="#64748B">equal-size cuts</text>
   <rect x="232" y="160" width="128" height="32" rx="4" fill="#FFFFFF" stroke="#64748B" stroke-width="1.5"/>
   <rect x="360" y="160" width="128" height="32" rx="4" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
   <rect x="488" y="160" width="128" height="32" rx="4" fill="#FFFFFF" stroke="#64748B" stroke-width="1.5"/>
@@ -52,14 +53,15 @@ Rows:
   <rect x="288" y="240" width="72" height="32" rx="4" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
   <rect x="360" y="240" width="48" height="32" rx="4" fill="#FFFFFF" stroke="#64748B" stroke-width="1.5"/>
   <rect x="408" y="240" width="64" height="32" rx="4" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
-  <rect x="472" y="240" width="72" height="32" rx="4" fill="#FFFFFF" stroke="#64748B" stroke-width="1.5"/>
-  <rect x="544" y="240" width="64" height="32" rx="4" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
-  <rect x="608" y="240" width="72" height="32" rx="4" fill="#FFFFFF" stroke="#64748B" stroke-width="1.5"/>
-  <rect x="680" y="240" width="56" height="32" rx="4" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
-  <rect x="736" y="240" width="48" height="32" rx="4" fill="#FFFFFF" stroke="#64748B" stroke-width="1.5"/>
-  <rect x="784" y="240" width="72" height="32" rx="4" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
-  <rect x="856" y="240" width="64" height="32" rx="4" fill="#FFFFFF" stroke="#64748B" stroke-width="1.5"/>
-  <rect x="920" y="240" width="80" height="32" rx="4" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="472" y="240" width="48" height="32" rx="4" fill="#FFFFFF" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="520" y="240" width="72" height="32" rx="4" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="592" y="240" width="64" height="32" rx="4" fill="#FFFFFF" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="656" y="240" width="56" height="32" rx="4" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="712" y="240" width="48" height="32" rx="4" fill="#FFFFFF" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="760" y="240" width="64" height="32" rx="4" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="824" y="240" width="80" height="32" rx="4" fill="#FFFFFF" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="904" y="240" width="48" height="32" rx="4" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="952" y="240" width="48" height="32" rx="4" fill="#FFFFFF" stroke="#64748B" stroke-width="1.5"/>
   <text x="232" y="292" font-size="12" fill="#64748B">Cuts at sentence ends; single ideas still fragment.</text>
 
   <!-- row 3: semantic -->
