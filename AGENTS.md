@@ -18,6 +18,7 @@
 ## 3. Content work (`content/**`)
 
 - [`docs/content-style-guide.md`](docs/content-style-guide.md) — binding templates, voice, diagrams, QC.
+- [`docs/content-render-qa.md`](docs/content-render-qa.md) — table/diagram render QA (`validate:content` + e2e).
 - [`docs/agent-workflow.md`](docs/agent-workflow.md) — produce → review → approve → ship.
 - [`CREDITS.md`](CREDITS.md) — attribution; never copy upstream prose.
 

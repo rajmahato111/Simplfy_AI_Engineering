@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import { compileMDX } from "next-mdx-remote/rsc";
+import remarkGfm from "remark-gfm";
 import { getContentBySlug, listContentSlugs } from "@/lib/content";
+import { prepareContentForRender } from "@/lib/content-audit";
 import { extractH2Headings } from "@/lib/headings";
 import { mdxComponents } from "@/lib/mdx-components";
 import { ArticleBreadcrumb, ArticleToc } from "@/components/article-chrome";
@@ -22,11 +24,16 @@ export default async function LearnDocPage({ params }: Props) {
   if (!doc) notFound();
 
   const headings = extractH2Headings(doc.content);
+  const diagrams = (doc.frontmatter as { diagrams?: string[] }).diagrams ?? [];
+  const source = prepareContentForRender(doc.content, diagrams);
 
   const { content: MdxBody } = await compileMDX({
-    source: doc.content,
+    source,
     components: mdxComponents(slug, headings),
-    options: { parseFrontmatter: false },
+    options: {
+      parseFrontmatter: false,
+      mdxOptions: { remarkPlugins: [remarkGfm] },
+    },
   });
 
   const { title, type, area, difficulty, est_minutes, source_attribution } =

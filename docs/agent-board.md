@@ -15,6 +15,7 @@ Coordination rules: [`dual-tool-coordination.md`](./dual-tool-coordination.md)
 | T-001 | Claude Code | `claude/ai-interview-platform-prd-4si5f9` | `in_progress` | `content/concepts/retrieval/**`, `content/walkthroughs/design-a-production-rag-system.mdx`, `content/walkthroughs/diagrams/design-a-production-rag-system--architecture.svg` |
 | T-002 | Cursor | `cursor/coordination-and-foundation-42a0` | `ready_for_review` | `docs/agent-board.md`, `docs/dual-tool-coordination.md`, `AGENTS.md`, `docs/pre-pr-testing.md` |
 | T-010 | Cursor | `cursor/coordination-and-foundation-42a0` | `ready_for_review` | `app/**`, `components/**`, `lib/**`, `package.json`, `package-lock.json`, `tsconfig.json`, `next.config.ts`, `postcss.config.mjs`, `eslint.config.mjs`, `.github/workflows/ci.yml` |
+| T-012 | Cursor | `cursor/content-render-qa-42a0` | `ready_for_browser_qa` | `app/learn/**`, `lib/content-audit.ts`, `lib/mdx-components.tsx`, `scripts/content-render-qc.ts`, `e2e/content-rendering.spec.ts`, `docs/content-render-qa.md` |
 
 ---
 
@@ -69,6 +70,26 @@ Coordination rules: [`dual-tool-coordination.md`](./dual-tool-coordination.md)
 **Playwright E2E:** passed locally 2026-07-04 — 40/40 tests (chromium + mobile-chrome)
 
 **Browser QA:** pending Cursor Browser (@Browser) re-verify before reviewer merge
+
+---
+
+### T-012 — Cursor — in_progress
+
+**Requirement:** Fix MDX table/diagram rendering; add automated content render QA (static + Playwright).
+
+**Do not touch:** T-001 locked MDX/SVG source files (render-time injection only).
+
+**Done when:**
+
+- [x] GFM tables render as styled HTML tables
+- [x] Frontmatter diagrams appear on concept pages
+- [x] `npm run validate:content` + `e2e/content-rendering.spec.ts` pass
+- [x] `docs/content-render-qa.md` documents the QA loop
+- [ ] Committed and pushed
+
+**Playwright E2E:** passed locally 2026-07-04 — 46/46 tests (includes content-rendering QA)
+
+**Browser QA:** pending Cursor Browser (@Browser) spot-check tables + diagrams before reviewer merge
 
 ---
 

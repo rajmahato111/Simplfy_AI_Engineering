@@ -38,9 +38,9 @@ Run from repo root after `npm install` (app tasks) or as noted (content-only tas
 | Lint | `npm run lint` | Any TS/Next change |
 | Production build | `npm run build` | Any TS/Next change |
 | **Playwright E2E** | `npm run test:e2e` | Any `app/**`, `e2e/**`, or reader-affecting change |
-| Content frontmatter | `node scripts/validate-content.mjs` | Any `content/**` change (when script exists) |
+| **Content render QC** | `npm run validate:content` | Any `content/**` or reader/MDX pipeline change |
 | Diagram QC | `bash scripts/render-diagram.sh <svg>` + visual inspect PNG | Any `*.svg` change |
-| Style guide §7 | Reviewer checklist | Any MDX change |
+| Style guide §7 + [content-render-qa.md](./content-render-qa.md) | Reviewer checklist | Any MDX change |
 
 **Fail = fix before browser stage.** Do not open a PR on a broken build.
 
@@ -119,6 +119,7 @@ Adapt rows to the task; **never skip rows that touch changed routes**.
 | B3 | Load `/learn` | Lists every committed MDX slug; links clickable |
 | B4 | Open each MDX route | Title + body render; no MDX compile error page |
 | B5 | MDX with diagram | Image loads (200); visible width > 0 |
+| B5b | MDX with tables | `<table>` renders (not pipe text); columns readable |
 | B6 | Internal MDX link | Click `.mdx` link → correct `/learn/...` page |
 | B7 | `/credits` | CREDITS content visible |
 | B8 | Unknown route | 404, not 500 |
