@@ -1,32 +1,42 @@
 # Deploy to Vercel
 
-> Production hosting for the Next.js app. Content ships as MDX in the repo — no DB required for the reader MVP.
+> Production hosting for the Next.js app. Postgres required for progress, mocks, and Pro status.
 
-## One-time setup
+## Local `.env`
+
+```bash
+npm run setup:env   # copies .env.example → .env with fresh AUTH_SECRET
+```
+
+Fill in keys in `.env` (gitignored):
+
+| Variable | Purpose |
+|----------|---------|
+| `DATABASE_URL` | Postgres |
+| `AUTH_SECRET` | Auth.js |
+| `ANTHROPIC_API_KEY` | LLM tutor, grader, whiteboard critique |
+| `STRIPE_SECRET_KEY` + `STRIPE_PRICE_ID` | Live checkout |
+| `STRIPE_WEBHOOK_SECRET` | Grant Pro after payment |
+| `PRO_ACCESS=all` | Dev only — skip paywall |
+
+## One-time Vercel setup
 
 1. Import the GitHub repo in [Vercel](https://vercel.com/new).
 2. Framework preset: **Next.js** (auto-detected).
-3. Root directory: `.` (default).
-4. Add environment variables (Production + Preview):
-
-| Variable | Required | Example |
-|----------|----------|---------|
-| `DATABASE_URL` | Yes (progress) | `postgresql://user:pass@host/db` |
-| `NEXT_PUBLIC_SITE_URL` | Yes | `https://your-app.vercel.app` |
-| `AUTH_SECRET` | Yes (auth) | `openssl rand -base64 32` |
-| `AUTH_GITHUB_ID` | Optional OAuth | GitHub OAuth app client ID |
-| `AUTH_GITHUB_SECRET` | Optional OAuth | GitHub OAuth app secret |
-
+3. Add environment variables (Production + Preview) — same as `.env.example`.
+4. Use **Neon** or **Supabase** for `DATABASE_URL`; run migrations via CI or `npm run db:push` locally against prod once.
 5. Deploy. Vercel runs `npm run build` (see `vercel.json`).
 
-## Git integration
+## Stripe webhook
 
-Every push to `main` triggers a production deploy. Pull requests get preview URLs automatically.
+Point Stripe webhook to `https://your-domain/api/stripe/webhook` for `checkout.session.completed`. Set `STRIPE_WEBHOOK_SECRET`.
 
 ## Pre-deploy checklist
 
 ```bash
 npm ci
+npm run db:push
+npm run db:reindex
 npm run typecheck
 npm run lint
 npm run build

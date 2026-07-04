@@ -45,6 +45,6 @@ test.describe("tier 3 pages", () => {
     await page.goto("/pricing");
     await expect(page.getByRole("heading", { name: "Pricing" })).toBeVisible();
     await page.getByRole("button", { name: "Upgrade to Pro" }).click();
-    await expect(page.getByText(/checkout stub|STRIPE_SECRET_KEY/i)).toBeVisible();
+    await expect(page.getByText(/checkout stub|STRIPE_SECRET_KEY|STRIPE_PRICE_ID/i)).toBeVisible();
   });
 });

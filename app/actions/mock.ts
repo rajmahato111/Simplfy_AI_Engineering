@@ -8,11 +8,13 @@ import {
   parseMockScorecard,
   registerMockSession,
   saveMockSessionResult,
+  countCompletedMocks,
 } from "@/lib/mock-sessions-db";
 import { scoreSpiderPractice } from "@/lib/spider-feedback";
 import { getQuestionBySlug } from "@/lib/questions";
 import { mockInterviewerPrompt } from "@/lib/mock-session";
 import { anthropicComplete, isLlmConfigured } from "@/lib/llm";
+import { FREE_MOCK_LIMIT, isProUser } from "@/lib/pro-access";
 import type { Question } from "@/lib/question-schema";
 
 async function optionalUserId() {
@@ -29,6 +31,18 @@ async function optionalUserId() {
 
 export async function startMockSession(sessionId: string, questionSlug: string) {
   const userId = await optionalUserId();
+  if (userId) {
+    const pro = await isProUser(userId);
+    if (!pro) {
+      const count = await countCompletedMocks(userId);
+      if (count >= FREE_MOCK_LIMIT) {
+        return {
+          ok: false as const,
+          error: "Free tier includes one completed mock. Upgrade to Pro for unlimited mocks.",
+        };
+      }
+    }
+  }
   await registerMockSession(sessionId, questionSlug, userId);
   return { ok: true as const, sessionId };
 }
