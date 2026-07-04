@@ -1,5 +1,6 @@
 import { SPIDER_PHASES } from "./spider-phases";
 import { getQuestionBySlug } from "./questions";
+import { anthropicJson, isLlmConfigured } from "./llm";
 
 const PHASE_KEYWORDS: Record<string, string[]> = {
   scope: ["latency", "qps", "scale", "users", "requirement", "constraint", "budget", "volume", "accuracy"],
@@ -19,6 +20,7 @@ export type PhaseFeedback = {
 export type SpiderFeedback = {
   overall: number;
   phases: PhaseFeedback[];
+  mode: "llm" | "stub";
 };
 
 function rubricHits(text: string, rubric: string[]) {
@@ -31,11 +33,7 @@ function rubricHits(text: string, rubric: string[]) {
   });
 }
 
-/** ponytail: keyword rubric scorer — LLM grader when API key lands */
-export function scoreSpiderPractice(notes: string[], questionSlug?: string): SpiderFeedback {
-  const question = questionSlug ? getQuestionBySlug(questionSlug) : null;
-  const rubric = question?.interviewer_looks_for ?? [];
-
+function scoreSpiderStub(notes: string[], rubric: string[]): Omit<SpiderFeedback, "mode"> {
   const phases = SPIDER_PHASES.map((phase, i) => {
     const text = (notes[i] ?? "").trim().toLowerCase();
     const keywords = PHASE_KEYWORDS[phase.id] ?? [];
@@ -68,4 +66,40 @@ export function scoreSpiderPractice(notes: string[], questionSlug?: string): Spi
 
   const overall = Math.round(phases.reduce((sum, p) => sum + p.score, 0) / phases.length);
   return { overall, phases };
+}
+
+type LlmScorecard = {
+  overall: number;
+  phases: { phase: string; score: number; feedback: string }[];
+};
+
+export async function scoreSpiderPractice(notes: string[], questionSlug?: string): Promise<SpiderFeedback> {
+  const question = questionSlug ? getQuestionBySlug(questionSlug) : null;
+  const rubric = question?.interviewer_looks_for ?? [];
+
+  if (isLlmConfigured() && question) {
+    const phasesText = SPIDER_PHASES.map(
+      (p, i) => `## ${p.name}\nPrompt: ${p.prompt}\nCandidate answer:\n${notes[i] || "(empty)"}`,
+    ).join("\n\n");
+
+    const llm = await anthropicJson<LlmScorecard>(
+      "You grade AI system design interview answers using the SPIDER framework. Score each phase 0-100. Be constructive and specific. Reference the rubric signals when relevant.",
+      `Question: ${question.title}\n\nRubric (what interviewers look for):\n${rubric.map((r) => `- ${r}`).join("\n")}\n\n${phasesText}\n\nReturn JSON: {"overall": number, "phases": [{"phase": string, "score": number, "feedback": string}]}`,
+      2048,
+    );
+
+    if (llm?.phases?.length) {
+      return {
+        overall: Math.min(100, Math.max(0, Math.round(llm.overall))),
+        phases: llm.phases.map((p) => ({
+          phase: p.phase,
+          score: Math.min(100, Math.max(0, Math.round(p.score))),
+          feedback: p.feedback,
+        })),
+        mode: "llm",
+      };
+    }
+  }
+
+  return { ...scoreSpiderStub(notes, rubric), mode: "stub" };
 }

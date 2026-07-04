@@ -29,5 +29,16 @@ export const userProgress = pgTable(
   (t) => [uniqueIndex("user_progress_user_slug").on(t.userId, t.slug)],
 );
 
+export const mockSessions = pgTable("mock_sessions", {
+  id: uuid("id").primaryKey(),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
+  questionSlug: text("question_slug").notNull(),
+  notes: text("notes").notNull().default("[]"),
+  scorecard: text("scorecard"),
+  startedAt: timestamp("started_at").defaultNow().notNull(),
+  completedAt: timestamp("completed_at"),
+});
+
 export type User = typeof users.$inferSelect;
 export type UserProgress = typeof userProgress.$inferSelect;
+export type MockSession = typeof mockSessions.$inferSelect;

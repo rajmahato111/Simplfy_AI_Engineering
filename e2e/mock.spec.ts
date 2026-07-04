@@ -5,7 +5,8 @@ test.describe("mock interviewer", () => {
     await page.goto("/mock");
     await expect(page.getByRole("heading", { name: "AI mock interviewer" })).toBeVisible();
     await page.getByRole("button", { name: "Start mock interview" }).click();
-    await expect(page.getByPlaceholder("Your response…")).toBeVisible({ timeout: 10000 });
+    await expect(page).toHaveURL(/\/mock\/[^/?]+\?question=/, { timeout: 15000 });
+    await expect(page.getByPlaceholder("Your response…")).toBeVisible();
     await expect(page.getByText("Phase 1 of 6")).toBeVisible();
 
     await page.getByPlaceholder("Your response…").fill(

@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, Suspense } from "react";
+import { useState, Suspense, useTransition } from "react";
+import { startMockSession } from "@/app/actions/mock";
 import { createMockSession, MOCK_DURATION_MINUTES } from "@/lib/mock-session";
 import { cn } from "@/lib/cn";
 
@@ -19,15 +20,19 @@ const btnPrimary = cn(
 function MockSetupInner({ questions }: { questions: QuestionOption[] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [pending, startTransition] = useTransition();
   const preset = searchParams.get("question");
   const initial = preset && questions.some((q) => q.slug === preset) ? preset : (questions[0]?.slug ?? "");
   const [slug, setSlug] = useState(initial);
 
   function start() {
-    if (!slug) return;
+    if (!slug || pending) return;
     const sessionId = crypto.randomUUID();
     createMockSession(sessionId, slug);
-    router.push(`/mock/${sessionId}?question=${encodeURIComponent(slug)}`);
+    startTransition(async () => {
+      await startMockSession(sessionId, slug);
+      router.push(`/mock/${sessionId}?question=${encodeURIComponent(slug)}`);
+    });
   }
 
   return (
@@ -53,12 +58,17 @@ function MockSetupInner({ questions }: { questions: QuestionOption[] }) {
         ))}
       </select>
 
-      <button type="button" className={cn(btnPrimary, "mt-6 w-full")} onClick={start} disabled={!slug}>
-        Start mock interview
+      <button
+        type="button"
+        className={cn(btnPrimary, "mt-6 w-full")}
+        onClick={start}
+        disabled={!slug || pending}
+      >
+        {pending ? "Starting…" : "Start mock interview"}
       </button>
 
       <p className="mt-4 text-xs text-zinc-500">
-        Rule-based interviewer stub — adaptive follow-ups ship with the LLM API.
+        Uses rule-based grading without an API key; set ANTHROPIC_API_KEY for LLM interviewer and grader.
       </p>
     </div>
   );
