@@ -15,7 +15,7 @@ status: draft
 
 ## The 30-second version
 
-Every RAG system and every fine-tuning run gets fed by the same unglamorous machinery: detect what a document is, extract its content, clean it, deduplicate it, scrub sensitive information, filter for quality, and only then hand it to whichever consumer needs it. Most visible engineering effort in an AI system goes into retrieval and prompting, but most of the actual quality ceiling is set upstream, in a pipeline nobody demos. Skip a stage — trust a file extension instead of sniffing real content, skip Unicode normalization, filter too aggressively, forget to check whether your "fresh" test set is secretly in the training data — and the failure shows up as a mysteriously bad model or a RAG system quietly serving stale answers for months.
+Every RAG system and every fine-tuning run gets fed by the same unglamorous machinery: detect what a document is, extract its content, clean it, deduplicate it, scrub sensitive information, filter for quality, and only then hand it to whichever consumer needs it. Most visible engineering effort goes into retrieval and prompting, but the actual quality ceiling is set upstream, in a pipeline nobody demos. Skip a stage — trust a file extension over real content, skip Unicode normalization, filter too aggressively, forget to check whether your "fresh" test set is secretly in the training data — and the failure shows up as a mysteriously bad model or a RAG system quietly serving stale answers for months.
 
 ## The analogy
 
@@ -47,7 +47,7 @@ Follow the diagram left to right: one pipeline, two consumers, diverging only at
 
 **Deduplicate**, as a cascade of increasingly expensive passes: exact hashing catches verbatim copies; MinHash with locality-sensitive hashing (LSH) catches near-duplicates by estimating similarity over shingled text; semantic embedding-based dedup catches paraphrases that look nothing alike lexically but mean the same thing. This pays off three ways downstream: RAG stops wasting context window on duplicate chunks, fine-tuning needs fewer steps and memorizes less, and deduplicating against your own benchmarks removes train-test overlap — dedup doubles as decontamination.
 
-**Govern.** Detect and redact personally identifiable information (PII), and attach source, license, consent, and timestamp metadata to every record from the moment it enters the pipeline — not as a final gate bolted on before shipping.
+**Govern.** Detect and redact personally identifiable information (PII), and attach source, license, consent, and timestamp metadata from the moment a record enters the pipeline — not as a final gate bolted on before shipping.
 
 **Diverge.** Only here does the pipeline split. The RAG branch chunks, enriches with metadata, embeds, and writes to a vector store kept fresh through incremental Change Data Capture (CDC) — reprocessing only documents that changed, not a full re-index. The fine-tuning branch curates and labels examples, generates synthetic data where useful, decontaminates against every eval set the model will be judged on, and balances the result into training records.
 
