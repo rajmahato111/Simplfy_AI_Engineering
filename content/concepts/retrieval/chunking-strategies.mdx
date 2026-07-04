@@ -1,0 +1,109 @@
+---
+title: "Chunking Strategies: Where You Cut Decides What You Find"
+slug: chunking-strategies
+type: concept
+area: retrieval
+difficulty: intermediate
+tags: [chunking, rag, retrieval, indexing]
+diagrams:
+  - diagrams/chunking-strategies--comparison.svg
+est_minutes: 11
+source_attribution: "Factual basis: AI System Design Guide (MIT) by Om Bharatiya; rewritten and expanded. See CREDITS.md."
+last_reviewed: 2026-07-03
+status: draft
+---
+
+## The 30-second version
+
+Chunking is how you split documents into the pieces that get embedded, indexed, and retrieved in a RAG system. It is a dial between two goods you can't max out at once: small chunks match a query precisely but arrive stripped of their surroundings, while big chunks carry context but blur into weak, diluted matches. The main strategies are fixed-size, sentence-based, recursive, semantic, parent-child, and no-chunking-at-all (whole document). Parent-child is the production favorite because it refuses the tradeoff: search against small pieces, but hand the LLM the larger parent they came from. Chunking sets the ceiling on retrieval quality — no prompt engineering downstream can repair a fact that was cut in half at index time.
+
+## The analogy
+
+You're condensing a 600-page textbook into flashcards for revision. Every chunking strategy is a flashcard-making habit.
+
+Write one card per chapter and each card is a wall of text: you can locate the right chapter, but the specific fact you need is buried, and the card weakly "matches" every question while nailing none. That's an oversized chunk. Write one card per bullet point and each card is razor-specific but meaningless on its own — "increase the dose by 50%" — of *what*? That's an undersized chunk. Write one card per sentence and no card ever cuts a thought in half, but an argument spanning four sentences gets scattered across four cards. Write one card per *idea*, letting cards vary in length, and you get the best deck — at the cost of far more prep effort. And the cleverest habit: keep the cards tiny and crisp, but write "see page 212" at the bottom, so you find the fact via the small card and then read the full page for the reasoning. Search small, read big.
+
+| Flashcard habit | Chunking strategy |
+|---|---|
+| Cut every 10 lines, mid-sentence if needed | Fixed-size chunking |
+| One card per sentence | Sentence-based chunking |
+| Cut at chapter, then section, then paragraph marks | Recursive (structure-aware) splitting |
+| One card per idea, whatever its length | Semantic chunking |
+| Tiny card that says "see page 212" | Parent-child chunking |
+| No cards — just reread the book | Whole-document (long-context) |
+| How fast you find the right card | Retrieval precision |
+| Whether a card makes sense on its own | Context completeness |
+
+## How it actually works
+
+The comparison diagram shows one document — the same ~4,000 tokens every time — cut four different ways. The vertical dashed lines mark where the document's topics actually shift. Watch where each strategy's cuts land relative to those lines.
+
+**Fixed-size** slices every N tokens (usually 256–1,000; 512 is a common default), often with ~10% overlap between neighbors. In the diagram, its cuts land wherever the counter says — including mid-sentence and mid-topic, ignoring both dashed lines. Overlap duplicates a little text across the boundary to soften the damage, but the splitter still ignores what the text says.
+
+**Sentence-based** cuts only at sentence ends, then packs sentences into chunks up to a size cap. No thought is ever severed mid-sentence, but a multi-sentence idea still fragments across chunks — you can see the diagram's many small segments straddling the first dashed line.
+
+**Recursive** splitting tries separators in order of strength — blank lines (paragraphs), then single newlines, then sentence ends, then spaces — recursing until pieces fit the size limit. The structure-aware variant for Markdown also copies each section's heading into every chunk cut from that section, so a chunk about "rate limits" still knows it lives under "API Gateway". This is the sane default for anything with structure.
+
+**Semantic** chunking uses embeddings at *index* time: embed each sentence, and keep extending the current chunk while consecutive sentences stay similar (cosine similarity above a threshold around 0.8). When similarity drops, the topic moved — cut there. In the diagram it's the only strategy whose boundaries sit exactly on the dashed lines. Newer pipelines improve on the threshold trick with small trained models that predict break points directly, but the idea is the same: cut where meaning changes.
+
+**Parent-child** builds two layers: parents of ~1,500 tokens, each subdivided into ~5 children of ~300 tokens. Only the children are embedded and indexed. When a child matches a query, the system swaps in its parent before prompting the LLM. The vector database matches against small, focused text; the model reasons over a complete section.
+
+**Whole-document** means opting out: if the entire corpus is small — tens of thousands of tokens — skip the index and put everything in the prompt, using prompt caching to keep the cost sane. Below roughly 50k tokens this beats running retrieval infrastructure; past ~100k tokens, you're back to chunking.
+
+## A concrete example
+
+Take a 120-page employee handbook, about 80,000 tokens, and run the numbers per strategy:
+
+| Strategy | Config | Resulting index |
+|---|---|---|
+| Fixed-size | 512 tokens, 64 overlap (stride 448) | ~180 chunks |
+| Sentence-based | ~5 sentences per chunk (~100 tokens) | ~800 chunks |
+| Semantic | topic-boundary cuts, ~320 tokens average | ~250 chunks |
+| Parent-child | 1,500-token parents → 300-token children | ~53 parents, ~270 children indexed |
+
+Embedding cost is noise in every row — 80k–140k tokens through an embedding API at ~$0.05 per million tokens is under a cent. What actually differs is what a match *returns*. Query: "how many days in advance must I request parental leave?" With fixed-size chunks, the sentence holding "30 days" may sit in a different chunk than the sentence saying which leave type it applies to — the model sees the number without its condition. With parent-child, the 300-token child containing "30 days" matches crisply, and the LLM receives the full 1,500-token leave-policy section, eligibility caveats included. Same document, same embedding model, same LLM — the cut decided the answer.
+
+## The tradeoffs that matter
+
+| Strategy | Cut quality | Index size | Effort & cost to build | Reach for it when |
+|---|---|---|---|---|
+| Fixed-size | Ignores meaning; splits mid-thought | Small | Trivial | Prototyping, uniform text |
+| Sentence-based | Whole sentences; ideas still fragment | Large (many small vectors) | Low | FAQs, chat logs, short factual text |
+| Recursive | Follows document structure | Medium | Low | Markdown/HTML docs — the default |
+| Semantic | Aligns with topic boundaries | Medium | High (index-time embedding + tuning) | Dense prose with no structure |
+| Parent-child | Precise match *and* full context | Children indexed + parents stored | Medium | Production RAG at scale |
+| Whole-document | No cuts to get wrong | None | None | Corpus under ~50k tokens |
+
+Two rules of thumb organize the whole table. First, the tension: small chunks are easier to *find*, large chunks are easier to *reason over* — every strategy is a different answer to that pull, and parent-child is the one that takes both. Second, match the splitter to the document type:
+
+- **Markdown, HTML, wikis** → recursive with headings copied into chunks.
+- **Code** → syntax-aware splitting on the parse tree: keep a whole function together with its imports and class wrapper, never cut inside a body.
+- **Tables** → don't slice rows apart; embed a one-line natural-language summary and return the intact table to the model.
+- **Scanned PDFs and slides** → layout-aware or vision-model preprocessing first, so captions and sidebars don't leak into body text.
+- **Contracts and policies** → parent-child: clause-level precision with section-level context.
+
+## Where people go wrong
+
+1. **Tuning chunk size while using the wrong strategy.** Sweeping 256 vs 512 vs 1,024 on a fixed-size splitter optimizes a local maximum; switching to structure-aware or parent-child usually beats any size setting.
+2. **Trusting overlap to fix fixed-size cuts.** Overlap duplicates the text around a bad boundary; it doesn't move the boundary to a sensible place.
+3. **Assuming smaller is always better.** Precision rises, but the model receives shards and starts inventing the missing connective tissue — a hallucination caused by your indexer.
+4. **Forgetting chunks travel alone.** "Battery life: 9 hours" — of which product? Prepend a line of document context to each chunk before embedding, or matches will fire for the wrong product entirely.
+5. **Changing chunking without re-measuring.** Any chunking change means re-embedding and rebuilding the index — treat it like a schema migration, compared with retrieval metrics on a fixed query set, not eyeballed.
+
+## The interview lens
+
+Interviewers use chunking to test whether you see RAG as a system, not a library call. They want the precision-versus-context tension named explicitly, and they listen for whether you know the choice is measurable.
+
+A strong sound bite: *"Chunk size is a dial between finding and understanding — small chunks match better, big chunks read better — and parent-child chunking is how you stop choosing: match on the child, generate from the parent."*
+
+Likely follow-ups:
+
+- How would you chunk a 10,000-file code repository? (Parse-tree boundaries, functions kept whole with their imports.)
+- Two chunking configs — how do you decide between them? (Recall@k and answer quality on a labeled query set, not intuition.)
+- What breaks operationally when you change chunk size? (Full re-embed, index rebuild, eval regression, cost of the migration window.)
+
+## Go deeper
+
+- [RAG Fundamentals](./rag-fundamentals.mdx) — the pipeline these chunks flow through.
+- Upstream reference: [Chunking Strategies — AI System Design Guide](https://github.com/ombharatiya/ai-system-design-guide/blob/main/06-retrieval-systems/02-chunking-strategies.md) (MIT; see [CREDITS](../../../CREDITS.md)).
+- [Anthropic: Introducing Contextual Retrieval](https://www.anthropic.com/news/contextual-retrieval) — the prepend-context-per-chunk pattern.

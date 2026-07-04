@@ -1,0 +1,97 @@
+---
+title: "RAG Fundamentals: Give Your LLM an Open Book"
+slug: rag-fundamentals
+type: concept
+area: retrieval
+difficulty: beginner
+tags: [rag, retrieval, vector-search, embeddings]
+diagrams:
+  - diagrams/rag-fundamentals--pipeline.svg
+est_minutes: 12
+source_attribution: "Factual basis: AI System Design Guide (MIT) by Om Bharatiya; rewritten and expanded. See CREDITS.md."
+last_reviewed: 2026-07-03
+status: draft
+---
+
+## The 30-second version
+
+Retrieval-Augmented Generation (RAG) fetches relevant snippets from your own documents and pastes them into the model's prompt, so the answer comes from your data instead of the model's frozen memory. You need it because a large language model (LLM) stops learning at its training cutoff, invents plausible-sounding facts when it is unsure, and has never seen your company's private data. RAG is really two pipelines: an offline ingestion pipeline that splits documents into chunks, embeds them, and loads a vector index; and an online query pipeline that finds the best chunks for a question and hands them to the LLM. Updating what the system knows means updating a database, not retraining a model.
+
+## The analogy
+
+Think of a closed-book exam versus an open-book exam.
+
+A plain LLM is a student in a closed-book exam. Everything it can say comes from what stuck during study time — its training run. Ask about a lecture given after it stopped studying, and it has nothing. Worse, under exam pressure it will write a confident, fluent, wrong answer rather than leave the page blank. That confident guess is a hallucination.
+
+RAG turns the same student loose in an open-book exam — with preparation. The night before, the student works through the textbook, flags important passages with sticky tabs, and writes a one-line gist on each tab. That prep session is the ingestion pipeline. During the exam, the student reads the question, scans the tabs for the two or three most promising passages, opens those pages, double-checks which one actually answers the question, and writes the answer in their own words with a page citation. That lookup-and-write motion is the query pipeline.
+
+Two lessons carry over directly. First, the student still writes the answer — the book doesn't. The LLM still generates; retrieval only feeds it. Second, the grade depends more on the tabbing job than on the student's prose. If the right passage was never tabbed, or the scan grabs the wrong page, no amount of eloquent writing saves the answer. And when the textbook gets a new edition, the student swaps the book and re-tabs it — no re-studying required.
+
+| Open-book exam | RAG system |
+|---|---|
+| Studying before the course ends | Model training (knowledge cutoff) |
+| Answering purely from memory | Parametric generation — hallucination risk |
+| Tabbing the textbook the night before | Ingestion pipeline (chunk, embed, index) |
+| One-line gist written on each tab | A chunk's embedding vector |
+| The tabbed textbook | Vector index |
+| Scanning tabs for a question | Vector search (top-k candidates) |
+| Double-checking which page really answers it | Reranking |
+| Writing the answer with a page citation | LLM generation with citations |
+| Buying the new edition and re-tabbing | Re-indexing — no retraining |
+
+## How it actually works
+
+Open the pipeline diagram and read the top container first, then the bottom one.
+
+The **ingestion pipeline** (top, offline) runs before any user shows up. Source documents flow left to right: a chunking service splits each document into passages of a few hundred tokens (see the [chunking chapter](./chunking-strategies.mdx) — where you cut matters enormously). An embedding model then converts each chunk into a vector: a long list of numbers, typically 768 to 3,072 of them, positioned so that texts with similar meaning land geometrically close together. "Meaning becomes coordinates" is the whole trick. Each vector, plus the original chunk text and metadata like source and section, is written into the vector index. This plane re-runs whenever documents change.
+
+The **query path** (bottom, online) runs per request. Follow the arrows left to right: the user's question reaches the retriever, which embeds the question using the *same* embedding model and asks the index for its nearest neighbors — the top-k most similar chunks, scored by cosine similarity. Those candidates flow to a reranker, a slower but sharper model that reads the question and each candidate together and re-scores them. The few survivors get pasted into the LLM's prompt alongside the question, and the model writes a grounded answer with citations back to the source chunks.
+
+Two refinements show up in almost every production system. Pure vector search is fuzzy on purpose, so it can whiff on exact strings — error codes, part numbers, people's names. **Hybrid search** runs a classic keyword search (BM25) in parallel with the vector search and merges the two ranked lists before reranking. And note the coupling the diagram implies: documents and queries must be embedded by the same model. Swap the embedding model and every stored vector is stale — you re-embed the whole corpus.
+
+## A concrete example
+
+Say you're building RAG over an internal support knowledge base: 5,000 documents averaging 2,000 tokens each (roughly four pages), so about 10 million tokens total.
+
+- **Chunking:** 512-token chunks with a 64-token overlap gives a stride of 448 tokens → about 22,000 chunks.
+- **Embedding cost (one-time):** 22,000 chunks × 512 tokens ≈ 11.4M tokens through the embedding model. At 2025 API pricing of roughly $0.02–$0.10 per million tokens, that's between about $0.25 and $1.15 — call it fifty cents at mid-range pricing.
+- **Storage:** 22,000 vectors × 1,024 dimensions × 4 bytes ≈ 90 MB. A rounding error for any database.
+- **Per query:** embedding a 30-token question costs a thousandth of a cent. Retrieve the top 20 candidates, rerank down to 5, and the LLM sees 5 × 512 = 2,560 tokens of context — about 0.03% of the corpus.
+
+Compare the alternative: you can't stuff 10 million tokens into any context window, and even shipping a 200,000-token prompt on every question would cost dollars per query and add seconds of latency. Retrieval is what makes the corpus affordable to consult.
+
+## The tradeoffs that matter
+
+| Approach | Updating knowledge | Attribution | Cost profile | Breaks down when |
+|---|---|---|---|---|
+| RAG | Re-index changed docs — minutes, cheap | Built-in citations to sources | Small one-time indexing + tiny per-query prompt | Retrieval misses; extra infra to run |
+| Fine-tuning | Retrain — slow and expensive | None; knowledge is baked into weights | Large up-front training cost | Facts change often, or data must be deletable |
+| Long-context stuffing | Edit the prompt | Weak — model must self-report | Re-reads the corpus every query (caching softens this) | Corpus beyond ~100k tokens, or per-query cost matters |
+
+The honest framing: fine-tuning changes how a model writes; retrieval changes what it can look up. If you need current facts, citations, per-user access control, or the ability to delete data, RAG wins. If your whole corpus fits comfortably under roughly 50k–100k tokens and rarely changes, skip the vector database entirely and put everything in the prompt with caching — a vector index you don't need is pure operational drag. And RAG's cost is real: an extra retrieval hop of latency, embedding-version management, index sync, and a retrieval quality problem you now have to measure.
+
+## Where people go wrong
+
+1. **Debugging the generator when the retriever failed.** Most bad RAG answers happen because the right chunk never entered the prompt. Check what was retrieved before touching prompts or models.
+2. **Expecting zero hallucination.** RAG shrinks the problem; it doesn't erase it. Retrieval can miss, and models sometimes overlook context buried mid-prompt (the "lost in the middle" effect).
+3. **Declaring RAG dead because contexts hit 1M+ tokens.** Re-reading a giant prompt per query costs more and responds slower than fetching 2,500 relevant tokens — and enterprise corpora outgrow any window anyway.
+4. **Shipping bare vector search to production.** Top-k cosine similarity straight into the LLM misses keyword matches and ranks loosely. Hybrid search plus reranking is the modern baseline.
+5. **Ignoring embedding coupling.** Vectors from different models (or model versions) don't mix. Upgrading the embedding model means re-embedding everything — version your index and plan the migration.
+
+## The interview lens
+
+At senior level, nobody asks you to define RAG. Interviewers probe the edges: when you would *not* use it, how you'd debug a wrong answer, and whether you know that retrieval — not generation — is where these systems fail.
+
+A strong sound bite: *"RAG failures are usually retrieval failures, so before touching the prompt or the model, I'd check whether the right chunk even made it into the context — measure retrieval recall first, generation second."*
+
+Likely follow-ups:
+
+- Frontier models accept a million tokens of context. Why does RAG still exist? (Cost and latency per query, data freshness, corpora larger than any window.)
+- How would you evaluate the retriever separately from the generator?
+- When is fine-tuning the right call instead of — or alongside — RAG?
+
+## Go deeper
+
+- [Chunking Strategies](./chunking-strategies.mdx) — how documents get split, and why it caps retrieval quality.
+- Upstream reference: [RAG Fundamentals — AI System Design Guide](https://github.com/ombharatiya/ai-system-design-guide/blob/main/06-retrieval-systems/01-rag-fundamentals.md) (MIT; see [CREDITS](../../../CREDITS.md)).
+- Upstream reference: [Embeddings and Vector Spaces — AI System Design Guide](https://github.com/ombharatiya/ai-system-design-guide/blob/main/01-foundations/05-embeddings-and-vector-spaces.md).

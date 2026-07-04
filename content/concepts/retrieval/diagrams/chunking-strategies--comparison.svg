@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="608" viewBox="0 0 1040 608" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN (8px grid)
+Canvas 1040x608. Content bottom y=492 (legend). Extra bottom room because the
+headless-Chromium QC renderer cannot paint the last ~96px of the window.
+Label column: left-aligned text at x=32 (col 32..216).
+Bar area: x=232..1000 (w=768). Bars h=32 unless noted.
+Topic guide lines (under bars): x=544 and x=784, y=128..448, #CBD5E1 dashed.
+
+Rows:
+  Document bar  y=88..120   zones 232..544 / 544..784 / 784..1000 (dashed separators)
+  Fixed-size    y=160..192  6 segments w=128: x=232,360,488,616,744,872  ann y=212
+  Sentence      y=240..272  cuts at 288,360,408,472,544,608,680,736,784,856,920  ann y=292
+  Semantic      y=320..352  3 segments: 232..544, 544..784, 784..1000   ann y=372
+  Parent-child  parents y=400..416 (2 x w=384, dashed), children y=424..440
+                (6 x w=128, solid), ann y=460
+  Legend        sample dash (232..264, y=488), text baseline y=492
+-->
+  <rect width="1040" height="608" fill="#ffffff"/>
+
+  <text x="520" y="40" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">Four ways to cut the same document</text>
+
+  <!-- topic-shift guide lines (drawn under the bars) -->
+  <line x1="544" y1="128" x2="544" y2="448" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="4 4"/>
+  <line x1="784" y1="128" x2="784" y2="448" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="4 4"/>
+
+  <!-- reference document bar -->
+  <text x="32" y="100" font-size="14" font-weight="600" fill="#334155">Original document</text>
+  <text x="32" y="118" font-size="12" fill="#64748B">&#8776;4,000 tokens</text>
+  <rect x="232" y="88" width="768" height="32" rx="4" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <line x1="544" y1="88" x2="544" y2="120" stroke="#64748B" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="784" y1="88" x2="784" y2="120" stroke="#64748B" stroke-width="1" stroke-dasharray="3 3"/>
+  <text x="388" y="109" font-size="12" fill="#334155" text-anchor="middle">Topic A</text>
+  <text x="664" y="109" font-size="12" fill="#334155" text-anchor="middle">Topic B</text>
+  <text x="892" y="109" font-size="12" fill="#334155" text-anchor="middle">Topic C</text>
+
+  <!-- row 1: fixed-size -->
+  <text x="32" y="172" font-size="14" font-weight="600" fill="#334155">Fixed-size</text>
+  <text x="32" y="190" font-size="12" fill="#64748B">512 tokens each</text>
+  <rect x="232" y="160" width="128" height="32" rx="4" fill="#FFFFFF" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="360" y="160" width="128" height="32" rx="4" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="488" y="160" width="128" height="32" rx="4" fill="#FFFFFF" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="616" y="160" width="128" height="32" rx="4" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="744" y="160" width="128" height="32" rx="4" fill="#FFFFFF" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="872" y="160" width="128" height="32" rx="4" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <text x="232" y="212" font-size="12" fill="#64748B">Both topic shifts get cut straight through.</text>
+
+  <!-- row 2: sentence-based -->
+  <text x="32" y="252" font-size="14" font-weight="600" fill="#334155">Sentence-based</text>
+  <text x="32" y="270" font-size="12" fill="#64748B">one per sentence</text>
+  <rect x="232" y="240" width="56" height="32" rx="4" fill="#FFFFFF" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="288" y="240" width="72" height="32" rx="4" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="360" y="240" width="48" height="32" rx="4" fill="#FFFFFF" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="408" y="240" width="64" height="32" rx="4" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="472" y="240" width="72" height="32" rx="4" fill="#FFFFFF" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="544" y="240" width="64" height="32" rx="4" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="608" y="240" width="72" height="32" rx="4" fill="#FFFFFF" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="680" y="240" width="56" height="32" rx="4" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="736" y="240" width="48" height="32" rx="4" fill="#FFFFFF" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="784" y="240" width="72" height="32" rx="4" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="856" y="240" width="64" height="32" rx="4" fill="#FFFFFF" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="920" y="240" width="80" height="32" rx="4" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <text x="232" y="292" font-size="12" fill="#64748B">Cuts at sentence ends; single ideas still fragment.</text>
+
+  <!-- row 3: semantic -->
+  <text x="32" y="332" font-size="14" font-weight="600" fill="#334155">Semantic</text>
+  <text x="32" y="350" font-size="12" fill="#64748B">cut at topic shifts</text>
+  <rect x="232" y="320" width="312" height="32" rx="4" fill="#FFFFFF" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="544" y="320" width="240" height="32" rx="4" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="784" y="320" width="216" height="32" rx="4" fill="#FFFFFF" stroke="#64748B" stroke-width="1.5"/>
+  <text x="388" y="340" font-size="12" fill="#64748B" text-anchor="middle">Topic A</text>
+  <text x="664" y="340" font-size="12" fill="#64748B" text-anchor="middle">Topic B</text>
+  <text x="892" y="340" font-size="12" fill="#64748B" text-anchor="middle">Topic C</text>
+  <text x="232" y="372" font-size="12" fill="#64748B">Cut boundaries land exactly on the topic shifts.</text>
+
+  <!-- row 4: parent-child -->
+  <text x="32" y="416" font-size="14" font-weight="600" fill="#334155">Parent-child</text>
+  <text x="32" y="434" font-size="12" fill="#64748B">index child, return parent</text>
+  <rect x="232" y="400" width="384" height="16" rx="3" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <rect x="616" y="400" width="384" height="16" rx="3" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <rect x="232" y="424" width="128" height="16" rx="3" fill="#FFFFFF" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="360" y="424" width="128" height="16" rx="3" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="488" y="424" width="128" height="16" rx="3" fill="#FFFFFF" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="616" y="424" width="128" height="16" rx="3" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="744" y="424" width="128" height="16" rx="3" fill="#FFFFFF" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="872" y="424" width="128" height="16" rx="3" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <text x="232" y="460" font-size="12" fill="#64748B">Parents (dashed) go to the LLM; only children (solid) are indexed.</text>
+
+  <!-- legend -->
+  <line x1="232" y1="488" x2="264" y2="488" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="4 4"/>
+  <text x="272" y="492" font-size="12" fill="#64748B">Dashed vertical lines mark where the document&#8217;s topics actually shift.</text>
+</svg>

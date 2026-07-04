@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1136" height="656" viewBox="0 0 1136 656" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN (8px grid)
+Canvas 1136x656. Title center (568,44). Content bottom y=544.
+NOTE: canvas height includes extra bottom room because the headless-Chromium
+QC renderer cannot paint the last ~96px of the window; content ends by H-112.
+Ingestion container: x=32 y=80 w=648 h=136 (32..680, 80..216), caption (48,102)
+Query container:     x=32 y=408 w=1072 h=136 (32..1104, 408..544), caption (48,430)
+
+Nodes (h=64):
+  Source documents (green)  x=48  w=160 y=120  -> 48..208,  c=(128,152)
+  Chunking service (indigo) x=272 w=144 y=120  -> 272..416, c=(344,152)
+  Embedding model (violet)  x=488 w=176 y=120  -> 488..664, c=(576,152)
+  Vector index (green)      x=488 w=176 y=280  -> 488..664, c=(576,312)
+  User (orange)             x=48  w=128 y=448  -> 48..176,  c=(112,480)
+  Retriever (indigo)        x=248 w=144 y=448  -> 248..392, c=(320,480)
+  Reranker (violet)         x=496 w=160 y=448  -> 496..656, c=(576,480)
+  LLM (violet)              x=720 w=160 y=448  -> 720..880, c=(800,480)
+  Answer (orange)           x=944 w=144 y=448  -> 944..1088, c=(1016,480)
+
+Arrows (#475569, end 2px before target edge):
+  A1 Source->Chunker      (208,152)->(270,152)
+  A2 Chunker->Embedding   (416,152)->(486,152)
+  A3 Embedding->Index     (576,184)->(576,278)  label "store vectors" right of line
+  A4 Retriever->Index     (320,448)->(320,312)->(486,312)  one bend, label "query vector"
+  A5 Index->Reranker      (576,344)->(576,446)  label "top-k chunks" right of line
+  A6 User->Retriever      (176,480)->(246,480)
+  A7 Reranker->LLM        (656,480)->(718,480)
+  A8 LLM->Answer          (880,480)->(942,480)
+-->
+  <rect width="1136" height="656" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="568" y="44" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">RAG: two pipelines, one index</text>
+
+  <!-- group containers -->
+  <rect x="32" y="80" width="648" height="136" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="48" y="102" font-size="12" fill="#64748B">Ingestion pipeline (offline)</text>
+  <rect x="32" y="408" width="1072" height="136" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="48" y="430" font-size="12" fill="#64748B">Query path (online)</text>
+
+  <!-- arrows -->
+  <line x1="208" y1="152" x2="270" y2="152" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="416" y1="152" x2="486" y2="152" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="576" y1="184" x2="576" y2="278" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <polyline points="320,448 320,312 486,312" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="576" y1="344" x2="576" y2="446" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="176" y1="480" x2="246" y2="480" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="656" y1="480" x2="718" y2="480" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="880" y1="480" x2="942" y2="480" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- arrow labels (white backing) -->
+  <rect x="584" y="222" width="90" height="18" fill="#ffffff"/>
+  <text x="588" y="235" font-size="12" fill="#475569">store vectors</text>
+  <rect x="360" y="303" width="86" height="18" fill="#ffffff"/>
+  <text x="403" y="316" font-size="12" fill="#475569" text-anchor="middle">query vector</text>
+  <rect x="584" y="386" width="90" height="18" fill="#ffffff"/>
+  <text x="588" y="399" font-size="12" fill="#475569">top-k chunks</text>
+
+  <!-- ingestion nodes -->
+  <rect x="48" y="120" width="160" height="64" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="128" y="149" font-size="14" fill="#064E3B" text-anchor="middle">Source<tspan x="128" dy="17">documents</tspan></text>
+
+  <rect x="272" y="120" width="144" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="344" y="149" font-size="14" fill="#1E1B4B" text-anchor="middle">Chunking<tspan x="344" dy="17">service</tspan></text>
+
+  <rect x="488" y="120" width="176" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="576" y="149" font-size="14" fill="#2E1065" text-anchor="middle">Embedding<tspan x="576" dy="17">model</tspan></text>
+
+  <!-- shared index -->
+  <rect x="488" y="280" width="176" height="64" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="576" y="317" font-size="14" fill="#064E3B" text-anchor="middle">Vector index</text>
+
+  <!-- query nodes -->
+  <rect x="48" y="448" width="128" height="64" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="112" y="485" font-size="14" fill="#7C2D12" text-anchor="middle">User</text>
+
+  <rect x="248" y="448" width="144" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="320" y="477" font-size="14" fill="#1E1B4B" text-anchor="middle">Retriever<tspan x="320" dy="17">(embeds query)</tspan></text>
+
+  <rect x="496" y="448" width="160" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="576" y="485" font-size="14" fill="#2E1065" text-anchor="middle">Reranker</text>
+
+  <rect x="720" y="448" width="160" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="800" y="485" font-size="14" fill="#2E1065" text-anchor="middle">LLM</text>
+
+  <rect x="944" y="448" width="144" height="64" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="1016" y="477" font-size="14" fill="#7C2D12" text-anchor="middle">Answer<tspan x="1016" dy="17">with citations</tspan></text>
+</svg>
