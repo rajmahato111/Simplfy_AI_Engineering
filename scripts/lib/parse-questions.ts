@@ -220,8 +220,12 @@ export function parseQuestionBank(md: string): Question[] {
     }
 
     const looksFor = parseBullets(extractBlock(body, "What interviewers look for"));
-    const strong = parseStrongAnswer(extractFirstBlock(body, STRONG_LABELS));
-    const sample = extractFirstBlock(body, SAMPLE_LABELS);
+    const strongBlock = extractFirstBlock(body, STRONG_LABELS);
+    const strong = parseStrongAnswer(strongBlock);
+    let sample = extractFirstBlock(body, SAMPLE_LABELS);
+    if (!sample && strongBlock.length > 150) {
+      sample = strongBlock;
+    }
     const requirements = extractBlock(body, "Requirements");
     const followRaw = extractFirstBlock(body, FOLLOW_LABELS);
     const keyInsight =
