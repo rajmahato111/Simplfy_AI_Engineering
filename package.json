@@ -18,7 +18,8 @@
     "ingest:glossary": "tsx scripts/ingest-glossary.ts",
     "ingest:patterns": "tsx scripts/ingest-patterns.ts",
     "ingest:questions": "tsx scripts/ingest-questions.ts",
-    "ingest:all": "npm run ingest:glossary && npm run ingest:patterns && npm run ingest:questions"
+    "ingest:frameworks": "tsx scripts/ingest-frameworks.ts",
+    "ingest:all": "npm run ingest:glossary && npm run ingest:patterns && npm run ingest:questions && npm run ingest:frameworks"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.2",

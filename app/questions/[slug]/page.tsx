@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getQuestionBySlug } from "@/lib/questions";
+import { relatedChaptersForQuestion } from "@/lib/related-chapters";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -18,6 +19,7 @@ export default async function QuestionDetailPage({ params }: Props) {
   const { slug } = await params;
   const q = getQuestionBySlug(slug);
   if (!q) notFound();
+  const related = relatedChaptersForQuestion(q);
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
@@ -36,12 +38,28 @@ export default async function QuestionDetailPage({ params }: Props) {
       <section className="mt-10 rounded-xl border border-zinc-200 bg-zinc-50 p-6">
         <h2 className="font-semibold text-zinc-900">Practice mode</h2>
         <p className="mt-2 text-sm text-zinc-600">
-          Answer hidden until you reveal — full interactive practice ships in Phase P2.
+          Run a SPIDER walkthrough with rubric checkpoint feedback for this question.
         </p>
-        <Button href="/practice" variant="secondary" size="sm" className="mt-4">
+        <Button href={`/practice?question=${q.slug}`} variant="secondary" size="sm" className="mt-4">
           Open guided practice
         </Button>
       </section>
+
+      {related.length > 0 && (
+        <section className="mt-8">
+          <h2 className="font-semibold text-zinc-900">Related chapters</h2>
+          <ul className="mt-3 space-y-2">
+            {related.map((r) => (
+              <li key={r.slug}>
+                <Link href={r.href} className="text-sm font-medium text-brand hover:underline">
+                  {r.title}
+                </Link>
+                <span className="ml-2 text-xs text-zinc-500">{r.type}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section className="mt-8">
         <h2 className="font-semibold text-zinc-900">What interviewers look for</h2>

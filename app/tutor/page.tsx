@@ -7,7 +7,7 @@ export default function TutorPage() {
       <PageHero
         eyebrow="Coach"
         title="AI tutor"
-        description="Grounded, cited Q&A over the full corpus — ask anything, get answers linked to source chapters."
+        description="Grounded, cited Q&A over the corpus — answers link to chapters, questions, and glossary entries."
       />
       <div className="mx-auto max-w-6xl px-4 pb-16 sm:px-6">
         <TutorChatShell />
