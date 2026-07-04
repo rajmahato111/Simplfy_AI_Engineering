@@ -107,7 +107,7 @@ Coordination rules: [`dual-tool-coordination.md`](./dual-tool-coordination.md)
 - [x] `npm run validate:frontmatter` checks all MDX files
 - [x] CI runs frontmatter validation
 - [x] `lib/content.ts` uses typed schema
-- [ ] Committed and pushed
+- [x] Committed and pushed — PR #4 (`cursor/content-schema-42a0` → `cursor/content-render-qa-42a0`)
 
 ---
 
