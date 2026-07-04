@@ -5,7 +5,12 @@ test.describe("top-level navigation", () => {
   for (const { href, label } of NAV_ROUTES) {
     test(`${label} (${href}) loads`, async ({ page }) => {
       await page.goto(href);
-      await expect(page.locator("h1")).toBeVisible();
+      if (href === "/dashboard") {
+        await expect(page).toHaveURL(/\/login/);
+        await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
+      } else {
+        await expect(page.locator("h1")).toBeVisible();
+      }
     });
   }
 

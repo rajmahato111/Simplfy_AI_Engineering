@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { MobileNav } from "@/components/mobile-nav";
+import { AuthNav } from "@/components/auth-nav";
 
 const NAV = [
   { href: "/learn", label: "Learn" },
@@ -37,6 +38,7 @@ export function SiteHeader() {
 
         <div className="ml-auto flex items-center gap-2 sm:gap-3">
           <MobileNav />
+          <AuthNav />
           <Link
             href="/dashboard"
             className="hidden rounded-md px-3 py-2 text-sm font-medium text-zinc-600 hover:text-zinc-900 sm:inline"
