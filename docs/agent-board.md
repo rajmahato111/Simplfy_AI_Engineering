@@ -8,7 +8,14 @@
 
 | ID | Tool | Branch | Status | Paths (locks) |
 |----|------|--------|--------|---------------|
-| T-001 | Claude Code | `claude/ai-interview-platform-prd-4si5f9` | `in_progress` | `content/concepts/retrieval/**`, walkthrough pilot |
+| T-001 | Claude Code | `claude/ai-interview-platform-prd-4si5f9` | `ready_for_browser_qa` | `content/concepts/retrieval/**`, walkthrough pilot |
+
+**T-001 notes (2026-07-04):** pilot batch written by 2 writer sub-agents, audited by
+reviewer agent (12 findings), all fixes applied, diagrams re-rendered + visually
+verified. `validate:frontmatter` ✓ · `validate:content` ✓ · diagram QC ✓. Cloud
+session — no Cursor Browser available, so per pre-pr-testing §3b the smoke matrix is
+pending; draft PR opened for merge-approver visibility. Style-guide amendments
+proposed in PR body (file is human-approval-only).
 
 ---
 
