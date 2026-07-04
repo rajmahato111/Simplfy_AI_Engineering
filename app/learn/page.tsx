@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { listContentSlugs, getContentBySlug } from "@/lib/content";
+import { getContentBySlug } from "@/lib/content";
+import { orderedContentSlugs } from "@/lib/content-nav";
 import { Badge, BadgeBrand } from "@/components/ui/badge";
 
 export default function LearnIndexPage() {
-  const slugs = listContentSlugs();
-  const byArea = new Map<string, typeof slugs>();
+  const slugs = orderedContentSlugs();
+  const byArea = new Map<string, string[]>();
 
   for (const slug of slugs) {
     const doc = getContentBySlug(slug);

@@ -1,11 +1,14 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { compileMDX } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
 import { getContentBySlug, listContentSlugs } from "@/lib/content";
+import { getAdjacentSlugs } from "@/lib/content-nav";
 import { prepareContentForRender } from "@/lib/content-audit";
 import { extractH2Headings } from "@/lib/headings";
 import { mdxComponents } from "@/lib/mdx-components";
 import { ArticleBreadcrumb, ArticleToc } from "@/components/article-chrome";
+import { ArticlePrevNext } from "@/components/article-prev-next";
 import { Badge, BadgeBrand } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -15,6 +18,31 @@ export function generateStaticParams() {
   return listContentSlugs().map((slug) => ({
     slug: slug.split("/"),
   }));
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug: parts } = await params;
+  const slug = parts.join("/");
+  const doc = getContentBySlug(slug);
+  if (!doc) return { title: "Not found" };
+
+  const { title, est_minutes } = doc.frontmatter;
+  const description = doc.content
+    .split("\n")
+    .find((l) => l.trim() && !l.startsWith("#"))
+    ?.replace(/^#+\s*/, "")
+    .slice(0, 160);
+
+  return {
+    title,
+    description: description ?? `${title} — Simplify AI Engineering`,
+    openGraph: {
+      title,
+      description: description ?? undefined,
+      type: "article",
+    },
+    other: est_minutes ? { "reading-time": `${est_minutes} min` } : undefined,
+  };
 }
 
 export default async function LearnDocPage({ params }: Props) {
@@ -38,6 +66,7 @@ export default async function LearnDocPage({ params }: Props) {
 
   const { title, type, area, difficulty, est_minutes, source_attribution } =
     doc.frontmatter;
+  const { prev, next } = getAdjacentSlugs(slug);
 
   return (
     <div className="border-b border-zinc-200 bg-zinc-50/50">
@@ -72,6 +101,7 @@ export default async function LearnDocPage({ params }: Props) {
             </header>
 
             <div className="prose mx-auto mt-8 max-w-none px-1 pb-12">{MdxBody}</div>
+            <ArticlePrevNext prev={prev} next={next} />
           </article>
 
           <aside className="hidden lg:block">
