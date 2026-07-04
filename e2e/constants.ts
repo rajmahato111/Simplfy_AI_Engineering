@@ -7,6 +7,7 @@ export const LEARN_SLUGS = [
 
 export const NAV_ROUTES = [
   { href: "/learn", label: "Learn" },
+  { href: "/search", label: "Search" },
   { href: "/questions", label: "Questions" },
   { href: "/practice", label: "Practice" },
   { href: "/mock", label: "Mock Interview" },
