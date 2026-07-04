@@ -3,14 +3,15 @@
 import Link from "next/link";
 import { useState } from "react";
 import { cn } from "@/lib/cn";
+import { Button } from "@/components/ui/button";
 
 const LINKS = [
   { href: "/learn", label: "Learn" },
-  { href: "/search", label: "Search" },
   { href: "/questions", label: "Questions" },
   { href: "/practice", label: "Practice" },
-  { href: "/mock", label: "Mock Interview" },
+  { href: "/mock", label: "Mock interview" },
   { href: "/tutor", label: "Tutor" },
+  { href: "/search", label: "Search" },
   { href: "/dashboard", label: "Dashboard" },
   { href: "/pricing", label: "Pricing" },
 ] as const;
@@ -19,7 +20,7 @@ export function MobileNav() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="md:hidden">
+    <div className="lg:hidden">
       <button
         type="button"
         aria-expanded={open}
@@ -36,7 +37,7 @@ export function MobileNav() {
         </svg>
       </button>
       {open && (
-        <div className="absolute left-0 right-0 top-16 z-40 border-b border-zinc-200 bg-white px-4 py-4 shadow-lg">
+        <div className="absolute inset-x-0 top-14 z-40 border-b border-zinc-200 bg-white px-4 py-4 shadow-lg">
           <nav className="flex flex-col gap-1">
             {LINKS.map(({ href, label }) => (
               <Link
@@ -51,6 +52,11 @@ export function MobileNav() {
               </Link>
             ))}
           </nav>
+          <div className="mt-4 border-t border-zinc-100 pt-4 sm:hidden">
+            <Button href="/learn" size="sm" className="w-full">
+              Get started
+            </Button>
+          </div>
         </div>
       )}
     </div>

@@ -12,14 +12,14 @@ export function AuthNav() {
 
   if (session?.user) {
     return (
-      <div className="hidden items-center gap-2 sm:flex">
-        <span className="max-w-[120px] truncate text-sm text-zinc-600">
+      <div className="hidden items-center gap-1 sm:flex">
+        <span className="max-w-[7rem] truncate px-1 text-sm text-zinc-500 lg:max-w-[9rem]">
           {session.user.name ?? session.user.email}
         </span>
         <button
           type="button"
           onClick={() => signOut({ callbackUrl: "/" })}
-          className="rounded-md px-3 py-2 text-sm font-medium text-zinc-600 hover:text-zinc-900"
+          className="whitespace-nowrap rounded-md px-2.5 py-2 text-sm font-medium text-zinc-600 transition-colors hover:text-zinc-900"
         >
           Sign out
         </button>
@@ -30,7 +30,7 @@ export function AuthNav() {
   return (
     <Link
       href="/login"
-      className="hidden rounded-md px-3 py-2 text-sm font-medium text-zinc-600 hover:text-zinc-900 sm:inline"
+      className="hidden whitespace-nowrap rounded-md px-2.5 py-2 text-sm font-medium text-zinc-600 transition-colors hover:text-zinc-900 sm:inline"
     >
       Sign in
     </Link>
