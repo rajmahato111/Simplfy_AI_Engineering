@@ -13,7 +13,7 @@ Coordination rules: [`dual-tool-coordination.md`](./dual-tool-coordination.md)
 | ID | Tool | Branch | Status | Paths (locks) |
 |----|------|--------|--------|---------------|
 | T-001 | Claude Code | `claude/ai-interview-platform-prd-4si5f9` | `in_progress` | `content/concepts/retrieval/**`, `content/walkthroughs/design-a-production-rag-system.mdx`, `content/walkthroughs/diagrams/design-a-production-rag-system--architecture.svg` |
-| T-002 | Cursor | `cursor/coordination-and-foundation-42a0` | `ready_for_review` | `docs/agent-board.md`, `docs/dual-tool-coordination.md`, `AGENTS.md` |
+| T-002 | Cursor | `cursor/coordination-and-foundation-42a0` | `ready_for_review` | `docs/agent-board.md`, `docs/dual-tool-coordination.md`, `AGENTS.md`, `docs/pre-pr-testing.md` |
 | T-010 | Cursor | `cursor/coordination-and-foundation-42a0` | `ready_for_review` | `app/**`, `components/**`, `lib/**`, `package.json`, `package-lock.json`, `tsconfig.json`, `next.config.ts`, `postcss.config.mjs`, `eslint.config.mjs`, `.github/workflows/ci.yml` |
 
 ---
@@ -66,7 +66,15 @@ Coordination rules: [`dual-tool-coordination.md`](./dual-tool-coordination.md)
 - [x] Ponytail-minimal; CI typecheck + lint stub
 - [x] Committed and pushed
 
-**Browser QA:** Playwright smoke passed 2026-07-04 — B1–B8, S1–S5 green (`npm run test:browser`)
+**Browser QA:** Playwright smoke passed 2026-07-04 — human-approved fallback for cloud session; B1–B8, S1–S5 green. **Re-verify in Cursor Browser (@Browser) before reviewer merge.**
+
+---
+
+### T-002 addendum — pre-PR testing policy
+
+**Browser QA policy (human confirmed 2026-07-04):** Cursor Browser is the required
+gate; Playwright is opt-in only with human approval; cloud agents use
+`ready_for_browser_qa` when Browser tools are unavailable.
 
 ---
 

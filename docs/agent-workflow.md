@@ -40,7 +40,9 @@ model: **Orchestrator → Sub-agents → Reviewer → Orchestrator approval → 
 5. **Ship** — orchestrator commits with a descriptive message and pushes to the
    designated branch. Nothing reaches GitHub without steps 3–4.
 6. **Pre-PR QA** — [`pre-pr-testing.md`](./pre-pr-testing.md): automated checks +
-   browser smoke (Cursor MCP or `npm run test:browser`) **before** opening a PR.
+   **Cursor Browser** smoke (`@Browser`) **before** opening a PR. Playwright only
+   if the human approves for that task. Cloud sessions without Browser tools stop
+   at `ready_for_browser_qa` — no PR until desktop Browser QA passes.
 7. **PR + merge** — implementing agent opens PR; **reviewer agent** re-runs checks,
    merges to integration branch. Human is not asked to merge.
 

@@ -8,7 +8,7 @@
 Workflow position:
 
 ```
-Finish task → automated checks → browser QA → commit + push → open PR → reviewer agent → merge
+Finish task → automated checks → Cursor Browser QA → commit + push → open PR → reviewer agent → merge
 ```
 
 Cross-tool rules: [`dual-tool-coordination.md`](./dual-tool-coordination.md) · Board: [`agent-board.md`](./agent-board.md)
@@ -19,9 +19,12 @@ Cross-tool rules: [`dual-tool-coordination.md`](./dual-tool-coordination.md) · 
 
 | Role | Runs testing? | Opens PR? | Merges? |
 |------|---------------|-----------|---------|
-| **Implementing agent** (Claude Code or Cursor) | Yes — full checklist below | Yes — after browser QA passes | No |
-| **Reviewer agent** | Re-runs spot checks + browser smoke on PR branch | No | Yes — if checklist + code review pass |
-| **Human** | Optional spot-check in desktop browser | No | No (unless emergency) |
+| **Implementing agent** (Claude Code or Cursor) | Yes — full checklist below | Yes — **only after Cursor Browser QA passes** | No |
+| **Reviewer agent** | Re-runs §2 + Cursor Browser spot-check on PR branch | No | Yes — if checklist + code review pass |
+| **Human** | Decides tooling exceptions; optional spot-check | No | No (unless emergency) |
+
+**Human is the decision-maker** on tooling. Agents do not install dependencies or
+substitute test runners without explicit human approval in chat (recorded on the board).
 
 ---
 
@@ -44,26 +47,50 @@ Run from repo root after `npm install` (app tasks) or as noted (content-only tas
 
 ## 3. Browser QA (required for front-end / reader changes)
 
-### 3a. Primary: Cursor native browser MCP (desktop)
+### 3a. Primary — Cursor built-in Browser (required)
 
-When the **Cursor native browser MCP** is available (desktop IDE):
+Use **Cursor Browser Automation** — the built-in browser pane (globe icon) that loads
+`localhost`. This is the default and required pre-PR gate for any task that touches
+`app/**` or the reader.
 
-1. Start dev server: `npm run dev` (note port, default 3000).
-2. Connect browser MCP to `http://localhost:3000`.
-3. Execute the **smoke matrix** (§4) manually in the native browser.
-4. Capture screenshots of any failure; fix and re-run until clean.
-5. Record in PR body: `Browser QA: Cursor MCP — passed <date>`.
+**Setup (human verifies once per machine):**
 
-### 3b. Fallback: headless Playwright smoke (cloud / CI)
+- Cursor **Settings → Tools & MCP → Browser Automation** enabled
+- Dev server running: `npm run dev` (default port 3000)
 
-When browser MCP is **not** available (e.g. cloud agent):
+**Implementing agent steps:**
 
-1. Start dev server in background on a fixed port.
-2. Run: `node scripts/browser-smoke.mjs --base-url http://127.0.0.1:3000`
-3. Script must exit 0. On failure, read console output + saved screenshots under `.qa/` (gitignored).
-4. Record in PR body: `Browser QA: Playwright smoke — passed <date>`.
+1. Add **`@Browser`** to agent context (or open the browser pane).
+2. Navigate to `http://localhost:3000`.
+3. Execute the **smoke matrix** (§4) — click through routes, verify content, check diagram loads.
+4. Fix failures; re-run until clean.
+5. Record on board + PR: `Browser QA: Cursor Browser — passed <date>` (note any screenshots).
 
-Both paths must hit the **same smoke matrix**. MCP is not a shortcut — same coverage.
+**Reviewer agent:** re-run the same matrix on the PR branch before merge.
+
+### 3b. Cloud / headless sessions (no Browser in tool catalog)
+
+If the agent session **does not expose Browser tools** (e.g. some cloud runs):
+
+1. Complete §2 automated checks.
+2. Commit + push to the task branch.
+3. Set board status → **`ready_for_browser_qa`** (not `ready_for_review`).
+4. **Do not open a PR** until Cursor Browser QA is completed in a desktop session
+   (implementing or reviewer agent with `@Browser`).
+5. Ask the human only if blocked — do not assume a fallback runner.
+
+### 3c. Playwright smoke (opt-in only — human approval required)
+
+`scripts/browser-smoke.mjs` exists in the repo **for now** as an optional helper.
+Agents **must not** run or add Playwright-based gates unless the human explicitly
+approves it for that task in chat (record on the board):
+
+```markdown
+**Approved fallback:** Playwright smoke for T-___ (human approved 2026-07-04)
+```
+
+If approved: `npm run dev` + `npm run test:browser`. Same smoke matrix as §4.
+This does **not** replace Cursor Browser when Browser tools are available to the agent.
 
 ---
 
@@ -89,7 +116,7 @@ Adapt rows to the task; **never skip rows that touch changed routes**.
 | # | Action | Pass criteria |
 |---|--------|---------------|
 | C1 | Render diagram QC PNG | Style guide §6 visual check |
-| C2 | If reader exists | Re-run B3–B6 for changed slugs only |
+| C2 | If reader exists | Re-run B3–B6 for changed slugs in Cursor Browser |
 
 ### Stress / regression (before PR on reader changes)
 
@@ -115,7 +142,7 @@ Copy into PR description; all boxes must be true before opening/updating PR:
 - [ ] `npm run typecheck` passed
 - [ ] `npm run lint` passed
 - [ ] `npm run build` passed
-- [ ] Browser smoke matrix (§4) passed — MCP or Playwright
+- [ ] Browser smoke matrix (§4) passed in **Cursor Browser** (@Browser)
 - [ ] Screenshots / notes attached if UI changed
 - [ ] agent-board.md updated → `ready_for_review`
 ```
@@ -126,12 +153,14 @@ Copy into PR description; all boxes must be true before opening/updating PR:
 
 ## 6. Reviewer agent checklist (on PR)
 
-1. Check out PR branch locally or via CI artifact.
+1. Check out PR branch.
 2. Re-run §2 automated checks.
-3. Re-run `node scripts/browser-smoke.mjs` OR spot-check MCP matrix.
+3. Re-run smoke matrix (§4) in **Cursor Browser** (`@Browser`).
 4. Code review: Ponytail (code) / style guide (content) / no Tier A doc drift.
 5. If pass → merge to integration branch; update agent-board → `merged`.
 6. If fail → `FIX REQUIRED` comment with file/line findings; do not merge.
+
+Playwright re-run only if human documented approval on the board for that PR.
 
 ---
 
@@ -140,22 +169,28 @@ Copy into PR description; all boxes must be true before opening/updating PR:
 When browser QA completes, add to the task block in `agent-board.md`:
 
 ```markdown
-**Browser QA:** Playwright smoke passed 2026-07-04 — B1–B8, S1–S5 green
+**Browser QA:** Cursor Browser passed 2026-07-04 — B1–B8, S1–S5 green (@Browser)
 ```
 
-Or:
+If human approved Playwright for this task only:
 
 ```markdown
-**Browser QA:** Cursor MCP passed 2026-07-04 — screenshots in PR #N
+**Browser QA:** Playwright smoke passed 2026-07-04 — human-approved fallback; B1–B8, S1–S5 green
+```
+
+If waiting on desktop Browser from a cloud session:
+
+```markdown
+**Browser QA:** pending — status ready_for_browser_qa; §2 automated checks passed
 ```
 
 ---
 
 ## 8. When browser QA is skipped
 
-Only with explicit human approval in chat, documented on the board:
+Only with **explicit human approval** in chat, documented on the board:
 
 - Docs-only changes with **zero** UI surface (`docs/*.md` only, no `app/`).
-- Pure content MDX with **no** running reader in repo yet *(not the case after T-010)*.
+- Other exceptions the human defines.
 
-If the reader exists and content changed, run at least C2 before PR.
+If the reader exists and content changed, run at least C2 in Cursor Browser before PR.
