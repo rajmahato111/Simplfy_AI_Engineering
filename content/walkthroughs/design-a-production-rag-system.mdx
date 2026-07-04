@@ -10,7 +10,7 @@ diagrams:
 est_minutes: 25
 source_attribution: "Factual basis: AI System Design Guide (MIT) by Om Bharatiya; rewritten and expanded. See CREDITS.md."
 last_reviewed: 2026-07-03
-status: draft
+status: reviewed
 ---
 
 ## The question
@@ -53,7 +53,7 @@ Never draw before you scope. Here is how a strong five minutes sounds:
 >
 > **Interviewer:** "Single-turn is fine for v1."
 >
-> **You:** "Great. So: 4M documents from three sources, 20K users, permission-true answers with citations, p95 under 4 seconds, 15-minute freshness for wikis, single-turn. If roughly 10% of employees ask a few questions a day, that's low single-digit queries per second at peak — so retrieval *quality* is the hard problem here, not throughput. I'll design for that."
+> **You:** "Great. So: 4M documents from three sources, 20K users, permission-true answers with citations, p95 under 4 seconds, 15-minute freshness for wikis, single-turn. If half the company uses this on a given day at about five questions each, that's ~50K queries a day — still only single-digit queries per second (QPS) at peak — so retrieval *quality* is the hard problem here, not throughput. I'll design for that."
 
 That last line is the move: you converted the interviewer's answers into numbers, then named the real bottleneck out loud.
 
@@ -112,7 +112,7 @@ Draw the two halves and the guardrail between user and data:
 
 > "Top half is ingestion. Connectors pull documents from SharePoint, Confluence, and Drive — webhooks for the wikis to hit our 15-minute freshness bar, nightly delta sync for the rest. A parser normalizes each format, then a chunker splits documents into retrieval-sized pieces that carry their ACL tags. The indexing stage writes each chunk to two stores: its embedding goes to the vector database for semantic search, and its raw text goes to a keyword index for exact-match search.
 >
-> Bottom half is the query path. A user's question gets a light rewrite — expanding acronyms, cleaning phrasing. Then the permission filter resolves the caller's groups and injects an ACL predicate *into* the retrieval query itself, so a chunk the user can't read never even becomes a candidate. Hybrid retrieval runs dense and keyword search in parallel and fuses them. A cross-encoder reranks the top ~50 down to the 5–8 chunks that actually matter. Context assembly formats those with source labels, the LLM generates a cited answer, and we stream it back.
+> Bottom half is the query path. A user's question gets a light rewrite — expanding acronyms, cleaning phrasing. Then the permission filter resolves the caller's groups and injects an ACL predicate *into* the retrieval query itself, so restricted chunks are excluded before similarity scoring ever runs. Hybrid retrieval runs dense and keyword search in parallel and fuses them. A cross-encoder reranks the top ~50 down to the 5–8 chunks that actually matter. Context assembly formats those with source labels, the LLM generates a cited answer, and we stream it back.
 >
 > Underneath everything: tracing on every stage — latency, cost, retrieval hits — because we'll need it for the eval story. Where would you like me to go deeper?"
 
@@ -156,7 +156,7 @@ Pick the areas where this question is actually won: chunking (quality is decided
 
 **Why the interviewer probes here.** This is the difference between a demo and an enterprise product, and it's the deep dive with a *wrong* answer. Retrieving first and then discarding unauthorized chunks means restricted content was already fetched, scored, and possibly logged — one bug from a breach.
 
-**The strong move.** Make the ACL predicate part of the database query. Every chunk carries permission tags synced from the source system; at query time you resolve the caller's identity to their group set (cached with a short TTL — around five minutes — since grants change slowly) and the vector and keyword stores both filter on it *before* similarity scoring. Unauthorized chunks never enter the candidate set. Two details that separate senior answers: response-cache keys must include the caller's permission set, or one user's cached answer serves another user's restricted content; and permissions are enforced at query time, so a revoked grant takes effect on the next query — not at the next reindex.
+**The strong move.** Make the ACL predicate part of the database query. Every chunk carries permission tags synced from the source system; at query time you resolve the caller's identity to their group set (cached with a short TTL — around five minutes — since grants change slowly) and the vector and keyword stores both filter on it *before* similarity scoring. Chunks outside the caller's grants are never fetched, scored, or logged in the first place. Two details that separate senior answers: response-cache keys must include the caller's permission set, or one user's cached answer serves another user's restricted content; and permissions are enforced at query time, so a revoked grant takes effect on the next query — not at the next reindex.
 
 | Approach | Leak risk | Latency | Ops burden |
 |---|---|---|---|

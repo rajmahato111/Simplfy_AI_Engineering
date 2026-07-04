@@ -1,17 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1144" height="640" viewBox="0 0 1144 640" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
 <!--
 COORDINATE PLAN (8px grid; node w=152 h=48; col gap 64; row gap 32)
-Canvas H=640: content ends at y=536. The extra bottom headroom is deliberate —
-the QC renderer's headless Chromium truncates painting in the bottom ~90px of
-the window (verified empirically), so the canvas is taller than the content
-to keep the observability note fully painted in QC renders.
+Canvas H=640: content ends at y=536. The extra bottom headroom was a workaround
+for a QC-renderer truncation bug since fixed in scripts/render-diagram.sh;
+kept because it is harmless.
 Columns (x-left / center): c1=64/140  c2=280/356  c3=496/572  c4=712/788  c5=928/1004
 Rows (y-top / center):     A=96/120   B=176/200   C=312/336   D=392/416
 Title baseline: y=36, centered x=572
 Containers: ingestion x=24 y=56 w=1096 h=184 (caption 40,78)
             query     x=24 y=272 w=1096 h=184 (caption 40,294)
 Nodes:
-  sources        c1,A orange   | parser+chunker c2,A yellow | embedder  c3,A purple
+  sources        c1,A orange   | parser+chunker c2,A yellow | embed+index c3,A indigo (stage, not model)
   vector DB      c4,B green    | keyword index  c5,B green
   user           c1,C orange   | query rewrite  c2,C indigo | perm filter c3,C red
   hybrid retr.   c4,C indigo   | reranker       c4,D purple | context     c3,D indigo
@@ -19,9 +18,9 @@ Nodes:
   observability note x=392 y=488 w=360 h=48 neutral
 Arrows (orthogonal, max one L-bend, end 2px before target edge):
   A1  sources->parser        216,120 -> 278,120
-  A2  parser->embedder       432,120 -> 494,120
-  A3  embedder->vectorDB     572,144 v 572,200 h 710,200
-  A4  embedder->keywordIdx   648,120 h 1004,120 v 1004,174   label "raw chunk text"
+  A2  parser->embedIndex     432,120 -> 494,120
+  A3  embedIndex->vectorDB   572,144 v 572,200 h 710,200
+  A4  embedIndex->keywordIdx 648,120 h 1004,120 v 1004,174   label "raw chunk text"
   A5  vectorDB->hybrid       788,224 v 788,310               label "dense"
   A6  keywordIdx->hybrid     1004,224 v 1004,336 h 866,336   label "BM25"
   A7  user->rewrite          216,336 -> 278,336
@@ -53,8 +52,8 @@ Arrows (orthogonal, max one L-bend, end 2px before target edge):
   <rect x="280" y="96" width="152" height="48" rx="10" fill="#FEFCE8" stroke="#CA8A04" stroke-width="1.5"/>
   <text x="356" y="116" font-size="14" fill="#713F12" text-anchor="middle">Parser +<tspan x="356" y="133">chunker</tspan></text>
 
-  <rect x="496" y="96" width="152" height="48" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
-  <text x="572" y="116" font-size="14" fill="#2E1065" text-anchor="middle">Embedding<tspan x="572" y="133">model</tspan></text>
+  <rect x="496" y="96" width="152" height="48" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="572" y="116" font-size="14" fill="#1E1B4B" text-anchor="middle">Embed +<tspan x="572" y="133">index</tspan></text>
 
   <!-- ingestion row B: stores -->
   <rect x="712" y="176" width="152" height="48" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>

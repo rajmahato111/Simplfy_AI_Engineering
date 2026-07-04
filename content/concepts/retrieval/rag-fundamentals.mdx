@@ -10,7 +10,7 @@ diagrams:
 est_minutes: 12
 source_attribution: "Factual basis: AI System Design Guide (MIT) by Om Bharatiya; rewritten and expanded. See CREDITS.md."
 last_reviewed: 2026-07-03
-status: draft
+status: reviewed
 ---
 
 ## The 30-second version
@@ -41,13 +41,15 @@ Two lessons carry over directly. First, the student still writes the answer — 
 
 ## How it actually works
 
-Open the pipeline diagram and read the top container first, then the bottom one.
+![The RAG pipeline: ingestion plane on top, query path below](diagrams/rag-fundamentals--pipeline.svg)
+
+Read the top container first, then the bottom one.
 
 The **ingestion pipeline** (top, offline) runs before any user shows up. Source documents flow left to right: a chunking service splits each document into passages of a few hundred tokens (see the [chunking chapter](./chunking-strategies.mdx) — where you cut matters enormously). An embedding model then converts each chunk into a vector: a long list of numbers, typically 768 to 3,072 of them, positioned so that texts with similar meaning land geometrically close together. "Meaning becomes coordinates" is the whole trick. Each vector, plus the original chunk text and metadata like source and section, is written into the vector index. This plane re-runs whenever documents change.
 
 The **query path** (bottom, online) runs per request. Follow the arrows left to right: the user's question reaches the retriever, which embeds the question using the *same* embedding model and asks the index for its nearest neighbors — the top-k most similar chunks, scored by cosine similarity. Those candidates flow to a reranker, a slower but sharper model that reads the question and each candidate together and re-scores them. The few survivors get pasted into the LLM's prompt alongside the question, and the model writes a grounded answer with citations back to the source chunks.
 
-Two refinements show up in almost every production system. Pure vector search is fuzzy on purpose, so it can whiff on exact strings — error codes, part numbers, people's names. **Hybrid search** runs a classic keyword search (BM25) in parallel with the vector search and merges the two ranked lists before reranking. And note the coupling the diagram implies: documents and queries must be embedded by the same model. Swap the embedding model and every stored vector is stale — you re-embed the whole corpus.
+Two refinements show up in almost every production system. Pure vector search is fuzzy on purpose, so it can whiff on exact strings — error codes, part numbers, people's names. **Hybrid search** runs a classic keyword search (BM25 — "Best Match 25", the standard exact-term ranking algorithm) in parallel with the vector search and merges the two ranked lists before reranking. And note the coupling the diagram implies: documents and queries must be embedded by the same model. Swap the embedding model and every stored vector is stale — you re-embed the whole corpus.
 
 ## A concrete example
 
@@ -56,7 +58,7 @@ Say you're building RAG over an internal support knowledge base: 5,000 documents
 - **Chunking:** 512-token chunks with a 64-token overlap gives a stride of 448 tokens → about 22,000 chunks.
 - **Embedding cost (one-time):** 22,000 chunks × 512 tokens ≈ 11.4M tokens through the embedding model. At 2025 API pricing of roughly $0.02–$0.10 per million tokens, that's between about $0.25 and $1.15 — call it fifty cents at mid-range pricing.
 - **Storage:** 22,000 vectors × 1,024 dimensions × 4 bytes ≈ 90 MB. A rounding error for any database.
-- **Per query:** embedding a 30-token question costs a thousandth of a cent. Retrieve the top 20 candidates, rerank down to 5, and the LLM sees 5 × 512 = 2,560 tokens of context — about 0.03% of the corpus.
+- **Per query:** embedding a 30-token question costs a fraction of a thousandth of a cent. Retrieve the top 20 candidates, rerank down to 5, and the LLM sees 5 × 512 = 2,560 tokens of context — about 0.03% of the corpus.
 
 Compare the alternative: you can't stuff 10 million tokens into any context window, and even shipping a 200,000-token prompt on every question would cost dollars per query and add seconds of latency. Retrieval is what makes the corpus affordable to consult.
 
@@ -82,7 +84,7 @@ The honest framing: fine-tuning changes how a model writes; retrieval changes wh
 
 At senior level, nobody asks you to define RAG. Interviewers probe the edges: when you would *not* use it, how you'd debug a wrong answer, and whether you know that retrieval — not generation — is where these systems fail.
 
-A strong sound bite: *"RAG failures are usually retrieval failures, so before touching the prompt or the model, I'd check whether the right chunk even made it into the context — measure retrieval recall first, generation second."*
+A strong sound bite: *"When a RAG answer is wrong, the retriever usually broke before the generator did — so I'd check whether the right chunk even made it into the context, and measure retrieval recall before touching the prompt or the model."*
 
 Likely follow-ups:
 
