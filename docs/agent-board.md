@@ -12,7 +12,7 @@
 
 ---
 
-## Recently merged (Cursor priorities P1–P5)
+## Recently merged (Cursor priorities P1–P5 + tiers)
 
 | PR | Task | Merged |
 |----|------|--------|
@@ -21,6 +21,8 @@
 | #9 | P3 Auth skeleton | 2026-07-04 |
 | #10 | P4 Search | 2026-07-04 |
 | #11 | P5 Question bank shell | 2026-07-04 |
+| #12 | Tier 1: Postgres progress, question detail, landing polish | 2026-07-04 |
+| #13 | Tier 2: Ingest validate, Postgres FTS search, glossary/patterns | 2026-07-04 |
 
 ---
 

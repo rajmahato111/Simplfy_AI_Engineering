@@ -1,14 +1,17 @@
-import { PageHero, ComingSoonPanel } from "@/components/page-hero";
+import { PageHero } from "@/components/page-hero";
+import { PracticeSpiderFlow } from "@/components/practice-spider-flow";
 
 export default function PracticePage() {
   return (
     <>
       <PageHero
-        eyebrow="Interactive"
-        title="Guided practice"
-        description="Step through SPIDER walkthroughs with checkpoint feedback — the Hello Interview motion, for AI system design."
+        eyebrow="Guided practice"
+        title="SPIDER walkthrough"
+        description="Step through Scope → Prioritize → Initial architecture → Deep dive → Eval → Reliability. AI checkpoint feedback ships next."
       />
-      <ComingSoonPanel title="Guided practice" phase="PRD E3 · Phase P2" />
+      <div className="mx-auto max-w-6xl px-4 pb-16 sm:px-6">
+        <PracticeSpiderFlow />
+      </div>
     </>
   );
 }
