@@ -56,7 +56,7 @@ Say you're indexing 20 million support-ticket chunks at 1,024 dimensions.
 - **HNSW graph overhead:** roughly 1.5–2x raw size, so the index needs around 120–165 GB of RAM to serve comfortably — past what a single mid-size instance offers cheaply.
 - **Query latency, well-tuned:** single-digit to low-double-digit milliseconds at 95–99% recall, versus far higher latency for 100%-recall brute force at this scale.
 - **Filtered query for one of 500 tenants:** each tenant holds about 40,000 chunks — a needle-in-haystack filter that returns unusable counts under naive post-filtering, but works fine under filter-aware traversal or a per-tenant namespace.
-- **pgvector reality check:** brute-force pgvector is "OK to ~1M vectors" as a rule of thumb — 20 million rows and a 500-way tenant filter is well past what a Postgres extension without a serious ANN index was built for.
+- **pgvector reality check:** brute-force pgvector is comfortable up to roughly a million vectors as a rule of thumb — 20 million rows and a 500-way tenant filter is well past what a Postgres extension without a serious ANN index was built for.
 
 Compare a smaller shop: 300,000 chunks, single tenant, already on Postgres — squarely inside pgvector's comfortable range, no new operational surface.
 

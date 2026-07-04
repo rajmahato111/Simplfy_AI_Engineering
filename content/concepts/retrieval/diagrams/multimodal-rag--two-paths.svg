@@ -37,6 +37,10 @@ Arrows (#475569, end 2px before target edge, one L-bend max):
   Q4 VisualSearch->Fusion       (408,532)->(552,532)->(552,518)
   Q5 Fusion->VLMGenerator       (648,484)->(710,484)
   Q6 VLMGenerator->Answer       (888,484)->(950,484)
+  I5 TextIndex->TextSearch      (632,152)->(588,152)->(588,436)->(410,436)  [2-bend: right-margin
+      gap corridor avoids Multi-vector index box below it; verified collision-free]
+  I6 MultiVecIdx->VisualSearch  (824,248)->(900,248)->(900,532)->(410,532)  [2-bend: far-right
+      corridor (clear of VLM Generator) then a jog below the whole center row]
 
 Labels (12px #475569, white backing rect):
   "text chunks"  rect(435,414,90,18) text(480,427), above Q3 line
@@ -68,6 +72,8 @@ Labels (12px #475569, white backing rect):
   <polyline points="408,532 552,532 552,518" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
   <line x1="648" y1="484" x2="710" y2="484" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
   <line x1="888" y1="484" x2="950" y2="484" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <polyline points="632,152 588,152 588,436 410,436" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <polyline points="824,248 900,248 900,532 410,532" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <!-- arrow labels (white backing) -->
   <rect x="435" y="414" width="90" height="18" fill="#ffffff"/>

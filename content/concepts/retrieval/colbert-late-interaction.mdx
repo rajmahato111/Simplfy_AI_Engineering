@@ -19,21 +19,21 @@ There are three ways a retrieval model can compare a query to a document, and th
 
 ## The analogy
 
-Picture three ways a hiring committee could evaluate a stack of resumes against a job requisition.
+Picture three ways a translation checker could verify that a translated sentence is faithful to the original.
 
-The fast, crude way: boil the entire requisition down to one sentence — "senior backend engineer, distributed systems" — and the resume down to one sentence too, then check if they sound alike. It's instant, but a resume that's a perfect match on the one line that matters — "built a payments system that survived a 10x traffic spike" — reads as a generic near-match once compressed, because that line got averaged in with fifty lines about lunch-and-learns.
+The fast, crude way: boil the whole source sentence down to a one-line gist, boil the translated sentence down to a one-line gist too, and check if the gists agree. It's instant, but a translation that nails the one word that actually mattered — a rare technical term rendered exactly right — reads as a generic near-match once everything gets compressed into a single averaged summary alongside a dozen filler words.
 
-The careful, slow way: have a panel read the requisition and resume side by side, cross-referencing every requirement against every claim. This catches everything, but you can't afford it for all 400 applicants — only the 5 who already look promising.
+The careful, slow way: a professional interpreter reads both sentences side by side, checking every clause against every clause. This catches everything, but you can't afford it for every sentence in a 400-page manual — only the handful already flagged as suspicious.
 
-The clever middle way, which is what a good recruiter actually does: keep the requisition as a list of individual requirements, and the resume as a list of individual claims, not summaries. For *each* requirement, scan the resume for its single best-matching claim — "distributed systems" locks onto "built a payments system that survived a 10x spike" specifically, without that signal getting blended into anything else. Sum the best match found per requirement, and that's the score. Every resume can be pre-broken into its list of claims long before any requisition arrives — only the requirement list needs a fresh read each time.
+The clever middle way, which is what a good bilingual glossary check actually does: keep the source sentence as a list of individual words, and the translation as a list of individual words too, not summaries. For *each* source word, scan the translation for its single best-matching word — a rare technical term locks onto its exact counterpart specifically, without that signal getting blended into anything else. Sum the best match found per source word, and that's the fidelity score. Every translation can be pre-broken into its list of word entries long before any specific source sentence arrives for comparison — only the source words need a fresh look each time.
 
-| Hiring analogy | ColBERT element |
+| Translation-check analogy | ColBERT element |
 |---|---|
-| Requisition and resume each boiled to one sentence | Bi-encoder: one vector each, compared once |
-| Panel reading every line against every line | Cross-encoder: full attention, no precomputation |
-| Resumes pre-broken into individual claims, ahead of time | Document token embeddings (computed offline) |
-| For each requirement, find its single best-matching claim | MaxSim |
-| Summing the best match found per requirement | `Score(Q,D) = Σ max_j(qi · dj)` |
+| Source and translation each boiled to one gist | Bi-encoder: one vector each, compared once |
+| Interpreter reading every clause against every clause | Cross-encoder: full attention, no precomputation |
+| Translation pre-broken into individual word entries, ahead of time | Document token embeddings (computed offline) |
+| For each source word, find its single best-matching translated word | MaxSim |
+| Summing the best match found per source word | `Score(Q,D) = Σ max_j(qi · dj)` |
 
 ## How it actually works
 
@@ -41,19 +41,19 @@ The diagram places the three architectures on one spectrum and shows what "inter
 
 ![The retrieval architecture spectrum: bi-encoder compares one query vector to one document vector, late interaction (ColBERT) compares every query token vector to every document token vector via MaxSim, cross-encoder jointly encodes query and document with full attention](diagrams/colbert-late-interaction--spectrum.svg)
 
-**Bi-encoder.** Query and document each get compressed into one vector, independently. A single dot product is the entire "interaction." This is why bi-encoders scale to billions of documents — every document vector is precomputed, search is nearest-neighbor lookup — but also why they blur: a rare, important word ("Widget-X") gets averaged in with every common word around it.
+**Bi-encoder.** Query and document each get compressed into one vector, independently. A single dot product is the entire "interaction." This is why bi-encoders scale to billions of documents — every document vector is precomputed, search is nearest-neighbor lookup — but also why they blur: a rare, important word ("idempotency-key") gets averaged in with every common word around it.
 
 **Cross-encoder.** Query and document are concatenated and run through one transformer together, so every token attends to every other token at full resolution. Highest accuracy, but nothing can be precomputed — every pair needs a fresh forward pass, so cross-encoders only work as a reranker over a short candidate list, never as first-stage retrieval over a whole corpus.
 
 **Late interaction (ColBERT).** Encode query and document independently, like a bi-encoder — but keep one vector *per token* instead of collapsing to one vector for the whole text. MaxSim then does the comparison: for each query token, take the dot product against every document token, keep only the maximum, and sum those maxima across all query tokens. Document token vectors are precomputed offline, same as a bi-encoder; only the query needs encoding at request time, and MaxSim itself is cheap arithmetic over vectors that already exist.
 
-**Why this beats a bi-encoder without costing what a cross-encoder costs.** In a bi-encoder, "Widget-X," "costs," and "the" all flatten into one vector, so a rare, decisive term has no way to stand out. In ColBERT, "Widget-X" keeps its own vector, so MaxSim locks onto exactly that document token, independent of everything else diluting it. And unlike a cross-encoder, which re-processes the document jointly with the query on every call, ColBERT never re-processes the document at all — its token vectors were computed once, offline.
+**Why this beats a bi-encoder without costing what a cross-encoder costs.** In a bi-encoder, "idempotency-key," "prevents," and "the" all flatten into one vector, so a rare, decisive term has no way to stand out. In ColBERT, "idempotency-key" keeps its own vector, so MaxSim locks onto exactly that document token, independent of everything else diluting it. And unlike a cross-encoder, which re-processes the document jointly with the query on every call, ColBERT never re-processes the document at all — its token vectors were computed once, offline.
 
 ## A concrete example
 
-Query: "What is the price of Widget-X?" Document: "Widget-X costs $200 per month for the Standard plan."
+Query: "What does the idempotency-key header do?" Document: "The idempotency-key header prevents duplicate charge processing when a request is retried."
 
-A bi-encoder embeds the whole query and document into one vector each, and their similarity is one number with no visibility into *why*. ColBERT keeps each side as a list of token vectors and runs MaxSim: "price" locks onto "costs" (dot product 0.89, the highest in its row); "Widget-X" locks onto the document's own "Widget-X" token (0.95). Summed across all six query tokens, these two alone contribute 1.84 of the total score — the terms that actually carry the query's meaning dominate, instead of getting diluted by "what," "is," "the," and "of."
+A bi-encoder embeds the whole query and document into one vector each, and their similarity is one number with no visibility into *why*. ColBERT keeps each side as a list of token vectors and runs MaxSim: "idempotency-key" in the query locks onto the document's own "idempotency-key" token (dot product 0.94, the highest in its row); "does" locks onto "prevents" (0.79) — a looser but still sensible match. Summed across all six query tokens, these two alone contribute 1.73 of the total score — the terms that actually carry the query's meaning dominate, instead of getting diluted by "what," "the," and "header."
 
 Now the storage math this precision costs. Original ColBERT stores a 128-dimension, 32-bit vector per token — 512 bytes — so 10 million documents averaging 200 tokens each need roughly 1 terabyte just for token vectors. ColBERTv2's residual compression (cluster vectors into centroids, store a centroid ID plus a quantized residual) brings that to about 16–32 bytes per token, roughly 64 GB for the same corpus — landing around 2–4x a bi-encoder's footprint (~30 GB at that scale) instead of the naive 1 TB. On accuracy, published NDCG@10 numbers put bi-encoders around 0.35–0.40, ColBERT around 0.39–0.44, and cross-encoders around 0.42–0.46 — ColBERT closes most of the gap while staying in the bi-encoder's speed class, via PLAID's staged centroid-pruning.
 

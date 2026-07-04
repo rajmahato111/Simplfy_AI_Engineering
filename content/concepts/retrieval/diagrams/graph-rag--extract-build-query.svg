@@ -20,7 +20,7 @@ Nodes (h=64):
 Arrows (#475569, stop 2px short of target edge):
   A1 docs->extractor      (200,152)->(262,152)
   A2 extractor->graphdb   (360,184)->(360,278)   label "entities + edges"
-  A3 graphdb->summaries   (456,312)->(558,312)   label "communities" on line
+  A3 graphdb->summaries   (456,312)->(558,312)   label "communities" offset above line (was on-line, occluding it)
   A4 qA->local            (176,456)->(262,456)
   A5 local->genA          (456,456)->(510,456)
   A6 local->graphdb READ  (360,424)->(360,346)   label "traverse 1-2 hops"
@@ -56,8 +56,8 @@ Cross-check: vertical x=656 spans y=346..552; row A nodes end at x=640; no cross
   <!-- arrow labels (white backing) -->
   <rect x="368" y="222" width="110" height="18" fill="#ffffff"/>
   <text x="372" y="235" font-size="12" fill="#475569">entities + edges</text>
-  <rect x="459" y="303" width="96" height="18" fill="#ffffff"/>
-  <text x="507" y="316" font-size="12" fill="#475569" text-anchor="middle">communities</text>
+  <rect x="459" y="290" width="96" height="18" fill="#ffffff"/>
+  <text x="507" y="303" font-size="12" fill="#475569" text-anchor="middle">communities</text>
   <rect x="368" y="370" width="122" height="18" fill="#ffffff"/>
   <text x="372" y="383" font-size="12" fill="#475569">traverse 1–2 hops</text>
   <rect x="664" y="431" width="104" height="18" fill="#ffffff"/>

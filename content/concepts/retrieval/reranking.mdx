@@ -47,10 +47,10 @@ The neutral note under the funnel names the structural reason cross-encoders win
 
 ## A concrete example
 
-A cloud-infra support bot retrieves for the query "how to configure CUDA memory allocation."
+An HR help-desk bot retrieves for the query "how do I carry over unused vacation days into next year."
 
-- **Bi-encoder scores (cosine similarity), top 3 candidates:** a passage titled "Memory management in CUDA applications" scores 0.75 and ranks #1; a passage that literally says "Configure GPU memory using CUDA_VISIBLE_DEVICES..." scores only 0.72 and ranks #2 — the bi-encoder's fixed vectors put a generic "memory management" passage ahead of the one that actually answers the question, because vector distance doesn't capture that "configure" and "CUDA_VISIBLE_DEVICES" are the operative terms here.
-- **Cross-encoder scores on the same three, reading query and passage jointly:** the `CUDA_VISIBLE_DEVICES` passage jumps to 0.91 and ranks #1; the generic "memory management" passage drops to 0.67. The reranker caught what cosine similarity missed.
+- **Bi-encoder scores (cosine similarity), top 3 candidates:** a passage titled "Time off policy overview" scores 0.74 and ranks #1; a passage that literally says "Up to 5 unused PTO days roll over into Q1 of the following year" scores only 0.71 and ranks #2 — the bi-encoder's fixed vectors put a generic overview ahead of the one passage that actually answers the question, because vector distance doesn't capture that "carry over" and "roll over" are the operative match here, not the shared vocabulary around "policy."
+- **Cross-encoder scores on the same three, reading query and passage jointly:** the "roll over into Q1" passage jumps to 0.90 and ranks #1; the generic overview drops to 0.66. The reranker caught what cosine similarity missed.
 - **Latency budget:** first-stage retrieval runs in roughly 50–100ms; a cross-encoder reranking 50 candidates typically adds 100–200ms more, for a combined 150–300ms total — versus 50–100ms with no reranking at all.
 - **Quality delta:** it's common to see NDCG (Normalized Discounted Cumulative Gain, a standard ranking-quality metric) move from roughly 0.65 without reranking to roughly 0.78 with it — a meaningful jump for a few hundred milliseconds.
 - **Sweet spot for candidate count:** retrieving 20 candidates and reranking them often lands around NDCG 0.72 at ~120ms; retrieving 50 and reranking often reaches ~0.76 at ~180ms; pushing to 100 candidates typically adds only marginal quality (~0.77) for a much heavier ~280ms — the elbow of diminishing returns usually sits around K = 50.

@@ -19,23 +19,23 @@ GraphRAG bolts a knowledge graph onto retrieval. At index time an LLM (large lan
 
 ## The analogy
 
-Picture the detective's evidence board from every crime drama: photos pinned to a corkboard, string running between them, a case folder for each cluster of pins.
+Picture a genealogist tracing a family through history, versus someone holding only a stack of individual birth certificates.
 
-The board exists because no single witness statement solves a conspiracy. One report mentions a shell company. A different report, filed months later, mentions a harbor lease. Neither document names the other — but the board shows the shell company tied by string to an accountant, and the accountant tied to the lease. The detective solves the case by *walking the string*, hop by hop, through intermediaries the paperwork never puts in the same paragraph. A filing cabinet full of photocopies, however well organized, cannot do that.
+A single birth certificate tells you a name, a date, a place of birth — full stop. It doesn't tell you that this person's grandmother was the sister of a landowner three counties over, and that connection is exactly what explains why a disputed parcel of land ended up in this family's hands. No single certificate says that; the fact lives in the *chain* of relationships between certificates. A genealogist doesn't reread every scattered document from a courthouse archive to answer "how is this person connected to that estate?" — they consult the family tree they've already built: named people as nodes, marriages and parentage as edges, and they walk the tree hop by hop from the question to the answer.
 
-The board earns its keep a second way. When the chief asks "what's the big picture across all open cases?", the detective doesn't reread five hundred files. Each cluster of pins has a one-page folder summarizing it, and the briefing comes from those folders. But notice what the board costs: it takes weeks of reading to pin everything, and it rots. A string still pointing at last year's suspect doesn't just fail to help — it actively misleads.
+The tree earns its keep a second way. When a historian asks "summarize this family's rise and fall across three centuries," the genealogist doesn't reread every original certificate — each branch of the tree already has a written summary of that generation's major events, and the answer is built from those branch summaries. But building the tree in the first place took months of archive work, and it goes stale: a birth recorded in one archive but never linked to a later marriage record leaves a real relationship missing, and a genealogist working from an incomplete tree will confidently declare two branches unrelated when they aren't.
 
-| Evidence board element | GraphRAG element |
+| Genealogy element | GraphRAG element |
 |---|---|
-| A photo pinned to the board | Entity node (person, company, policy) |
-| String tied between two photos | Relationship edge with a type ("owns", "reports to") |
-| Reading every file to pin the board | LLM extraction pass at index time |
-| A tight cluster of connected pins | Community (graph cluster) |
-| The one-page folder per cluster | Community summary |
-| Walking the string, hop by hop | Local search (multi-hop traversal) |
-| Briefing the chief from the folders | Global search over summaries |
-| Re-pinning as new evidence arrives | Graph refresh and entity reconciliation |
-| String pointing at an old suspect | A stale graph answering confidently |
+| A named person on the family tree | Entity node (person, company, policy) |
+| A marriage or parentage line between two people | Relationship edge with a type ("owns", "reports to") |
+| Reading archives to build the tree | LLM extraction pass at index time |
+| A tightly connected branch of the family | Community (graph cluster) |
+| The written summary of one branch's history | Community summary |
+| Walking the tree, hop by hop, to a distant relative | Local search (multi-hop traversal) |
+| Answering "summarize this family" from branch summaries | Global search over summaries |
+| Adding newly discovered certificates to the tree | Graph refresh and entity reconciliation |
+| An unlinked record leaving two branches wrongly "unrelated" | A stale graph answering confidently |
 
 ## How it actually works
 

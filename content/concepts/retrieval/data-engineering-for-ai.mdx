@@ -19,21 +19,21 @@ Every RAG system and every fine-tuning run gets fed by the same unglamorous mach
 
 ## The analogy
 
-Picture a public library's technical services department — the unit nobody visits, behind a door marked "staff only," that decides what a library card actually gets you.
+Picture a materials-recovery facility — the sorting plant that turns a truckload of mixed recycling into clean bales of one material each, ready to sell.
 
-New donations arrive as a chaotic pile: hardbacks, water-damaged paperbacks, boxes of magazines, a donor's personal papers. Before anything reaches a shelf, technical services runs it through a fixed sequence. **Accessioning** figures out what each item actually is — you can't trust the label on the spine, so you open the book and check (never trust a file extension over its real content). **Cataloging** extracts the structured facts — author, subject, call number — the way a parser extracts typed elements from a raw file. **Conservation** cleans up water damage and re-binds torn pages before anything circulates. **Weeding** pulls duplicate copies and superseded editions off the shelf, because five copies of the same outdated tax guide crowd out what a patron actually needs. Anything in a donor's papers with a living person's medical or financial details goes into a **restricted archive** with redacted names, not the open stacks. And **collection development** actively retires what's outdated — an encyclopedia so old it's actively wrong shouldn't sit next to the current edition pretending to be current.
+Every load arrives as a chaotic mix: bottles, cardboard, scrap metal, and things that should never have been tossed in the bin at all. Before any of it becomes a bale a buyer will pay for, the facility runs a fixed sequence. **Intake screening** figures out what each item actually is — an optical sorter reads the object itself, not whichever bin a confused resident chose for it (never trust the bin someone picked over what the material actually is). **Sorting** separates the stream into typed categories — paper, aluminum, PET plastic — the way a parser extracts typed elements from a raw file. **Cleaning** rinses off food residue and strips labels before anything gets baled, or a whole bale gets rejected downstream. **Contaminant removal** pulls out duplicate scans and anything a magnet or eddy current shows doesn't belong, because one bale of mixed materials is worthless to every buyer. Anything hazardous — batteries, medical waste — goes into a **quarantine bin** with strict handling, never the open sorting line. And the facility actively **rejects stock that's degraded past use** — a bale so contaminated it will spoil an entire batch shouldn't ship next to clean material pretending to be equivalent.
 
-One more discipline matters for training new librarians: the sample books used in a cataloging exam can never be books the trainee already secretly handled and memorized answers for — if they have, the score is meaningless. That's decontamination, and it's why a "test set" quietly overlapping the "study material" invalidates the whole exam.
+One more discipline matters when the facility certifies new sorting-line staff on a quality-control test: the sample items used in that test can never be items the trainee already secretly sorted and memorized the answer key for — if they have, the score is meaningless. That's decontamination, and it's why a "test batch" quietly overlapping the "training batch" invalidates the whole certification.
 
-| Library technical services | AI data engineering |
+| Materials-recovery facility | AI data engineering |
 |---|---|
-| Opening the book instead of trusting the spine label | Content-based (magic-byte) file-type detection, not extension |
-| Cataloging: extracting author, subject, structure | Parsing: typed elements, layout, structure extraction |
-| Conservation: repairing damage before circulation | Cleaning: boilerplate strip, encoding fixes, Unicode |
-| Weeding duplicate and superseded copies | Deduplication cascade: exact, then fuzzy, then semantic |
-| The restricted archive with redacted donor details | PII detection, redaction, consent and provenance metadata |
-| Collection development retiring outdated editions | Freshness, CDC-driven reindexing, document lifecycle |
-| Exam books aren't secretly in study material | Eval-set decontamination against training data |
+| Optical sort reading the object, not the bin it arrived in | Content-based (magic-byte) file-type detection, not extension |
+| Sorting into typed material categories | Parsing: typed elements, layout, structure extraction |
+| Rinsing and de-labeling before baling | Cleaning: boilerplate strip, encoding fixes, Unicode |
+| Removing duplicate scans and damaged loads | Deduplication cascade: exact, then fuzzy, then semantic |
+| The quarantine bin for hazardous material | PII detection, redaction, consent and provenance metadata |
+| Rejecting stock that's degraded past use | Freshness, CDC-driven reindexing, document lifecycle |
+| Test items can't be items staff already secretly sorted | Eval-set decontamination against training data |
 
 ## How it actually works
 
