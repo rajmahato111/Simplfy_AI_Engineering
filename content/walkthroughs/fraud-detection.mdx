@@ -1,0 +1,43 @@
+---
+title: 'Case Study: Real-Time Fraud Detection'
+slug: fraud-detection
+type: walkthrough
+area: case-studies
+difficulty: advanced
+tags:
+  - case-studies
+  - fraud
+  - detection
+diagrams:
+  - diagrams/fraud-detection--overview.svg
+est_minutes: 8
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The question
+
+A payment processor handles 10 million transactions per day. They need to detect fraudulent transactions in real-time, blocking them before they complete, while minimizing false positives that frustrate legitimate customers.
+
+## What the interviewer is actually testing
+
+- Decision latency: under 100ms
+- False positive rate: under 0.1% (1 in 1,000)
+- Must explain why a transaction was flagged
+- Regulations require 7-year audit trail
+- Fraud patterns evolve constantly
+
+## How it actually works
+
+
+![Case Study: Real-Time Fraud Detection overview](diagrams/fraud-detection--overview.svg)
+
+
+
+## Go deeper
+
+- [Upstream chapter (Case Study: Real-Time Fraud Detection)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/16-case-studies/14-fraud-detection.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

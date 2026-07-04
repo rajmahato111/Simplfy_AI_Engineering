@@ -1,0 +1,73 @@
+---
+title: Evaluating Agentic Systems
+slug: evaluating-agentic-systems
+type: concept
+area: agents
+difficulty: intermediate
+tags:
+  - agents
+  - evaluating
+  - agentic
+  - systems
+diagrams:
+  - diagrams/evaluating-agentic-systems--overview.svg
+est_minutes: 8
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The 30-second version
+
+Evaluating agents is fundamentally different from evaluating RAG. While RAG is about "Accuracy," Agents are about "Reliability," "Efficiency," and "Safety." Production agent eval relies on Trajectory Benchmarks and LLM-as-Judge for multi-step reasoning, with tools like Langfuse, LangWatch, Braintrust, and Arize Phoenix offering native trace-level scoring.
+
+## The analogy
+
+Think of **Evaluating Agentic Systems** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Evaluating Agentic Systems overview](diagrams/evaluating-agentic-systems--overview.svg)
+
+Evaluating agents is fundamentally different from evaluating RAG. While RAG is about "Accuracy," Agents are about **"Reliability," "Efficiency," and "Safety."** Production agent eval relies on **Trajectory Benchmarks** and **LLM-as-Judge** for multi-step reasoning, with tools like Langfuse, LangWatch, Braintrust, and Arize Phoenix offering native trace-level scoring.
+
+> [!NOTE]
+> For standard RAG evaluation (Retrieval vs. Generation metrics), see [06-retrieval-systems/09-advanced-retrieval-patterns.md](../06-retrieval-systems/09-advanced-retrieval-patterns.md) and Section 14. This chapter focuses specifically on the *Execution Path* of an agent.
+
+## A concrete example
+
+Evaluating agents is fundamentally different from evaluating RAG. While RAG is about "Accuracy," Agents are about "Reliability," "Efficiency," and "Safety." Production agent eval relies on Trajectory Benchmarks and LLM-as-Judge for multi-step reasoning, with tools like Langfuse, LangWatch, Braintrust, and Arize Phoenix offering native trace-level scoring.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: How do you evaluate an agent when the environment is non-deterministic (e.g., the web)?
+
+**Strong answer:**
+We use **Mock Environments** or **Snapshotted States**. For high-fidelity testing, we use a containerized browser that resets to a clean state for every test run. We then compare the agent's trajectory against a **Reference Trace**. If the environment is truly live, we use **State-Based Verification**—instead of comparing the text, we check the external world's state (e.g., "Is there a new row in the database with the correct values?").
+
+### Q: Why is "Meandering" (taking too many steps) a critical failure in Staff-level Agent design?
+
+**Strong answer:**
+Meandering leads to three failures: 1) **Cost**: Every step is an LLM call; 2) **Latency**: Every step adds 2-5 seconds; 3) **Entropy**: The longer the trajectory, the higher the chance of the agent encountering a weird edge case that triggers a hallucination. The standard fix is **Step Budgets**: if an agent doesn't solve a task in 10 steps, we terminate it and escalate to a human to prevent a "Token Leak."
+
+## Go deeper
+
+- [Upstream chapter (Evaluating Agentic Systems)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/07-agentic-systems/10-evaluating-agentic-systems.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

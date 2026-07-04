@@ -1,0 +1,120 @@
+---
+title: Model Taxonomy
+slug: model-taxonomy
+type: concept
+area: models
+difficulty: beginner
+tags:
+  - models
+  - model
+  - taxonomy
+diagrams:
+  - diagrams/model-taxonomy--overview.svg
+est_minutes: 40
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The 30-second version
+
+This chapter provides a comprehensive guide to the model landscape as of June 2026, covering model families, capabilities, and selection criteria for production systems.
+
+## The analogy
+
+Think of **Model Taxonomy** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Model Taxonomy overview](diagrams/model-taxonomy--overview.svg)
+
+This chapter provides a comprehensive guide to the model landscape as of **June 2026**, covering model families, capabilities, and selection criteria for production systems.
+
+> **Last verified: June 28, 2026.** The model landscape evolves rapidly. Always cross-check with provider pricing pages and release notes.
+>
+> **June 2026 headline:** Anthropic released **Claude Fable 5** (June 9, `claude-fable-5`, $10/$50 per 1M, 1M context), its most capable widely released model: a Mythos-class model made safe for general availability, with an Opus 4.8 fallback safeguard on sensitive topics. **Claude Mythos 5** ships the same day as the unrestricted variant for Project Glasswing partners, succeeding Mythos Preview at less than half its price.
+>
+> **June 10-26 update:** A dense second wave of June launches followed. **Google DeepMind DiffusionGemma** (June 10, Apache 2.0) is Google DeepMind's first open-weight text-diffusion model: a 26B Mixture-of-Experts (~4B active) that denoises blocks of tokens in parallel for roughly 4x faster generation on a single H100, trading some quality versus standard Gemma 4. **Gemini 3.5 Live Translate** (June 9, built on Gemini 3 Pro) added real-time speech-to-speech translation across 70+ languages in public preview via the Gemini Live API and AI Studio. **Cohere North Mini Code 1.0** (June 9, Apache 2.0) is Cohere's first open coding model, a 30B / 3B-active MoE that runs on one H100. **Moonshot Kimi K2.7 Code** (June 12, Modified MIT) tunes K2.6 for long-horizon software work (1T / 32B-active MoE, roughly 30% fewer thinking tokens). **Z.ai GLM-5.2** (coding-plan access June 13, open weights under MIT June 16-17) is a ~753B / 40B-active MoE with a 1M context that reports SWE-Bench Pro 62.1, ahead of GPT-5.5 on that benchmark, at roughly $1.40 / $4.40 per 1M. **xAI Grok Imagine Video 1.5** reached general availability June 16 (image-to-video with synchronized audio, $0.080 per second of video), and **Grok 4.3** arrived on Amazon Bedrock June 15 ($1.25 / $2.50 per 1M, xAI's first model there). Alibaba's official Qwen Cloud changelog lists a June snapshot adding vision to **Qwen 3.7-Max** (text-only at its May launch), though some independent coverage attributes that vision update to Qwen 3.7-Plus instead, so verify before relying on it. Separately, on June 12 Anthropic suspended access to Claude Fable 5 and Claude Mythos 5 following a US export-control directive, with Mythos 5 later cleared for a limited set of US institutions. Then on June 26, OpenAI previewed **GPT-5.6** (Sol, Terra, and Luna), its next-generation line, in a limited release to a small set of US-government-approved partners over dual-use cybersecurity concerns, echoing the Anthropic restriction; Sol claims a new Terminal-Bench 2.1 record and Terra targets GPT-5.5-level quality at about half the cost. Coding scores here are largely vendor-reported; confirm on independent leaderboards.
+>
+> **May 2026 recap:** Anthropic Claude Opus 4.8 (May 28, same $5/$25 price as Opus 4.7; Dynamic Workflows research preview with hundreds of parallel subagents; fast mode at $10/$50 is 3x cheaper than the Opus 4.7 fast mode); OpenAI GPT-5.5 (April 23) and GPT-5.5 Instant (May 5, default in ChatGPT); Claude Opus 4.7 (April 16, GA on Bedrock/Vertex/Foundry); Google Gemma 4 (April 2, Apache 2.0) and Gemini 3.2 Flash (quiet rollout May 5); DeepSeek V4 Pro and V4 Flash (April 24; 75% V4 Pro discount made **permanent** May 22, new list price $0.435/$0.87 per 1M from June 1); Moonshot Kimi K2.6 (April 20, 1T MoE / 32B active); Alibaba Qwen 3.6 Plus / 3.6-35B-A3B / 3.6 Max-Preview; Mistral Medium 3.5 (April 29, unified chat/reasoning/coding/vision); Meta Muse Spark (April 8, first closed-weight Meta model); Llama 4 Behemoth release paused through fall 2026 amid capability concerns. SWE-bench Verified published leaders before the Fable 5 launch: Claude Mythos Preview 93.9%, GPT-5.5 88.7%, Claude Opus 4.8 88.6%; ARC-AGI-2 leader: GPT-5.5 at 85.0%. Anthropic describes Fable 5 as state of the art on nearly all tested benchmarks; standard numeric scores were not in the launch post, so verify on the leaderboards.
+
+## A concrete example
+
+This chapter provides a comprehensive guide to the model landscape as of June 2026, covering model families, capabilities, and selection criteria for production systems.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: How would you select a model for a production RAG system?
+
+**Strong answer:**
+I evaluate across these dimensions:
+
+**1. Quality requirements:**
+- Test on representative queries from the actual domain
+- Measure answer correctness, hallucination rate, citation accuracy
+
+**2. Cost analysis:**
+```
+Monthly cost = requests/day × 30 × avg_tokens × rate
+```
+Always calculate for top 2-3 candidates.
+
+**3. Latency requirements:**
+- If &lt;200ms TTFT needed: Gemini 3.1 Flash, Claude Haiku 4.5, GPT-5.4-mini
+- If quality is paramount: Accept 2-3s with Claude Opus 4.6 or GPT-5.4
+
+**4. Operational requirements:**
+- Self-hosting: Llama 4 Scout/Maverick, DeepSeek-V3
+- Compliance / data residency: Azure Sovereign or self-hosted
+
+**5. Practical selection:**
+- Start with Claude Sonnet 4.6 or GPT-5.4 for prototyping
+- A/B test Gemini 3.1 Flash for 80% of queries (cost)
+- Keep frontier on hard queries via semantic routing
+
+### Q: Explain the tradeoffs between proprietary and open source models.
+
+**Strong answer:**
+| Factor | Proprietary (OpenAI, Anthropic) | Open Source (Llama, DeepSeek) |
+|--------|--------------------------------|-----------------------------|
+| Quality | Generally higher (slightly) | Catching up rapidly |
+| Cost | Per-token pricing | Compute + ops |
+| Control | Limited | Full |
+| Privacy | Data goes to provider | Stays on-prem |
+| Updates | Automatic | Manual |
+| Customization | Limited fine-tuning | Full fine-tuning |
+| Ops overhead | None | Significant |
+
+**Key insight (2026)**: DeepSeek-V3/R1 and now Llama 4 have changed this conversation -- open models match or beat GPT-4o on many benchmarks. With Llama 4 Maverick matching DeepSeek V3 on reasoning at half the active parameters, the gap is narrower than ever.
+
+### Q: What is the difference between GPT-5.4 Pro and Claude Opus 4.6's Extended Thinking?
+
+**Strong answer:**
+Both use internal chain-of-thought, but the mechanics differ:
+
+- **GPT-5.4 Pro**: OpenAI's maximum-compute reasoning tier ($30/$180 per 1M tokens). Allocates high compute to reasoning. Internal thoughts are not exposed. Successor to the o3 line.
+- **Claude Opus 4.6 Adaptive Thinking**: Returns thinking tokens in a separate `<thinking>` block. Configurable `budget_tokens`. You can inspect the reasoning chain for debugging. Full 1M context with 128K max output.
+
+**Production choice**: For debugging and trust-building, Claude's visible thinking is more transparent. For maximum raw reasoning power on math/competition tasks, GPT-5.4 Pro leads. For cost-effective reasoning, Claude Sonnet 4.6 or GPT-5.4-mini are strong choices.
+
+## Go deeper
+
+- [Upstream chapter (Model Taxonomy)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/02-model-landscape/01-model-taxonomy.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

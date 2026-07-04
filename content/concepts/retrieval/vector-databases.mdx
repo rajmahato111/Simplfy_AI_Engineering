@@ -1,0 +1,153 @@
+---
+title: Vector Databases
+slug: vector-databases
+type: concept
+area: retrieval
+difficulty: intermediate
+tags:
+  - retrieval
+  - vector
+  - databases
+diagrams:
+  - diagrams/vector-databases--overview.svg
+est_minutes: 17
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The 30-second version
+
+Vector databases are purpose-built systems for storing, indexing, and searching high-dimensional embeddings. The market has split into Managed Serverless and Specialized High-Performance engines. We no longer ask "Does it support vector search?" (Postgres, Redis, and Mongo all do). We ask "Does it scale to 100M+ vectors with sub-100ms P99 and full metadata filtering?"
+
+## The analogy
+
+Think of **Vector Databases** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Vector Databases overview](diagrams/vector-databases--overview.svg)
+
+Vector databases are purpose-built systems for storing, indexing, and searching high-dimensional embeddings. The market has split into **Managed Serverless** and **Specialized High-Performance** engines. We no longer ask "Does it support vector search?" (Postgres, Redis, and Mongo all do). We ask **"Does it scale to 100M+ vectors with sub-100ms P99 and full metadata filtering?"**
+
+## A concrete example
+
+Vector databases are purpose-built systems for storing, indexing, and searching high-dimensional embeddings. The market has split into Managed Serverless and Specialized High-Performance engines. We no longer ask "Does it support vector search?" (Postgres, Redis, and Mongo all do). We ask "Does it scale to 100M+ vectors with sub-100ms P99 and full metadata filtering?"
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: How would you choose between Pinecone and a self-hosted solution?
+
+**Strong answer:**
+Decision depends on several factors:
+
+**Choose Pinecone when:**
+- Team lacks ops capacity for stateful infrastructure
+- Need to move quickly (days not weeks)
+- Scale is moderate (under 100M vectors)
+- Budget allows managed service premium
+- Compliance allows cloud-vendor dependency
+
+**Choose self-hosted (Qdrant, Milvus) when:**
+- Have Kubernetes and ops expertise
+- Cost sensitivity at scale
+- Need full control over data
+- Specific compliance requirements
+- Want to avoid vendor lock-in
+
+For most startups, I would start with Pinecone or Qdrant Cloud for velocity, then evaluate migration if costs become prohibitive at scale. The switching cost is moderate since vector DBs have similar APIs.
+
+### Q: Explain how HNSW works and when you would not use it.
+
+**Strong answer:**
+HNSW builds a hierarchical graph of vectors:
+
+**How it works:**
+1. Insert vectors as nodes in a multi-layer graph
+2. Higher layers have fewer nodes, larger jumps
+3. Search: start at top layer, greedily navigate to nearest neighbor
+4. Descend layers until bottom (all vectors)
+
+**Why it is good:**
+- O(log n) query complexity
+- No training required
+- Supports real-time updates
+- Excellent recall/latency tradeoff
+
+**When not to use:**
+- Very small datasets (&lt;10K): brute force is fine
+- Extremely memory constrained: HNSW uses 1.5-2x vector size for graph
+- Need exact search: HNSW is approximate
+- Heavy update workload with tight latency: updates can cause temporary degradation
+
+Alternatives:
+- IVF-PQ for memory constraints
+- DiskANN for billion-scale with cost efficiency
+- Flat index for exact search
+- LSH for very high-dimensional sparse vectors
+
+### Q: When would you use a Disk-based index (like DiskANN) over a RAM-based index (HNSW)?
+
+**Strong answer:**
+I would use a Disk-based index when the memory cost of the index exceeds the budget or the capacity of a single high-memory node. For example, a 100-million-vector index with 1536 dimensions would require nearly 1TB of RAM for HNSW. Using DiskANN, I can store the majority of that 1TB on NVMe SSDs, reducing the RAM requirement by 90-95% while maintaining sub-10ms query times. This represents a massive TCO (Total Cost of Ownership) reduction for non-real-time search applications.
+
+### Q: Why is metadata filtering often the bottleneck in vector databases?
+
+**Strong answer:**
+In naive vector search, we find the "Top K" nearest neighbors and THEN filter them by metadata (e.g., "only documents from 2024"). If the filter is very restrictive, we might find 0 results after filtering. Specialized databases now use **Pre-Filtering with HNSW**, traversing the graph but only considering nodes that satisfy the boolean metadata constraint. This is computationally expensive because it breaks the "short-circuit" logic of HNSW, requiring specialized bitmasks or hardware acceleration (SIMD) to keep latencies low.
+
+### Q: How do you handle multi-tenancy in a vector database?
+
+**Strong answer:**
+Three main approaches:
+
+**1. Metadata filtering (most common):**
+```python
+results = db.search(
+    vector=query,
+    filter={"tenant_id": current_tenant}
+)
+```
+- Pros: Simple, single index
+- Cons: All tenants share resources, potential for bugs exposing data
+
+**2. Collection per tenant:**
+```python
+results = db.collection(f"tenant_{tenant_id}").search(vector=query)
+```
+- Pros: Strong isolation, per-tenant scaling
+- Cons: Many collections, operational overhead
+
+**3. Namespace per tenant (Pinecone):**
+```python
+results = index.query(vector=query, namespace=tenant_id)
+```
+- Pros: Isolation within single index
+- Cons: Vendor-specific
+
+**I would choose:**
+- Metadata filtering for most cases (simple, cost-effective)
+- Separate collections for high-security requirements
+- Never post-filter (retrieve all, filter after) due to leakage risk
+
+## Go deeper
+
+- [Upstream chapter (Vector Databases)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/06-retrieval-systems/04-vector-databases.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

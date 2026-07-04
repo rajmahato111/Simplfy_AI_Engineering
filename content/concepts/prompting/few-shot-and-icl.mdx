@@ -1,0 +1,77 @@
+---
+title: Few-Shot and In-Context Learning (ICL)
+slug: few-shot-and-icl
+type: concept
+area: prompting
+difficulty: intermediate
+tags:
+  - prompting
+  - few
+  - shot
+  - and
+  - icl
+diagrams:
+  - diagrams/few-shot-and-icl--overview.svg
+est_minutes: 8
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The 30-second version
+
+In-Context Learning (ICL) is the ability of an LLM to learn a new task simply by seeing examples in the prompt, without any weight updates. Maximizing ICL efficiency is a key lever for prompt stability.
+
+## The analogy
+
+Think of **Few-Shot and In-Context Learning (ICL)** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Few-Shot and In-Context Learning (ICL) overview](diagrams/few-shot-and-icl--overview.svg)
+
+In-Context Learning (ICL) is the ability of an LLM to learn a new task simply by seeing examples in the prompt, without any weight updates. Maximizing ICL efficiency is a key lever for prompt stability.
+
+## A concrete example
+
+In-Context Learning (ICL) is the ability of an LLM to learn a new task simply by seeing examples in the prompt, without any weight updates. Maximizing ICL efficiency is a key lever for prompt stability.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: Why not just provide all 50 examples we have in the prompt?
+
+**Strong answer:**
+There are three primary reasons:
+1. **Context Window Latency**: Every example adds tokens, increasing the "Prefill" time and the cost per request.
+2. **Attention Dilution**: Even with 128k context, models can "lose" specific constraints if buried under too much irrelevant data (the "lost-in-the-middle" effect).
+3. **Overfitting**: Providing too many narrow examples can cause the model to mimic the *format* of the examples too strictly, losing its general capability to handle edge cases outside that set.
+
+### Q: What is "Label Bias" in In-Context Learning?
+
+**Strong answer:**
+Label bias occurs when the model predicts a specific label more frequently simply because it appeared more often in the few-shot examples or because it appeared at the end of the list. The standard mitigations are:
+1. Shuffling the order of examples for different requests.
+2. Ensuring an equal number of positive/negative/neutral samples.
+3. Using "Permutation Testing" during prompt development to ensure the model responds to the content, not the order.
+
+## Go deeper
+
+- [Upstream chapter (Few-Shot and In-Context Learning (ICL))](https://github.com/ombharatiya/ai-system-design-guide/blob/main/05-prompting-and-context/02-few-shot-and-icl.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

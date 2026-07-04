@@ -1,0 +1,69 @@
+---
+title: GraphRAG
+slug: graph-rag
+type: concept
+area: retrieval
+difficulty: intermediate
+tags:
+  - retrieval
+  - graph
+  - rag
+diagrams:
+  - diagrams/graph-rag--overview.svg
+est_minutes: 9
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The 30-second version
+
+GraphRAG is the combination of Knowledge Graphs (KG) and Retrieval-Augmented Generation. While vector RAG is good at "finding a specific chunk," GraphRAG is designed for Global Reasoning across an entire dataset.
+
+## The analogy
+
+Think of **GraphRAG** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![GraphRAG overview](diagrams/graph-rag--overview.svg)
+
+GraphRAG is the combination of **Knowledge Graphs (KG)** and **Retrieval-Augmented Generation**. While vector RAG is good at "finding a specific chunk," GraphRAG is designed for **Global Reasoning** across an entire dataset.
+
+## A concrete example
+
+GraphRAG is the combination of Knowledge Graphs (KG) and Retrieval-Augmented Generation. While vector RAG is good at "finding a specific chunk," GraphRAG is designed for Global Reasoning across an entire dataset.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: Why is the "Extraction" phase the bottleneck for GraphRAG?
+
+**Strong answer:**
+Knowledge Graph extraction is extremely token-intensive. To build a high-quality graph, you must process every document with a "Frontier" model to ensure you don't miss subtle entity connections. For a 10,000-page dataset, this can cost thousands of dollars in LLM API calls. The standard mitigation is **SLM-based Extraction** (Small Language Models) for the initial pass, with giant models reserved for "conflict resolution" between overlapping entities. Microsoft's LazyGraphRAG further delays community-summarization cost by deferring it until query time.
+
+### Q: How does GraphRAG solve the "Context Window" limit for aggregate questions?
+
+**Strong answer:**
+For aggregate questions (e.g., "Summarize the sentiment of 1,000 documents"), a standard RAG system would have to feed 1,000 chunks into the context window, which is impossible or prohibitively expensive. GraphRAG solves this by **Pre-Summarization**. It hierarchically summarizes the clusters of information in the graph (Communities). When the user asks a global question, the system only retrieves the high-level community summaries, which are compact and rich in information, allowing the model to "see" the entire dataset through a condensed lens.
+
+## Go deeper
+
+- [Upstream chapter (GraphRAG)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/06-retrieval-systems/07-graph-rag.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

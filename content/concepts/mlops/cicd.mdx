@@ -1,0 +1,100 @@
+---
+title: CI/CD for LLM Applications
+slug: cicd
+type: concept
+area: mlops
+difficulty: intermediate
+tags:
+  - mlops
+  - cicd
+diagrams:
+  - diagrams/cicd--overview.svg
+est_minutes: 8
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The 30-second version
+
+Deploying LLM applications requires adapting traditional CI/CD practices for AI-specific concerns like model evaluation, prompt testing, and quality gates.
+
+## The analogy
+
+Think of **CI/CD for LLM Applications** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![CI/CD for LLM Applications overview](diagrams/cicd--overview.svg)
+
+Deploying LLM applications requires adapting traditional CI/CD practices for AI-specific concerns like model evaluation, prompt testing, and quality gates.
+
+## A concrete example
+
+Deploying LLM applications requires adapting traditional CI/CD practices for AI-specific concerns like model evaluation, prompt testing, and quality gates.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: How do you test prompt changes before production?
+
+**Strong answer:**
+
+"I use a multi-stage testing pipeline:
+
+**Stage 1: Static validation.** Syntax check, token limits, template errors. Fast and cheap.
+
+**Stage 2: Unit tests.** Template rendering, output parsing, deterministic behavior. Still fast.
+
+**Stage 3: Golden set tests.** Known input/output pairs that must pass. Catches obvious regressions.
+
+**Stage 4: LLM evaluation.** Sampled evaluation using LLM-as-judge. Measures quality dimensions (relevance, accuracy). More expensive but catches subtle issues.
+
+**Quality gates:** All stages must pass thresholds. Golden set > 95% pass rate, quality scores > 4.0/5.0.
+
+**Deployment:** Canary at 5% traffic, bake for 30 minutes, monitor metrics, gradually increase.
+
+The key insight is that LLM outputs are non-deterministic, so testing must be statistical. I cannot guarantee 100% correctness, but I can ensure quality stays within acceptable bounds."
+
+### Q: What triggers should cause automatic rollback?
+
+**Strong answer:**
+
+"I configure multiple rollback triggers:
+
+**Error rate:** If errors exceed 5% for 5 consecutive minutes, rollback. This catches outright failures.
+
+**Latency:** If P99 latency exceeds SLA (e.g., 10s) for 10 minutes, rollback. This catches performance regressions.
+
+**Quality score:** If sampled quality score drops below 3.5/5.0, rollback. This catches subtle quality degradation.
+
+**User signals:** If negative feedback rate spikes 2x baseline, investigate and potentially rollback.
+
+**Implementation:**
+- Prometheus alerts trigger rollback script
+- Automatic notification to team
+- Rollback to last known good version
+- Block further deploys until investigated
+
+The key is fast detection and action. A bad prompt in production for 10 minutes is acceptable. For 10 hours is not."
+
+## Go deeper
+
+- [Upstream chapter (CI/CD for LLM Applications)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/11-infrastructure-and-mlops/02-cicd.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

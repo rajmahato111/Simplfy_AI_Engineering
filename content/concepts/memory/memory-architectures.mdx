@@ -1,0 +1,72 @@
+---
+title: Memory Architectures
+slug: memory-architectures
+type: concept
+area: memory
+difficulty: intermediate
+tags:
+  - memory
+  - architectures
+diagrams:
+  - diagrams/memory-architectures--overview.svg
+est_minutes: 8
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The 30-second version
+
+LLM memory has evolved from "history buffers" to a Three-Tiered Cognitive Architecture. This hierarchy mimics human cognitive systems (L1-L3) to balance speed, cost, and recall capacity. Production agent stacks now lean on dedicated memory layers (Mem0, Zep, Letta, Cognee) on top of vector stores rather than rolling their own.
+
+## The analogy
+
+Think of **Memory Architectures** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Memory Architectures overview](diagrams/memory-architectures--overview.svg)
+
+LLM memory has evolved from "history buffers" to a **Three-Tiered Cognitive Architecture**. This hierarchy mimics human cognitive systems (L1-L3) to balance speed, cost, and recall capacity. Production agent stacks now lean on dedicated memory layers (Mem0, Zep, Letta, Cognee) on top of vector stores rather than rolling their own.
+
+## A concrete example
+
+LLM memory has evolved from "history buffers" to a Three-Tiered Cognitive Architecture. This hierarchy mimics human cognitive systems (L1-L3) to balance speed, cost, and recall capacity. Production agent stacks now lean on dedicated memory layers (Mem0, Zep, Letta, Cognee) on top of vector stores rather than rolling their own.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: Why not just use a 2M token context window for all memory (L1-L3)?
+
+**Strong answer:**
+While possible, it is **Economically and Cognitively inefficient**. 
+1. **Cost**: Calling a model with 1M+ tokens for every turn costs significantly more than a 10K token call with RAG-recalled context.
+2. **Attention Dilution**: Even with "Long Context" models, "Lost in the Middle" remains a factor. If the context is cluttered with irrelevant historical turns, the model's reasoning on the *current* task degrades.
+3. **Latency**: TTFT (Time to First Token) scales with context size due to KV cache loading. 
+A staff-level architecture uses **Strategic Retrieval** to keep the context window lean and focused.
+
+### Q: How do you handle "Privacy Leakage" in Tier 3 (Global Semantic Memory)?
+
+**Strong answer:**
+Tier 3 (Semantic Memory) must be **Sharded by Namespace**. Each user or organization gets a unique `namespace_id` in the vector DB and Knowledge Graph. We implement **RLS (Row Level Security)** at the database layer. Additionally, we use a **PII-Scrubbing Layer** during the Consolidation step to ensure that sensitive data (passwords, PII) never moves from the transient L1 context into the persistent L3 knowledge store.
+
+## Go deeper
+
+- [Upstream chapter (Memory Architectures)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/08-memory-and-state/01-memory-architectures.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

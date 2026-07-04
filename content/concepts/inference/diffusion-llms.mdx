@@ -1,0 +1,69 @@
+---
+title: Diffusion Language Models
+slug: diffusion-llms
+type: concept
+area: inference
+difficulty: intermediate
+tags:
+  - inference
+  - diffusion
+  - llms
+diagrams:
+  - diagrams/diffusion-llms--overview.svg
+est_minutes: 10
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The 30-second version
+
+Almost every LLM you use is autoregressive (AR): it emits one token per forward pass, left to right. Diffusion language models take a different path borrowed from image generation: start from a fully masked sequence and iteratively denoise *all positions in parallel* over a handful of steps. The payoff is throughput, reported figures over 1,000 tokens per second, an order of magnitude above speed-optimized AR models. The cost is some quality, and the maturity is early. This chapter explains how they work, where they win, and what an engineer should actually do with them in 2026.
+
+## The analogy
+
+Think of **Diffusion Language Models** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Diffusion Language Models overview](diagrams/diffusion-llms--overview.svg)
+
+Almost every LLM you use is autoregressive (AR): it emits one token per forward pass, left to right. **Diffusion language models** take a different path borrowed from image generation: start from a fully masked sequence and iteratively denoise *all positions in parallel* over a handful of steps. The payoff is throughput, reported figures over 1,000 tokens per second, an order of magnitude above speed-optimized AR models. The cost is some quality, and the maturity is early. This chapter explains how they work, where they win, and what an engineer should actually do with them in 2026.
+
+## A concrete example
+
+Almost every LLM you use is autoregressive (AR): it emits one token per forward pass, left to right. Diffusion language models take a different path borrowed from image generation: start from a fully masked sequence and iteratively denoise *all positions in parallel* over a handful of steps. The payoff is throughput, reported figures over 1,000 tokens per second, an order of magnitude above speed-optimized AR models. The cost is some quality, and the maturity is early. This chapter explains how they work, where they win, and what an engineer should actually do with them in 2026.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: How does a diffusion language model differ from an autoregressive one, and where is that an advantage?
+
+**Strong answer:**
+An autoregressive model generates left to right, one token per forward pass, each conditioned only on the past. A diffusion language model starts from a fully masked sequence and iteratively denoises all positions in parallel over a few steps, with bidirectional attention. The practical advantage is throughput: it commits many tokens per forward pass instead of one, so reported speeds run over 1,000 tokens per second, several times faster than speed-optimized AR. Bidirectionality also helps on infilling and editing, where you mask several locations and regenerate them coherently in one shot, and on order-insensitive tasks. The cost is a quality gap on knowledge and hard reasoning, partly because masked diffusion optimizes a likelihood bound rather than exact likelihood, and weaker long-context and tool-use behavior. So I would reach for it on latency-critical, short-to-medium, structured generation like code, not as a frontier-model replacement.
+
+### Q: If diffusion LLMs are faster, why has not everyone switched?
+
+**Strong answer:**
+Because the speed comes with real tradeoffs and the ecosystem is young. The quality gap is still meaningful on knowledge and hard reasoning, and the speed itself is a function of how aggressively you unmask: the best quality comes from committing fewer tokens per step, which gives back much of the speed. Pure diffusion also handles long context and variable-length output poorly and lacks the mature KV-cache and serving optimizations AR has accumulated. The likely path is not a wholesale switch but hybrids, block or semi-autoregressive models and diffusion-as-a-speculative-drafter, that recover caching and quality while keeping much of the throughput. In 2026 the pragmatic move is to pilot diffusion where latency dominates and outputs are structured, and keep the AR frontier model for everything else.
+
+## Go deeper
+
+- [Upstream chapter (Diffusion Language Models)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/04-inference-optimization/08-diffusion-llms.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

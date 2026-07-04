@@ -1,0 +1,156 @@
+---
+title: Inference Pipeline
+slug: inference-pipeline
+type: concept
+area: foundations
+difficulty: beginner
+tags:
+  - foundations
+  - inference
+  - pipeline
+diagrams:
+  - diagrams/inference-pipeline--overview.svg
+est_minutes: 13
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The 30-second version
+
+This chapter covers how LLMs generate text at inference time, the computational phases involved, and the key metrics for production serving.
+
+## The analogy
+
+Think of **Inference Pipeline** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Inference Pipeline overview](diagrams/inference-pipeline--overview.svg)
+
+This chapter covers how LLMs generate text at inference time, the computational phases involved, and the key metrics for production serving.
+
+## A concrete example
+
+This chapter covers how LLMs generate text at inference time, the computational phases involved, and the key metrics for production serving.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: Explain the difference between prefill and decode phases.
+
+**Strong answer:**
+LLM inference has two distinct phases:
+
+**Prefill:**
+- Processes the entire input prompt at once
+- All tokens attend to each other in parallel
+- Populates the KV cache for all prompt positions
+- Compute-bound: uses GPU cores efficiently
+- Time scales with prompt length
+
+**Decode:**
+- Generates one token at a time
+- New token attends to all KV cache entries
+- Appends new K, V to cache
+- Memory-bound: bottlenecked by loading KV cache
+- Time per token is roughly constant
+
+This matters for system design because:
+- Long prompts increase TTFT (prefill intensive)
+- Batching helps decode more than prefill
+- Different optimization strategies for each phase
+
+### Q: How do temperature and top-p affect generation?
+
+**Strong answer:**
+Both control randomness in token selection:
+
+**Temperature:**
+- Scales logits before softmax
+- Low (0-0.3): More deterministic, picks high-probability tokens
+- High (1.0+): More random, flattens probability distribution
+- Zero: Greedy decoding
+
+**Top-p (nucleus sampling):**
+- Filters to smallest set of tokens with cumulative probability > p
+- Dynamically adjusts cutoff based on distribution
+- High confidence: few tokens considered
+- Low confidence: many tokens considered
+
+Typical production settings:
+- Factual Q&A: temperature 0.1, top-p 0.95
+- General chat: temperature 0.7, top-p 0.9
+- Creative: temperature 1.0+, top-p 0.95
+
+The key insight is that these work together. Temperature reshapes the distribution; top-p truncates it.
+
+### Q: What determines TTFT vs TPS?
+
+**Strong answer:**
+**TTFT (Time to First Token):**
+- Network latency to reach the server
+- Queue wait time
+- Prefill computation time
+- Dominated by: prompt length, GPU compute speed
+
+**TPS (Tokens Per Second):**
+- Decode phase efficiency
+- Memory bandwidth for loading KV cache
+- Dominated by: memory bandwidth, batch size, model size
+
+Optimization strategies differ:
+- TTFT: Reduce prompt when possible, use faster networking, minimize queueing
+- TPS: Increase batch size, use GQA/MQA models, optimize memory access
+
+The tradeoff: batching improves TPS (throughput) but may increase TTFT (latency) if requests wait for batch formation.
+
+### Q: How would you estimate GPU requirements for serving a model?
+
+**Strong answer:**
+Three main memory consumers:
+
+1. **Model weights:**
+   - FP16: parameters * 2 bytes
+   - INT8: parameters * 1 byte
+   - INT4: parameters * 0.5 bytes
+
+2. **KV cache:**
+   - Per token: 2 * layers * kv_heads * head_dim * 2 bytes (FP16)
+   - Per request: per_token * sequence_length
+   - Total: per_request * batch_size
+
+3. **Activations:** Typically 5-10% overhead
+
+Example for Llama 70B serving:
+- Weights (INT4): 35 GB
+- KV cache (8K context, batch 8): 168 GB
+- Need: ~200 GB total
+
+Hardware options:
+- 3x A100 80GB with tensor parallelism
+- 2x H100 80GB with tensor parallelism
+- 8x A100 40GB with more parallelism
+
+Then verify throughput meets requirements via benchmarking.
+
+## Go deeper
+
+- [Upstream chapter (Inference Pipeline)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/01-foundations/06-inference-pipeline.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

@@ -1,0 +1,64 @@
+---
+title: 'OpenClaw Deep Dive: The Open-Source Personal AI Agent'
+slug: openclaw-deep-dive
+type: concept
+area: tool-use
+difficulty: intermediate
+tags:
+  - tool-use
+  - openclaw
+  - deep
+  - dive
+diagrams:
+  - diagrams/openclaw-deep-dive--overview.svg
+est_minutes: 32
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The 30-second version
+
+OpenClaw is an open-source, self-hosted personal AI agent that executes tasks through LLMs using messaging platforms as its primary interface. You talk to it via WhatsApp, Telegram, Slack, Discord, or Signal, and it talks back -- running shell commands, controlling your browser, managing calendars, processing emails, and orchestrating multi-step workflows.
+
+## The analogy
+
+Think of **OpenClaw Deep Dive: The Open-Source Personal AI Agent** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![OpenClaw Deep Dive: The Open-Source Personal AI Agent overview](diagrams/openclaw-deep-dive--overview.svg)
+
+OpenClaw is an **open-source, self-hosted personal AI agent** that executes tasks through LLMs using messaging platforms as its primary interface. You talk to it via WhatsApp, Telegram, Slack, Discord, or Signal, and it talks back -- running shell commands, controlling your browser, managing calendars, processing emails, and orchestrating multi-step workflows.
+
+## A concrete example
+
+OpenClaw is an open-source, self-hosted personal AI agent that executes tasks through LLMs using messaging platforms as its primary interface. You talk to it via WhatsApp, Telegram, Slack, Discord, or Signal, and it talks back -- running shell commands, controlling your browser, managing calendars, processing emails, and orchestrating multi-step workflows.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+- What tradeoffs would you highlight in an interview?
+- How would you measure success in production?
+- What failure modes would you design for?
+
+## Go deeper
+
+- [Upstream chapter (OpenClaw Deep Dive: The Open-Source Personal AI Agent)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/17-tool-use-and-computer-agents/03-openclaw-deep-dive.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

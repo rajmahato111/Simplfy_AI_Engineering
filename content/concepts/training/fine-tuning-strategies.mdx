@@ -1,0 +1,72 @@
+---
+title: Fine-Tuning Strategies
+slug: fine-tuning-strategies
+type: concept
+area: training
+difficulty: intermediate
+tags:
+  - training
+  - fine
+  - tuning
+  - strategies
+diagrams:
+  - diagrams/fine-tuning-strategies--overview.svg
+est_minutes: 8
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The 30-second version
+
+Fine-tuning adapts a pretrained model to specific tasks, domains, or styles. Today, fine-tuning is less about "teaching facts" and more about "teaching format and behavior."
+
+## The analogy
+
+Think of **Fine-Tuning Strategies** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Fine-Tuning Strategies overview](diagrams/fine-tuning-strategies--overview.svg)
+
+Fine-tuning adapts a pretrained model to specific tasks, domains, or styles. Today, fine-tuning is less about "teaching facts" and more about "teaching format and behavior."
+
+## A concrete example
+
+Fine-tuning adapts a pretrained model to specific tasks, domains, or styles. Today, fine-tuning is less about "teaching facts" and more about "teaching format and behavior."
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: Why use Continued Pretraining instead of just putting domain data in the SFT set?
+
+**Strong answer:**
+SFT is "expensive" in terms of data creation—you need prompt/answer pairs. Continued Pretraining allows you to leverage massive amounts of raw, unlabeled domain text to teach the model's inner representations the specialized vocabulary and style. Once the model "speaks the language," you use a small SFT set to teach it the "tasks" (e.g., classification, summarization) in that language.
+
+### Q: How do you prevent a model from "unlearning" general capabilities during fine-tuning?
+
+**Strong answer:**
+This is "Catastrophic Forgetting." Two main mitigations:
+1. **Rehearsal:** Mix in 5-10% of the original pretraining data into your fine-tuning set.
+2. **PEFT (LoRA):** Since we only train a small percentage of weights, the original "knowledge" remains frozen in the base model weights, significantly reducing the risk of forgetting.
+
+## Go deeper
+
+- [Upstream chapter (Fine-Tuning Strategies)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/03-training-and-adaptation/02-fine-tuning-strategies.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

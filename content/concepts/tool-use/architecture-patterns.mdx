@@ -1,0 +1,74 @@
+---
+title: Architecture Patterns for Tool-Use Agents
+slug: architecture-patterns
+type: concept
+area: tool-use
+difficulty: intermediate
+tags:
+  - tool-use
+  - architecture
+  - patterns
+diagrams:
+  - diagrams/architecture-patterns--overview.svg
+est_minutes: 21
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The 30-second version
+
+Every tool-use agent in 2026 -- from OpenClaw to Claude Code to Cursor's Background Agents -- is built on one of a handful of core architecture patterns. Understanding these patterns lets you design agents from first principles rather than copying specific tools. This chapter breaks down each pattern with detailed diagrams, code examples, trade-offs, and guidance on when to use which.
+
+## The analogy
+
+Think of **Architecture Patterns for Tool-Use Agents** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Architecture Patterns for Tool-Use Agents overview](diagrams/architecture-patterns--overview.svg)
+
+Every tool-use agent in 2026 -- from OpenClaw to Claude Code to Cursor's Background Agents -- is built on one of a handful of core architecture patterns. Understanding these patterns lets you design agents from first principles rather than copying specific tools. This chapter breaks down each pattern with detailed diagrams, code examples, trade-offs, and guidance on when to use which.
+
+## A concrete example
+
+Every tool-use agent in 2026 -- from OpenClaw to Claude Code to Cursor's Background Agents -- is built on one of a handful of core architecture patterns. Understanding these patterns lets you design agents from first principles rather than copying specific tools. This chapter breaks down each pattern with detailed diagrams, code examples, trade-offs, and guidance on when to use which.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: Design a system that lets a customer support agent answer questions using data from Zendesk, Salesforce, and an internal knowledge base.
+
+**Strong answer:**
+Pattern 1 (function/tool calling) with three MCP servers, one per data source. Use the Multi-Server Fan-Out pattern with dynamic manifests so only relevant tools load per query. For production, add an MCP Gateway to handle OAuth per data source, rate limiting (critical for Salesforce API limits), and audit logging. State is ephemeral -- customer support does not need cross-session memory.
+
+### Q: How would you prevent an AI agent from causing damage through tool calls?
+
+**Strong answer:**
+Defense in depth across five layers: (1) Schema constraints with deny-patterns (regex rejecting `DROP TABLE`, etc.). (2) Permission gate for destructive operations -- Claude Code's allow/deny rules are a good model. (3) Sandbox isolation (Docker with read-only mounts, no outbound network). (4) Token and cost caps to prevent runaway loops. (5) Audit trail via the MCP Gateway pattern. No single layer is sufficient -- the model can hallucinate args that pass validation (need sandbox), the sandbox cannot prevent exfiltration through allowed paths (need audit logging).
+
+### Q: Explain the trade-offs between vision-based computer use and API-based tool calling.
+
+**Strong answer:**
+API-based is faster (50-200ms vs. 1-3s per step), cheaper (text vs. image tokens), more reliable (deterministic vs. coordinate-clicking), and easier to test. Always prefer it when an API exists. Vision-based is the fallback for applications without APIs, legacy systems, or multi-app workflows. The 2026 Zoom Action mitigates misclicks on dense UIs. Best practice: API calls for the 80% of tasks with API support, vision-based for the remaining 20%.
+
+## Go deeper
+
+- [Upstream chapter (Architecture Patterns for Tool-Use Agents)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/17-tool-use-and-computer-agents/02-architecture-patterns.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

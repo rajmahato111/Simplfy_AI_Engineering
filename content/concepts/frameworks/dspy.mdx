@@ -1,0 +1,68 @@
+---
+title: 'DSPy: Programming Language Models'
+slug: dspy
+type: concept
+area: frameworks
+difficulty: intermediate
+tags:
+  - frameworks
+  - dspy
+diagrams:
+  - diagrams/dspy--overview.svg
+est_minutes: 8
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The 30-second version
+
+DSPy has become the industry reference for high-reliability AI systems. It represents a paradigm shift from "Prompt Engineering" (trial and error) to Prompt Compilation (automated optimization), and benchmarks consistently show a 10-40% quality lift over hand-tuned prompts.
+
+## The analogy
+
+Think of **DSPy: Programming Language Models** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![DSPy: Programming Language Models overview](diagrams/dspy--overview.svg)
+
+**DSPy** has become the industry reference for high-reliability AI systems. It represents a paradigm shift from "Prompt Engineering" (trial and error) to **Prompt Compilation** (automated optimization), and benchmarks consistently show a 10-40% quality lift over hand-tuned prompts.
+
+## A concrete example
+
+DSPy has become the industry reference for high-reliability AI systems. It represents a paradigm shift from "Prompt Engineering" (trial and error) to Prompt Compilation (automated optimization), and benchmarks consistently show a 10-40% quality lift over hand-tuned prompts.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: Why is DSPy considered "Anti-Prompt Engineering"?
+
+**Strong answer:**
+Because it replaces the **Manual trial-and-error loop** with an **Optimization Loop**. In prompt engineering, the human is the optimizer. In DSPy, the human is the **Teacher**. You define the *Goal* (Signature) and the *Evaluation* (Metric), and you provide a few *Examples*. The framework then uses mathematical optimization (like Bayesian search) to find the tokens that statistically perform the best. This makes the system far more **Portable** and **Scalable** than a library of hardcoded strings.
+
+### Q: What is the biggest drawback of using DSPy in a production environment?
+
+**Strong answer:**
+**Compilation Latency and Cost**. To compile a complex DSPy pipeline, you might need to run 100-500 LLM calls to test different prompt variations. This is a significant upfront cost. However, for a Staff-level engineer, this is a **Tradeoff**: You pay more in development/compilation time to gain **Guaranteed Reliability** and lower **Run-time Failure Rates**. Another challenge is the learning curve; it requires thinking like an ML researcher rather than a traditional developer.
+
+## Go deeper
+
+- [Upstream chapter (DSPy: Programming Language Models)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/09-frameworks-and-tools/05-dspy.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

@@ -1,0 +1,112 @@
+---
+title: Hybrid Search
+slug: hybrid-search
+type: concept
+area: retrieval
+difficulty: intermediate
+tags:
+  - retrieval
+  - hybrid
+  - search
+diagrams:
+  - diagrams/hybrid-search--overview.svg
+est_minutes: 13
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The 30-second version
+
+Hybrid search combines dense (semantic) and sparse (keyword) retrieval to get the benefits of both. It is the baseline for production RAG: Elasticsearch's `rrf` retriever, OpenSearch hybrid search, Weaviate, Qdrant, and Azure AI Search all ship native hybrid pipelines out of the box.
+
+## The analogy
+
+Think of **Hybrid Search** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Hybrid Search overview](diagrams/hybrid-search--overview.svg)
+
+Hybrid search combines dense (semantic) and sparse (keyword) retrieval to get the benefits of both. It is the baseline for production RAG: Elasticsearch's `rrf` retriever, OpenSearch hybrid search, Weaviate, Qdrant, and Azure AI Search all ship native hybrid pipelines out of the box.
+
+## A concrete example
+
+Hybrid search combines dense (semantic) and sparse (keyword) retrieval to get the benefits of both. It is the baseline for production RAG: Elasticsearch's `rrf` retriever, OpenSearch hybrid search, Weaviate, Qdrant, and Azure AI Search all ship native hybrid pipelines out of the box.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: When would you use hybrid search over pure dense search?
+
+**Strong answer:**
+I would use hybrid search when:
+
+1. **Queries contain specific terms:** Product codes, API names, error codes. Dense search may miss exact matches.
+
+2. **Domain has specialized vocabulary:** Technical documentation, legal, medical. Sparse captures specific terms.
+
+3. **Zero-shot retrieval:** New domain without fine-tuned embeddings. Sparse provides robust baseline.
+
+4. **Quality is critical:** Hybrid rarely performs worse than either alone, at cost of complexity.
+
+**I would stick with pure dense when:**
+- Queries are purely conceptual/semantic
+- Latency budget is very tight
+- Simpler architecture is priority
+- Embedding model is well-tuned for domain
+
+The decision is empirical. I would A/B test hybrid vs dense on my actual query distribution.
+
+### Q: Why is Reciprocal Rank Fusion (RRF) safer than "Simple Score Addition"?
+
+**Strong answer:**
+Simple score addition is dangerous because vector scores (e.g., Cosine Similarity: 0.0 to 1.0) and keyword scores (e.g., BM25: 0 to infinity) use completely different scales. An extremely high BM25 score for a lucky keyword match could "drown out" 10 highly relevant semantic matches. RRF ignores the absolute scores and only cares about the relative order (rank). This makes it mathematically robust to outliers and "score-drift" in different retrieval engines.
+
+### Q: When would you choose SPLADE over the standard BM25 + Dense Hybrid approach?
+
+**Strong answer:**
+I would choose SPLADE when I want to simplify my infrastructure. SPLADE produces a sparse vector that can be stored in many modern vector databases (like Milvus or Qdrant) alongside the dense vector. This allows the database to perform "Hybrid search" in a single pass without needing a separate Elasticsearch or BM25 index. However, I would stick to BM25 if my dataset has extremely rare, non-linguistic tokens (like unique serial numbers) that a neural model might not have seen during training.
+
+### Q: How do you balance dense vs sparse in hybrid search?
+
+**Strong answer:**
+The alpha parameter controls the balance (typically alpha for dense weight):
+
+**Tuning approach:**
+1. Start with alpha=0.5 (equal weight)
+2. Create evaluation set with queries and relevance labels
+3. Grid search alpha in [0.1, 0.3, 0.5, 0.7, 0.9]
+4. Measure NDCG or MRR at each setting
+5. Pick alpha that maximizes evaluation metric
+
+**Query-adaptive tuning:**
+- Detect query type (keyword-heavy, conceptual, mixed)
+- Adjust alpha per query
+- Can use simple heuristics or learned classifier
+
+**Rule of thumb:**
+- Technical/code queries: alpha 0.3-0.4
+- General text: alpha 0.5
+- Conversational: alpha 0.7-0.8
+
+## Go deeper
+
+- [Upstream chapter (Hybrid Search)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/06-retrieval-systems/05-hybrid-search.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

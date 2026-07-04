@@ -1,0 +1,68 @@
+---
+title: LlamaIndex
+slug: llamaindex
+type: concept
+area: frameworks
+difficulty: intermediate
+tags:
+  - frameworks
+  - llamaindex
+diagrams:
+  - diagrams/llamaindex--overview.svg
+est_minutes: 8
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The 30-second version
+
+While LangChain focuses on "Orchestration," LlamaIndex is the master of Data-Centric AI. It has evolved from a RAG library into a framework for Workflows and Agentic Data Manipulation.
+
+## The analogy
+
+Think of **LlamaIndex** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![LlamaIndex overview](diagrams/llamaindex--overview.svg)
+
+While LangChain focuses on "Orchestration," **LlamaIndex** is the master of **Data-Centric AI**. It has evolved from a RAG library into a framework for **Workflows** and **Agentic Data Manipulation**.
+
+## A concrete example
+
+While LangChain focuses on "Orchestration," LlamaIndex is the master of Data-Centric AI. It has evolved from a RAG library into a framework for Workflows and Agentic Data Manipulation.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: LangChain and LlamaIndex now both have "Graph/Workflow" features. How do you choose?
+
+**Strong answer:**
+I choose **LlamaIndex Workflows** for **Data-Intensive** tasks where the main complexity is ingestion, multimodal parsing, and complex retrieval. Its event-driven architecture is more performant for massive parallel data processing. I choose **LangGraph** for **Logic-Intensive** multi-agent systems where the complexity is in the "Reasoning" and "Human-in-the-loop" logic. In many senior architectures, we use **Both**: LlamaIndex for the RAG engine and LangGraph for the overall agentic supervisor.
+
+### Q: What is the "Property Graph" in LlamaIndex and why is it superior to basic Vector RAG?
+
+**Strong answer:**
+A Property Graph combines the **Semantic flexibility** of vectors with the **Structural precision** of a database. In basic RAG, you might find a chunk about "Project Alpha," but you don't know who owns it. In a Property Graph, the vector chunk is a node linked to a `User` node and a `Timeline` node. This allows for **Global Reasoning** (e.g., "Find all documents written by Tom in the last month about Project Alpha"). Basic RAG would likely miss many related nodes because they don't contain the exact keyword "Alpha."
+
+## Go deeper
+
+- [Upstream chapter (LlamaIndex)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/09-frameworks-and-tools/04-llamaindex.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

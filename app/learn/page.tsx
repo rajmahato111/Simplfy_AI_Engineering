@@ -15,8 +15,25 @@ export default function LearnIndexPage() {
   }
 
   const areaLabels: Record<string, string> = {
+    foundations: "Foundations",
+    models: "Model landscape",
+    training: "Training & adaptation",
+    inference: "Inference optimization",
+    prompting: "Prompting & context",
     retrieval: "Retrieval & RAG",
     agents: "Agentic systems",
+    memory: "Memory & state",
+    frameworks: "Frameworks & tools",
+    "document-processing": "Document processing",
+    mlops: "Infrastructure & MLOps",
+    security: "Security & access",
+    reliability: "Reliability & safety",
+    evals: "Evaluation & observability",
+    patterns: "Design patterns",
+    "case-studies": "Case studies",
+    "tool-use": "Tool use & computer agents",
+    voice: "Voice & audio",
+    multimodal: "Multimodal generation",
     general: "General",
   };
 

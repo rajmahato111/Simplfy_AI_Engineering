@@ -1,0 +1,80 @@
+---
+title: Contextual Retrieval
+slug: contextual-retrieval
+type: concept
+area: retrieval
+difficulty: intermediate
+tags:
+  - retrieval
+  - contextual
+diagrams:
+  - diagrams/contextual-retrieval--overview.svg
+est_minutes: 15
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The 30-second version
+
+Contextual Retrieval is an ingestion-time technique that solves the #1 cause of RAG failure: chunks that lose meaning when separated from their source document. Pioneered by Anthropic in late 2024, it is now a production standard for high-precision retrieval. Anthropic's own measurements show a 49% reduction in retrieval failures with hybrid search alone, and 67% reduction when combined with reranking.
+
+## The analogy
+
+Think of **Contextual Retrieval** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Contextual Retrieval overview](diagrams/contextual-retrieval--overview.svg)
+
+Contextual Retrieval is an ingestion-time technique that solves the #1 cause of RAG failure: **chunks that lose meaning when separated from their source document**. Pioneered by Anthropic in late 2024, it is now a production standard for high-precision retrieval. Anthropic's own measurements show a 49% reduction in retrieval failures with hybrid search alone, and 67% reduction when combined with reranking.
+
+## A concrete example
+
+Contextual Retrieval is an ingestion-time technique that solves the #1 cause of RAG failure: chunks that lose meaning when separated from their source document. Pioneered by Anthropic in late 2024, it is now a production standard for high-precision retrieval. Anthropic's own measurements show a 49% reduction in retrieval failures with hybrid search alone, and 67% reduction when combined with reranking.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: Explain Anthropic's Contextual Retrieval. When would you use it and when would you skip it?
+
+**Strong answer:**
+Contextual Retrieval solves the "context dilution" problem in RAG. When documents are chunked, individual chunks lose the surrounding context that gives them meaning -- a chunk saying "It costs $200" is useless without knowing *what* costs $200. The technique uses an LLM at ingestion time to generate a short context string (50-100 tokens) per chunk, explaining what that chunk is about within the document. This context is prepended to the chunk before embedding and BM25 indexing.
+
+The key results: Contextual Embeddings alone reduce retrieval failures by 35%. Adding Contextual BM25 achieves 49% reduction. Adding a reranker reaches 67% reduction.
+
+I would use it when chunks regularly lose meaning in isolation -- legal contracts, financial reports, technical manuals. I would skip it when chunks are already self-contained (FAQs, product cards) or when the corpus is small enough for long-context RAG.
+
+### Q: A knowledge base of 50,000 documents needs Contextual Retrieval. How do you manage the ingestion cost?
+
+**Strong answer:**
+Three strategies:
+1. **Model selection**: Use a small, fast model (Claude Haiku-class) for contextualization. The output is short factual text, not creative writing -- a frontier model adds cost without quality gain.
+2. **Prompt caching**: Cache the full document text across all chunk contextualization calls. For a 10,000-token document with 30 chunks, this reduces input token costs by approximately 90%.
+3. **Tiered approach**: Not every document needs LLM contextualization. For well-structured documents (Markdown, HTML with headers), use deterministic Contextual Chunk Headers (prepending doc title + section hierarchy) which is free. Reserve LLM contextualization for unstructured or ambiguous documents.
+
+### Q: How does Contextual Retrieval compare to HyDE for improving retrieval quality?
+
+**Strong answer:**
+They solve different sides of the same problem. Contextual Retrieval enriches **documents** at ingestion time (pay once), while HyDE enriches **queries** at search time (pay per query). For a system handling 10,000 queries/day against a 50,000-chunk corpus, Contextual Retrieval is dramatically cheaper because the ingestion cost is amortized. HyDE also has a hallucination risk -- the hypothetical document might pull in wrong data. In practice, the strongest systems use both: Contextual Retrieval for ingestion enrichment and HyDE (or multi-query expansion) for complex queries that need query-side help.
+
+## Go deeper
+
+- [Upstream chapter (Contextual Retrieval)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/06-retrieval-systems/10-contextual-retrieval.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

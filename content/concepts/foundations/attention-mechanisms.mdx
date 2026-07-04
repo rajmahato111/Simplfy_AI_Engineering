@@ -1,0 +1,121 @@
+---
+title: Attention Mechanisms
+slug: attention-mechanisms
+type: concept
+area: foundations
+difficulty: beginner
+tags:
+  - foundations
+  - attention
+  - mechanisms
+diagrams:
+  - diagrams/attention-mechanisms--overview.svg
+est_minutes: 15
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The 30-second version
+
+Attention is the core innovation that enables transformers. This chapter covers the mathematical foundations, variants, and optimizations that are essential for system design and interviews.
+
+## The analogy
+
+Think of **Attention Mechanisms** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Attention Mechanisms overview](diagrams/attention-mechanisms--overview.svg)
+
+Attention is the core innovation that enables transformers. This chapter covers the mathematical foundations, variants, and optimizations that are essential for system design and interviews.
+
+## A concrete example
+
+Attention is the core innovation that enables transformers. This chapter covers the mathematical foundations, variants, and optimizations that are essential for system design and interviews.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: Explain the attention mechanism and why it scales quadratically.
+
+**Strong answer:**
+Attention computes pairwise interactions between all positions. For n positions:
+
+1. Q @ K^T produces an n x n matrix of scores
+2. Each attention score is a dot product of a query and key
+3. Total: n^2 dot products
+
+This is quadratic in sequence length. For 8K tokens, that is 64 million pairwise scores per layer per head. For 128K tokens, it is 16 billion.
+
+The quadratic scaling limits context length. Solutions include:
+- Flash Attention: O(n^2) compute but O(n) memory
+- Sparse attention: O(n) by attending to subsets
+- Linear attention: O(n) approximations
+
+### Q: What is the KV cache and why is it critical for serving?
+
+**Strong answer:**
+During autoregressive generation, we produce one token at a time. Without caching, each new token would require recomputing K and V for all previous positions.
+
+The KV cache stores K and V tensors from previous positions. On each new token:
+1. Compute Q, K, V only for the new position
+2. Append new K, V to cache
+3. Attend to full cached K, V
+
+This reduces per-token complexity from O(n) to O(1) for projection computation.
+
+The cost is memory: KV cache scales linearly with sequence length. For Llama 70B at 8K context, it is about 21 GB per request. This directly limits batch size and throughput.
+
+GQA and MQA reduce this by sharing K, V across query heads.
+
+### Q: Compare MHA, GQA, and MQA.
+
+**Strong answer:**
+| Variant | K,V heads | KV Cache | Quality | Use Case |
+|---------|-----------|----------|---------|----------|
+| MHA | Equal to Q heads | Full | Best | Training, quality-critical |
+| GQA | Fewer than Q heads | Reduced | Near MHA | Production serving |
+| MQA | 1 | Minimal | Reduced | Memory-constrained |
+
+MHA: Each query head has its own K and V. Best quality but largest KV cache.
+
+GQA: Groups of query heads share K and V. Llama 2 uses 8 KV heads for 64 query heads (8:1 ratio). 8x smaller cache with minimal quality loss.
+
+MQA: All query heads share one K and V. Maximum memory savings but measurable quality reduction. Used by PaLM.
+
+For serving, GQA is the best tradeoff. It enables larger batch sizes (higher throughput) with quality nearly identical to MHA.
+
+### Q: How does Flash Attention achieve O(n) memory?
+
+**Strong answer:**
+Standard attention materializes the full n x n attention matrix in GPU memory. Flash Attention avoids this by:
+
+1. **Tiling:** Process blocks of Q and K that fit in on-chip SRAM
+2. **Online softmax:** Compute softmax incrementally without storing all scores
+3. **Recomputation:** During backward pass, recompute attention rather than loading saved values
+
+The key insight is that GPU SRAM (20 MB per SM) is 10x faster than HBM (80 GB). By doing more arithmetic in SRAM and fewer HBM reads/writes, Flash Attention is both faster and uses less memory.
+
+The result is exact attention (not an approximation) with O(n) memory and 2-4x speedup.
+
+## Go deeper
+
+- [Upstream chapter (Attention Mechanisms)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/01-foundations/03-attention-mechanisms.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

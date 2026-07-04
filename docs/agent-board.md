@@ -8,7 +8,7 @@
 
 | ID | Tool | Branch | Status | Paths (locks) |
 |----|------|--------|--------|---------------|
-| _(none)_ | | | | |
+| T-051 | Cursor | `cursor/content-gap-fix-42a0` | in-review | content, questions, meta-pages, ingest scripts |
 
 ---
 

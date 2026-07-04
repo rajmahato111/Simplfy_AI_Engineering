@@ -1,0 +1,69 @@
+---
+title: Embedding Models
+slug: embedding-models
+type: concept
+area: retrieval
+difficulty: intermediate
+tags:
+  - retrieval
+  - embedding
+  - models
+diagrams:
+  - diagrams/embedding-models--overview.svg
+est_minutes: 8
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The 30-second version
+
+Embedding models convert text into high-dimensional vectors. The frontier has moved past static single-vector representations to multi-resolution, late-interaction, and multimodal embeddings.
+
+## The analogy
+
+Think of **Embedding Models** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Embedding Models overview](diagrams/embedding-models--overview.svg)
+
+Embedding models convert text into high-dimensional vectors. The frontier has moved past static single-vector representations to **multi-resolution, late-interaction, and multimodal** embeddings.
+
+## A concrete example
+
+Embedding models convert text into high-dimensional vectors. The frontier has moved past static single-vector representations to multi-resolution, late-interaction, and multimodal embeddings.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: What is the "Vocabulary Mismatch" problem in embeddings?
+
+**Strong answer:**
+Embeddings rely on the semantic space learned during training. If a user query uses a newer term (e.g., a model name released after the embedding model's cutoff) that wasn't in the embedding model's training set, the model might assign it a generic "AI" vector, missing the specific nuances. The standard fix is **Hybrid Search** (using BM25 to catch the specific keyword) plus **Cross-Encoder Reranking**, which handles out-of-distribution vocabulary better by looking at query and document tokens simultaneously.
+
+### Q: Why would you choose a Matryoshka model for a 1-billion-vector index?
+
+**Strong answer:**
+Scaling to 1 billion vectors with standard `float32` 1536-dim embeddings requires ~6TB of high-speed RAM for an HNSW index, which is prohibitively expensive. With a Matryoshka model, I can use the first 128 dimensions (Binary quantized) for the initial retrieval. This reduces the memory footprint by over 90%, allowing the "Top 1,000" candidates to be found on significantly cheaper hardware. I can then fetch the full-resolution vectors for just those 1,000 candidates to perform the final reranking.
+
+## Go deeper
+
+- [Upstream chapter (Embedding Models)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/06-retrieval-systems/03-embedding-models.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

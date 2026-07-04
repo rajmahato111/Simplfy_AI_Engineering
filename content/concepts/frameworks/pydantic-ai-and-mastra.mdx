@@ -1,0 +1,75 @@
+---
+title: 'Pydantic AI and Mastra: Typed Agent Frameworks (2026)'
+slug: pydantic-ai-and-mastra
+type: concept
+area: frameworks
+difficulty: intermediate
+tags:
+  - frameworks
+  - pydantic
+  - and
+  - mastra
+diagrams:
+  - diagrams/pydantic-ai-and-mastra--overview.svg
+est_minutes: 12
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The 30-second version
+
+By May 2026 the agent framework debate has stopped being "LangGraph or LlamaIndex." Two newer entrants now own meaningful production share for teams that prioritize type safety over breadth: Pydantic AI in the Python world and Mastra in the TypeScript world. Both reject the "string in, string out" surface that older frameworks accepted, and both bet that a fully typed agent is easier to test, evaluate, and operate than a clever-but-untyped one.
+
+## The analogy
+
+Think of **Pydantic AI and Mastra: Typed Agent Frameworks (2026)** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Pydantic AI and Mastra: Typed Agent Frameworks (2026) overview](diagrams/pydantic-ai-and-mastra--overview.svg)
+
+By May 2026 the agent framework debate has stopped being "LangGraph or LlamaIndex." Two newer entrants now own meaningful production share for teams that prioritize type safety over breadth: **Pydantic AI** in the Python world and **Mastra** in the TypeScript world. Both reject the "string in, string out" surface that older frameworks accepted, and both bet that a fully typed agent is easier to test, evaluate, and operate than a clever-but-untyped one.
+
+## A concrete example
+
+By May 2026 the agent framework debate has stopped being "LangGraph or LlamaIndex." Two newer entrants now own meaningful production share for teams that prioritize type safety over breadth: Pydantic AI in the Python world and Mastra in the TypeScript world. Both reject the "string in, string out" surface that older frameworks accepted, and both bet that a fully typed agent is easier to test, evaluate, and operate than a clever-but-untyped one.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: When would you choose Pydantic AI over LangGraph for a Python service?
+
+**Strong answer:**
+I would choose Pydantic AI when the agent is essentially one LLM with a typed output and a few tools, and the rest of the service is already Pydantic-shaped (FastAPI, SQLModel, etc.). The win is that the same Pydantic model defines the HTTP response, the LLM output, and the eval scorer's expected shape, so there is no schema drift. LangGraph is worth the heavier surface when I need a real multi-agent graph with checkpoint-based time travel, supervisor patterns, or the LangChain integration ecosystem. The deciding question I ask is whether the most complicated part of the design is the tool list or the state machine. Tool list, Pydantic AI. State machine, LangGraph.
+
+### Q: Is Mastra a Vercel AI SDK replacement?
+
+**Strong answer:**
+No. Mastra builds on top of the Vercel AI SDK for the actual provider calls and streaming. What Mastra adds is the **agent abstraction**, **workflow engine**, **memory**, **RAG**, **evals**, and the **`mastra dev` playground**. If you only need to call an LLM with streaming and tool calls in a Next.js app, the AI SDK alone is plenty. If you want a typed agent with workflows, suspend / resume, memory, and a local playground, Mastra is the layer that adds those without forcing you to write them yourself.
+
+### Q: What does "typed agent framework" actually buy you in production?
+
+**Strong answer:**
+Three things. First, **fewer bad inputs leak through**. The LLM-facing schema is derived from the same Pydantic / Zod definition that validates the runtime payload, so if the LLM hallucinates a field, the parse step rejects it before any downstream code runs. Second, **clean unit tests**. A typed tool is just a function with a Pydantic / Zod boundary, so I can test it without any LLM in the loop. Third, **schema-aware evals**. The eval framework can compare two typed objects field by field rather than diffing strings, which catches subtle regressions like a field becoming optional or an enum gaining a new value.
+
+## Go deeper
+
+- [Upstream chapter (Pydantic AI and Mastra: Typed Agent Frameworks (2026))](https://github.com/ombharatiya/ai-system-design-guide/blob/main/09-frameworks-and-tools/11-pydantic-ai-and-mastra.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

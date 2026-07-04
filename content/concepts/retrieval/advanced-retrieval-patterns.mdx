@@ -1,0 +1,69 @@
+---
+title: Advanced Retrieval Patterns
+slug: advanced-retrieval-patterns
+type: concept
+area: retrieval
+difficulty: advanced
+tags:
+  - retrieval
+  - advanced
+  - patterns
+diagrams:
+  - diagrams/advanced-retrieval-patterns--overview.svg
+est_minutes: 8
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The 30-second version
+
+Beyond the basics, production RAG systems use specialized patterns to handle complex query-document gaps. These patterns are the "secret sauce" of high-precision search and are increasingly bundled into managed RAG offerings.
+
+## The analogy
+
+Think of **Advanced Retrieval Patterns** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Advanced Retrieval Patterns overview](diagrams/advanced-retrieval-patterns--overview.svg)
+
+Beyond the basics, production RAG systems use specialized patterns to handle complex query-document gaps. These patterns are the "secret sauce" of high-precision search and are increasingly bundled into managed RAG offerings.
+
+## A concrete example
+
+Beyond the basics, production RAG systems use specialized patterns to handle complex query-document gaps. These patterns are the "secret sauce" of high-precision search and are increasingly bundled into managed RAG offerings.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: Why is HyDE (Hypothetical Document Embedding) risky for some applications?
+
+**Strong answer:**
+HyDE relies on "Hallucinating" a baseline answer to find real data. If the user's query describes something non-existent or logically impossible, the LLM will still generate a hypothetical answer. This can pull in "Incorrect but Semantically Similar" data from the database, reinforcing the model's initial hallucination. The standard mitigation is a **Hybrid approach**: retrieve once with the real query (Keyword) and once with the HyDE query, then use **RRF** to combine them.
+
+### Q: What is the "Asymmetric Retrieval" problem?
+
+**Strong answer:**
+Asymmetric retrieval refers to the fact that user queries are usually short (3-10 words) while document chunks are long (300-500 words). These inhabit different statistical distributions in the vector space, leading to "Distance Bias." High-performance systems solve this using **Asymmetric Encoders** (one model for queries, one for docs) or **Query Expansion** (HyDE) to "inflate" the query into a document-like distribution.
+
+## Go deeper
+
+- [Upstream chapter (Advanced Retrieval Patterns)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/06-retrieval-systems/09-advanced-retrieval-patterns.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

@@ -1,0 +1,107 @@
+---
+title: Model Selection Guide
+slug: model-selection-guide
+type: concept
+area: models
+difficulty: intermediate
+tags:
+  - models
+  - model
+  - selection
+  - guide
+diagrams:
+  - diagrams/model-selection-guide--overview.svg
+est_minutes: 11
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The 30-second version
+
+A practical framework for choosing the right LLM for your use case, considering capability, cost, latency, and operational factors.
+
+## The analogy
+
+Think of **Model Selection Guide** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Model Selection Guide overview](diagrams/model-selection-guide--overview.svg)
+
+A practical framework for choosing the right LLM for your use case, considering capability, cost, latency, and operational factors.
+
+## A concrete example
+
+A practical framework for choosing the right LLM for your use case, considering capability, cost, latency, and operational factors.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: How do you choose between GPT-4o, Claude, and Gemini for a production application?
+
+**Strong answer:**
+
+"My selection depends on specific requirements:
+
+**For most production workloads**, I default to Claude 3.5 Sonnet or GPT-4o. Both are excellent general-purpose models. Sonnet has a slight edge on coding, GPT-4o has better ecosystem integration.
+
+**For long-context applications**, Gemini 1.5 Pro is the clear winner with 1-2 million token context. If I need to process entire codebases or very long documents, Gemini is my choice.
+
+**For cost-sensitive high-volume**, GPT-4o-mini or Claude Haiku. These are 10-20x cheaper and handle straightforward tasks well.
+
+**My practical approach:**
+1. Prototype with Sonnet or GPT-4o to validate the use case
+2. Evaluate on MY specific task, not just benchmarks
+3. Build abstraction layer so I can switch easily
+4. Optimize costs by routing simpler requests to cheaper models
+
+I never rely solely on benchmark scores. A model that ranks lower on MMLU might excel on my domain."
+
+### Q: When would you self-host vs use API providers?
+
+**Strong answer:**
+
+"It is a tradeoff of control vs operational burden.
+
+**Use APIs when:**
+- Volume under 1M queries/month (cost crossover)
+- Need latest models immediately
+- Team lacks GPU infrastructure expertise
+- Variable workload hard to capacity plan
+- Time-to-market is critical
+
+**Self-host when:**
+- Data cannot leave infrastructure (compliance)
+- Volume exceeds 10M queries/month (cost savings)
+- Need latency under 100ms P99
+- Need custom model weights or fine-tuning
+- Full control over model behavior
+
+**Hybrid often works best:**
+- Self-host for high-volume predictable workloads
+- API for spikes and specialized models
+- API as fallback when self-hosted fails
+
+Hidden costs of self-hosting: GPU procurement, engineering time, model updates, monitoring. Factor in 1-2 dedicated engineers for infrastructure."
+
+## Go deeper
+
+- [Upstream chapter (Model Selection Guide)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/02-model-landscape/04-model-selection-guide.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

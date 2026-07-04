@@ -1,0 +1,85 @@
+---
+title: 'Claude Code: The Autonomous Coding Agent'
+slug: claude-code
+type: concept
+area: frameworks
+difficulty: intermediate
+tags:
+  - frameworks
+  - claude
+  - code
+diagrams:
+  - diagrams/claude-code--overview.svg
+est_minutes: 12
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The 30-second version
+
+Claude Code is Anthropic's terminal-native autonomous coding agent. Unlike IDE plugins that suggest completions, Claude Code acts as a full-stack software engineer: it reads your codebase, edits files, runs commands, executes tests, and iterates until the task is done.
+
+## The analogy
+
+Think of **Claude Code: The Autonomous Coding Agent** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Claude Code: The Autonomous Coding Agent overview](diagrams/claude-code--overview.svg)
+
+Claude Code is Anthropic's **terminal-native autonomous coding agent**. Unlike IDE plugins that suggest completions, Claude Code acts as a full-stack software engineer: it reads your codebase, edits files, runs commands, executes tests, and iterates until the task is done.
+
+## A concrete example
+
+Claude Code is Anthropic's terminal-native autonomous coding agent. Unlike IDE plugins that suggest completions, Claude Code acts as a full-stack software engineer: it reads your codebase, edits files, runs commands, executes tests, and iterates until the task is done.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: How does Claude Code differ from GitHub Copilot?
+
+**Strong answer:**
+Copilot is a **completion tool** — it predicts the next few lines of code as you type. Claude Code is an **autonomous agent** — you give it a task (e.g., "add authentication to this API"), and it reads the codebase, plans the implementation, edits multiple files, runs tests, fixes failures, and only finishes when tests pass. The experience is fundamentally different: Copilot helps you code faster; Claude Code codes *for* you while you review the output.
+
+### Q: What is CLAUDE.md and why is it critical?
+
+**Strong answer:**
+CLAUDE.md is like a `README` specifically written for an AI colleague. Without it, Claude Code treats your project as a generic Python/JS project. With it, Claude knows: your exact test command, your forbidden patterns (no raw SQL, use ORM), your architecture decisions (JWT auth, specific error format), and your coding standards. It converts a general-purpose agent into a **project-specialist**. I've seen 2-3x faster task completion and 60% fewer mistakes with a well-written CLAUDE.md.
+
+### Q: How do you safely run Claude Code in production CI?
+
+**Strong answer:**
+Three layers:
+1. **Sandbox**: Run Claude Code inside a Docker container with no external network access. Only the git repo and test runner are accessible.
+2. **Permission allow-list**: Use the permissions config to whitelist exactly which bash commands are allowed (test runners, linters) and block destructive operations (rm -rf, pip install without review).
+3. **Human gate**: Claude Code outputs a branch with a diff. A human reviews the diff in a PR and merges. Claude never merges directly to main. This keeps human judgment in the loop for the final decision.
+
+### Q: How do you handle the cost of Claude Code for high-volume CI?
+
+**Strong answer:**
+I optimize in three ways:
+1. **Task scoping**: Claude Code is cost-effective for independent, bounded tasks (bug fixes, test generation). I don't use it for open-ended exploration — that's still cheaper with a human.
+2. **Max turns**: Setting `max_turns=15` prevents runaway jobs that burn $10+ on circular reasoning.
+3. **Model routing**: For simple bug fixes (syntax errors, obvious typos), I use Claude 3.5 Haiku via the SDK — 5x cheaper. For architectural refactoring, I use Claude 3.7 Sonnet with Extended Thinking.
+
+## Go deeper
+
+- [Upstream chapter (Claude Code: The Autonomous Coding Agent)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/09-frameworks-and-tools/09-claude-code.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

@@ -1,0 +1,74 @@
+---
+title: OCR and Layout Analysis
+slug: ocr-and-layout
+type: concept
+area: document-processing
+difficulty: intermediate
+tags:
+  - document-processing
+  - ocr
+  - and
+  - layout
+diagrams:
+  - diagrams/ocr-and-layout--overview.svg
+est_minutes: 8
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The 30-second version
+
+Traditional OCR (Tesseract, specialized engines) has been largely superseded by Native Multimodal LLMs (Gemini 3.1 Pro, GPT-5.5, Claude Sonnet 4.6, Claude Opus 4.7). We no longer "read characters"; we "understand layouts."
+
+## The analogy
+
+Think of **OCR and Layout Analysis** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![OCR and Layout Analysis overview](diagrams/ocr-and-layout--overview.svg)
+
+Traditional OCR (Tesseract, specialized engines) has been largely superseded by **Native Multimodal LLMs** (Gemini 3.1 Pro, GPT-5.5, Claude Sonnet 4.6, Claude Opus 4.7). We no longer "read characters"; we "understand layouts."
+
+## A concrete example
+
+Traditional OCR (Tesseract, specialized engines) has been largely superseded by Native Multimodal LLMs (Gemini 3.1 Pro, GPT-5.5, Claude Sonnet 4.6, Claude Opus 4.7). We no longer "read characters"; we "understand layouts."
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: Why would you still use AWS Textract or Azure AI Search (OCR) when vision LLMs exist?
+
+**Strong answer:**
+**Strict Spatial Metadata and Compliance**. If my application needs exact pixel-level bounding boxes for every single word (e.g., for a legal redaction tool), a specialized OCR engine is often more precise and cheaper. Furthermore, OCR engines are **Deterministic**: they do not \"Hallucinate\" words that do not exist. For high-stakes document processing where 100% character accuracy is required over \"Layout understanding,\" traditional engines still hold a spot in the hybrid pipeline.
+
+### Q: How do you handle a 500-page PDF with Vision LLMs efficiently?
+
+**Strong answer:**
+We use a **Parallel Map-Reduce** pattern. 
+1. **Map**: We spin up 50 parallel workers (using AWS Lambda or Modal) to process 10 pages each. Each worker calls a fast Vision model (like Gemini 3 Flash) to get the Markdown.
+2. **Consolidate**: A central agent reviews the Markdown snippets to ensure header continuity.
+3. **Cache**: We store the resulting Markdown in a vector DB.
+This reduces the processing time from 30 minutes (sequential) to under 20 seconds.
+
+## Go deeper
+
+- [Upstream chapter (OCR and Layout Analysis)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/10-document-processing/01-ocr-and-layout.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

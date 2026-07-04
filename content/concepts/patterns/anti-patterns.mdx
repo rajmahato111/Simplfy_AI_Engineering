@@ -1,0 +1,62 @@
+---
+title: AI Anti-Patterns
+slug: anti-patterns
+type: concept
+area: patterns
+difficulty: intermediate
+tags:
+  - patterns
+  - anti
+diagrams:
+  - diagrams/anti-patterns--overview.svg
+est_minutes: 9
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The 30-second version
+
+Recognizing what NOT to do is as important as knowing best practices. This chapter catalogs common mistakes in AI system design.
+
+## The analogy
+
+Think of **AI Anti-Patterns** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![AI Anti-Patterns overview](diagrams/anti-patterns--overview.svg)
+
+Recognizing what NOT to do is as important as knowing best practices. This chapter catalogs common mistakes in AI system design.
+
+## A concrete example
+
+Recognizing what NOT to do is as important as knowing best practices. This chapter catalogs common mistakes in AI system design.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+- What tradeoffs would you highlight in an interview?
+- How would you measure success in production?
+- What failure modes would you design for?
+
+## Go deeper
+
+- [Upstream chapter (AI Anti-Patterns)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/15-ai-design-patterns/02-anti-patterns.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

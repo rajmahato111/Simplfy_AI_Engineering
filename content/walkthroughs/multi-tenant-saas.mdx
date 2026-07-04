@@ -1,0 +1,44 @@
+---
+title: 'Case Study: Multi-Tenant AI SaaS Platform'
+slug: multi-tenant-saas
+type: walkthrough
+area: case-studies
+difficulty: advanced
+tags:
+  - case-studies
+  - multi
+  - tenant
+  - saas
+diagrams:
+  - diagrams/multi-tenant-saas--overview.svg
+est_minutes: 8
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The question
+
+A B2B startup is building an AI-powered document analysis platform where each customer uploads their own contracts, and the AI answers questions about them. Customers include competitors who must never see each other's data.
+
+## What the interviewer is actually testing
+
+- 500 enterprise customers, each with 10,000-100,000 documents
+- Absolute data isolation: Customer A's data cannot leak to Customer B
+- Shared infrastructure for cost efficiency
+- Compliance: SOC 2 Type II, GDPR
+- Query latency under 2 seconds
+
+## How it actually works
+
+
+![Case Study: Multi-Tenant AI SaaS Platform overview](diagrams/multi-tenant-saas--overview.svg)
+
+
+
+## Go deeper
+
+- [Upstream chapter (Case Study: Multi-Tenant AI SaaS Platform)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/16-case-studies/08-multi-tenant-saas.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

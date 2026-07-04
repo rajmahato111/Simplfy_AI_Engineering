@@ -1,0 +1,77 @@
+---
+title: Benchmarks and Leaderboards
+slug: benchmarks-and-leaderboards
+type: concept
+area: evals
+difficulty: intermediate
+tags:
+  - evals
+  - benchmarks
+  - and
+  - leaderboards
+diagrams:
+  - diagrams/benchmarks-and-leaderboards--overview.svg
+est_minutes: 26
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The 30-second version
+
+Public benchmarks are how the field talks about model capability: MMLU, SWE-bench, GPQA, Arena Elo. They are useful for orientation and dangerous for decisions. This chapter teaches you what each major benchmark measures, which ones still separate frontier models and which have saturated, and how to read a benchmark claim critically so you are not fooled by a number.
+
+## The analogy
+
+Think of **Benchmarks and Leaderboards** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Benchmarks and Leaderboards overview](diagrams/benchmarks-and-leaderboards--overview.svg)
+
+Public benchmarks are how the field talks about model capability: MMLU, SWE-bench, GPQA, Arena Elo. They are useful for orientation and dangerous for decisions. This chapter teaches you what each major benchmark measures, which ones still separate frontier models and which have saturated, and how to read a benchmark claim critically so you are not fooled by a number.
+
+The load-bearing idea: **a benchmark's definition and known flaws are stable; its scores are perishable.** Leaderboard numbers change weekly, get inflated by contamination and favorable harnesses, and are increasingly polluted by fabricated entries. So this page leads with what each benchmark *measures* and how it *breaks*, and treats specific scores as dated, sourced snapshots you should re-verify. For evaluating your own system (the thing that actually predicts production quality), see [LLM Evaluation](01-llm-evaluation.md).
+
+## A concrete example
+
+Public benchmarks are how the field talks about model capability: MMLU, SWE-bench, GPQA, Arena Elo. They are useful for orientation and dangerous for decisions. This chapter teaches you what each major benchmark measures, which ones still separate frontier models and which have saturated, and how to read a benchmark claim critically so you are not fooled by a number.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: A vendor says their model scores 90% on SWE-bench Verified. What questions do you ask before believing it predicts your coding-agent quality?
+
+**Strong answer:**
+First, the harness: which agent scaffold, what tools, what effort level, what output-token cap? Identical weights swing 10-20 points on scaffold alone, and vendor numbers use the best harness they found, so the 90% is not comparable to any other model's published number. Second, contamination: SWE-bench Verified is partly contaminated (OpenAI found solutions reproducible from the task ID), so I would want the contamination-resistant variants (SWE-bench Pro, SWE-rebench) where scores run 25-35 points lower and separate better. Third, the confidence interval: it is 500 problems, so a few points is noise. Fourth and most important, the production gap: even a clean SWE-bench number predicts my codebase only if my tasks resemble GitHub issue resolution. I would shortlist on the public number and decide on my own gold set of real tickets from our repos, scored by a calibrated judge, priced against cost.
+
+### Q: Why have benchmarks like MMLU and HumanEval stopped being useful for ranking frontier models, and what replaced them?
+
+**Strong answer:**
+They saturated: the frontier clusters above 88-90% on MMLU and 90%+ on HumanEval, so deltas are within prompt-phrasing noise. They are also small and public, so contaminated, re-deriving HumanEval problems drops scores ~39%. And the construct is too easy: a single-function docstring-to-code task does not predict real engineering, which is why SWE-bench launched at under 2% for the same models that aced HumanEval. The field replaced them with harder successors (MMLU to MMLU-Pro to HLE), contamination-resistant time-gated benchmarks (LiveCodeBench, SWE-rebench), agentic and repository-scale benchmarks (SWE-bench, Terminal-Bench, tau2-bench), and composite indices that keep discriminating as components saturate.
+
+### Q: How would you use LMArena Elo responsibly when choosing a model for a chat product?
+
+**Strong answer:**
+As one signal of general chat preference, never as a measure of correctness or reasoning. I would read the style-controlled board, because raw Arena rewards longer and better-formatted answers regardless of correctness, and I would read the confidence intervals, because the top dozen models are statistically near-tied within ~15-20 Elo. I would also discount it for the leaderboard-illusion effects: providers privately test many variants and publish the best, so a fresh top entry may be partly best-of-N luck. Then I would triangulate with an objective benchmark and an agentic suite, and ultimately validate on my own preference data, because Arena prompts are not my users' prompts.
+
+## Go deeper
+
+- [Upstream chapter (Benchmarks and Leaderboards)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/14-evaluation-and-observability/03-benchmarks-and-leaderboards.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

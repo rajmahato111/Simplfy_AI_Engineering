@@ -1,0 +1,69 @@
+---
+title: Durable Execution for Long-Running Agents
+slug: durable-execution
+type: concept
+area: agents
+difficulty: intermediate
+tags:
+  - agents
+  - durable
+  - execution
+diagrams:
+  - diagrams/durable-execution--overview.svg
+est_minutes: 11
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The 30-second version
+
+An agent run is not a request/response handler. It calls tools, reads documents, triggers actions, waits for approvals, and carries state across steps that may run for minutes, hours, or days. That collides with ordinary infrastructure: processes get killed, nodes get recycled, and deploys roll pods. A naive agent loop holding state in memory loses everything on any of those events, and a naive retry re-runs side effects. Durable execution is the discipline that makes long-running agents survive all of it. This chapter covers the model, the tools, how it maps onto agent loops, and when it is worth the complexity.
+
+## The analogy
+
+Think of **Durable Execution for Long-Running Agents** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Durable Execution for Long-Running Agents overview](diagrams/durable-execution--overview.svg)
+
+An agent run is not a request/response handler. It calls tools, reads documents, triggers actions, waits for approvals, and carries state across steps that may run for minutes, hours, or days. That collides with ordinary infrastructure: processes get killed, nodes get recycled, and deploys roll pods. A naive agent loop holding state in memory loses everything on any of those events, and a naive retry re-runs side effects. **Durable execution** is the discipline that makes long-running agents survive all of it. This chapter covers the model, the tools, how it maps onto agent loops, and when it is worth the complexity.
+
+## A concrete example
+
+An agent run is not a request/response handler. It calls tools, reads documents, triggers actions, waits for approvals, and carries state across steps that may run for minutes, hours, or days. That collides with ordinary infrastructure: processes get killed, nodes get recycled, and deploys roll pods. A naive agent loop holding state in memory loses everything on any of those events, and a naive retry re-runs side effects. Durable execution is the discipline that makes long-running agents survive all of it. This chapter covers the model, the tools, how it maps onto agent loops, and when it is worth the complexity.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: Why are naive retries and checkpoints insufficient for a production agent with side effects?
+
+**Strong answer:**
+Because an agent crash creates an ambiguity a retry cannot resolve safely. If the agent calls a tool that charges a card and then crashes, you cannot tell from a state snapshot whether the charge committed before the crash or whether only the acknowledgment was lost, so a naive retry risks charging twice. A plain checkpoint that saves state between steps still leaves an unsafe window between executing the side effect and recording that it happened. Durable execution closes this by capturing the journal of steps, not just the latest state: each side-effecting step is a recorded activity with an idempotency key, so on replay a completed activity returns its recorded result instead of re-running. That gives exactly-once semantics for the side effect and lets the workflow resume from the exact point it failed rather than from the beginning.
+
+### Q: When is durable execution overkill, and what would you use instead?
+
+**Strong answer:**
+It is overkill when the agent has no irreversible side effects, runs short enough to fit inside a process and deploy cycle, and would be fine to simply re-run on failure, for example a read-only research or summarization agent with idempotent tools. There I would use framework-native durability like a LangGraph checkpointer to recover state, plus idempotency keys on the few non-idempotent calls, and a retry queue with a dead-letter handler. The determinism constraints and versioning hazards of a full engine like Temporal are a real cost, so I would only take them on once the agent has irreversible effects, must pause for human approval across restarts, or is long enough that re-running on a crash is unacceptable. If operational overhead is the blocker but I still need durability, a library approach like DBOS that uses my existing Postgres gets much of the value without running a cluster.
+
+## Go deeper
+
+- [Upstream chapter (Durable Execution for Long-Running Agents)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/07-agentic-systems/11-durable-execution.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

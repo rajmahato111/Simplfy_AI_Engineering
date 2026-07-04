@@ -1,0 +1,72 @@
+---
+title: AI Governance and Compliance
+slug: ai-governance-and-compliance
+type: concept
+area: reliability
+difficulty: advanced
+tags:
+  - reliability
+  - governance
+  - and
+  - compliance
+diagrams:
+  - diagrams/ai-governance-and-compliance--overview.svg
+est_minutes: 11
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The 30-second version
+
+Governance is now a delivery constraint, not a policy abstraction. The EU AI Act carries fines up to the greater of 35M euros or 7% of global turnover, US states are passing their own AI laws, and enterprise buyers ask for AI governance evidence in procurement. The good news for engineers: governance maps cleanly onto practices you already run (security, evals, observability, incident response), so the goal is to emit governance evidence as a byproduct rather than bolt on a parallel process.
+
+## The analogy
+
+Think of **AI Governance and Compliance** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![AI Governance and Compliance overview](diagrams/ai-governance-and-compliance--overview.svg)
+
+Governance is now a delivery constraint, not a policy abstraction. The EU AI Act carries fines up to the greater of 35M euros or 7% of global turnover, US states are passing their own AI laws, and enterprise buyers ask for AI governance evidence in procurement. The good news for engineers: governance maps cleanly onto practices you already run (security, evals, observability, incident response), so the goal is to **emit governance evidence as a byproduct** rather than bolt on a parallel process.
+
+This chapter is time-sensitive. Dates and enforcement status are given **as of June 2026** and are moving, especially the EU timeline; verify against primary sources before relying on a specific date. Items that were provisional at the time of writing are flagged.
+
+## A concrete example
+
+Governance is now a delivery constraint, not a policy abstraction. The EU AI Act carries fines up to the greater of 35M euros or 7% of global turnover, US states are passing their own AI laws, and enterprise buyers ask for AI governance evidence in procurement. The good news for engineers: governance maps cleanly onto practices you already run (security, evals, observability, incident response), so the goal is to emit governance evidence as a byproduct rather than bolt on a parallel process.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: How do you make a production LLM system EU AI Act ready without building a separate compliance stack?
+
+**Strong answer:**
+I start by classifying the system: its risk tier, whether we are a provider or deployer, and whether anything we do (fine-tuning, rebranding, repurposing a general-purpose model) makes us the provider. Most enterprise systems land in limited risk, where the obligation is transparency: disclose that users are talking to AI and mark synthetic content. Then I map the rest onto what we already run. Audit logging is an extension of our tracing, with retention set to the legal minimum. Human oversight is a stop button and an escalation path on consequential decisions. Red-team and bias evidence comes out of the eval suite in CI. The cards stack (model, system, data) lives in the repo and is versioned. The point is that governance is a view over existing telemetry and artifacts, not a parallel process, and I would calendar the live dates, since prohibitions and GPAI obligations are already enforceable while high-risk has been pushed to around 2027.
+
+### Q: What is the difference between the EU AI Act and the NIST AI RMF, and when does each matter?
+
+**Strong answer:**
+The EU AI Act is binding law with risk tiers, hard deadlines, and fines up to 7% of global turnover; it matters whenever you place a system on the EU market or your output reaches EU users, and it dictates concrete obligations by tier. The NIST AI RMF is a voluntary US framework (Govern, Map, Measure, Manage) plus a Generative AI Profile that enumerates GenAI risks; it matters as the de-facto best-practice baseline, as a way to structure your internal risk program, and as evidence of due diligence. In practice I would use NIST and ISO 42001 to build the governance system and the EU Act to set the hard requirements and deadlines that system has to satisfy. They are complementary: one tells you how to organize, the other tells you what you must do and by when.
+
+## Go deeper
+
+- [Upstream chapter (AI Governance and Compliance)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/13-reliability-and-safety/04-ai-governance-and-compliance.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

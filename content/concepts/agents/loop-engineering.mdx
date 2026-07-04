@@ -1,0 +1,91 @@
+---
+title: Loop Engineering
+slug: loop-engineering
+type: concept
+area: agents
+difficulty: intermediate
+tags:
+  - agents
+  - loop
+  - engineering
+diagrams:
+  - diagrams/loop-engineering--overview.svg
+est_minutes: 23
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The 30-second version
+
+Chapter 02 covered how a model reasons inside a single step: ReAct, Reflexion, Plan-and-Solve. Loop engineering is the discipline that wraps that reasoning. It is the practice of designing, instrumenting, and continuously improving the control loops around a core agent (a model plus tools), instead of hand-prompting the model turn by turn.
+
+## The analogy
+
+Think of **Loop Engineering** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Loop Engineering overview](diagrams/loop-engineering--overview.svg)
+
+Chapter 02 covered how a model reasons inside a single step: ReAct, Reflexion, Plan-and-Solve. **Loop engineering** is the discipline that wraps that reasoning. It is the practice of designing, instrumenting, and continuously improving the control loops around a core agent (a model plus tools), instead of hand-prompting the model turn by turn.
+
+The reframing that defines the field is blunt: you stop being the person in the chat box, and you build the system that prompts, acts, observes, verifies, remembers, and re-runs the agent toward a goal until a verifiable stop condition is met. A strong model in a weak harness loses to a decent model in a great one. By 2026, loop quality is a distinct discipline from base-model quality, and the leverage has moved from "write a better prompt" to "design a better loop."
+
+Two invariants run through everything in this chapter:
+
+1. **Termination is enforced by the harness on deterministic criteria, never by the model's own claim that it is done.**
+2. **The entity that verifies the work is structurally separate from the entity that produces it.**
+
+## A concrete example
+
+Chapter 02 covered how a model reasons inside a single step: ReAct, Reflexion, Plan-and-Solve. Loop engineering is the discipline that wraps that reasoning. It is the practice of designing, instrumenting, and continuously improving the control loops around a core agent (a model plus tools), instead of hand-prompting the model turn by turn.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: Define the agent loop, and explain when a loop is actively harmful.
+
+**Strong answer:**
+The inner agent loop is the reason-act-observe cycle a harness runs within one run: assemble context, let the model pick an action, execute a tool, feed the result back, check a stop condition, repeat. It exists because long-horizon tasks cannot finish in one forward pass and tool results must inform later steps. A loop is harmful when the task is fixed and predictable: it adds latency (every iteration is another round trip), cost, and non-determinism for no benefit. My decision rule: a single LLM call for one-shot transforms, a deterministic pipeline for a known fixed sequence, and a loop only when the path genuinely depends on intermediate results.
+
+### Q: Why must the verifier be separate from the producer, and where should budget enforcement live?
+
+**Strong answer:**
+When the same model produces and grades, it grades itself optimistically and reward-hacks toward whatever the check measures; research shows intrinsic self-correction can even degrade reasoning. So I split them: deterministic graders (tests, types, linters) first, then a separate, often stronger model as an adversarial reviewer instructed to reject anything not verifiably done, with humans on high-stakes cases. Budget enforcement must live outside the agent, at a gateway or proxy. If the spend and stop checks are in agent code, a buggy or jailbroken agent can skip its own guard. The gateway also gives me layered ceilings, per-tool to per-session to per-key, plus a rate-of-spend circuit breaker that catches runaways monthly caps miss.
+
+### Q: An agent called a broken tool 400 times in five minutes. Diagnose and design the fix.
+
+**Strong answer:**
+This is a runaway loop with no stagnation detection. The agent kept getting an ambiguous failure and retried forever. I would hash the tuple of tool name plus arguments and abort on a repetition streak (three identical calls is decisive), detect oscillation between two states, and compare successive plans by similarity, halting above about 95 percent. I would add a rate-of-spend breaker, since sustained high throughput is itself the signal, and enforce all of it at the gateway so the agent cannot bypass it. I would also fix the proximate cause: ambiguous tool feedback ("more results may be available") invites endless retries, so tools should return explicit SUCCESS or FAILED terminal states. On a cap hit, escalate to a human with a precise blocking question rather than silently continuing.
+
+### Q: What is loopmaxxing, and how do you convert a non-converging loop into a useful one?
+
+**Strong answer:**
+Loopmaxxing is the belief that more iterations automatically solve harder problems, the multi-step version of token-maxxing. It fails on goals with no concrete exit condition, like "improve the UX," so the loop never converges and spend runs away. The fix is to manufacture a verifiable success function. For a vague goal I decompose it into checkable predicates: instead of "improve test coverage," the stop condition becomes "coverage for the billing module is at least 90 percent and the suite exits zero." If a goal genuinely cannot be made checkable, it does not belong in an autonomous loop; it belongs in a human-in-the-loop workflow with the agent drafting and a person judging.
+
+### Q: Explain context rot and your full mitigation stack for a multi-hour loop.
+
+**Strong answer:**
+Context rot is silent quality degradation as the transcript grows with stale instructions, old tool output, and failed attempts. It sets in before the hard context limit, and long-context studies show models degrade with input length even when the answer is present, so a bigger window is not a fix. My stack: externalize state to disk so the loop is resumable and does not re-derive context each cycle; isolate subtasks in subagents with fresh windows, which is the strongest structural defense; compact verbose history into summaries before degradation is visible while keeping originals addressable; offload large tool outputs to a log and return a reference; and order messages so stable prefixes keep hitting the prompt cache. The guiding rule is that context curation beats context stuffing.
+
+## Go deeper
+
+- [Upstream chapter (Loop Engineering)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/07-agentic-systems/12-loop-engineering.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

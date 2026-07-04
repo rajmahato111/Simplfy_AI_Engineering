@@ -1,0 +1,69 @@
+---
+title: Tree-of-Thought (ToT)
+slug: tree-of-thought
+type: concept
+area: prompting
+difficulty: intermediate
+tags:
+  - prompting
+  - tree
+  - thought
+diagrams:
+  - diagrams/tree-of-thought--overview.svg
+est_minutes: 8
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The 30-second version
+
+Tree-of-Thought (ToT) is an advanced prompting architecture where a model explores multiple reasoning paths, evaluates them, and "backtracks" if a path leads to a dead end. It is the blueprint behind modern autonomous research agents.
+
+## The analogy
+
+Think of **Tree-of-Thought (ToT)** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Tree-of-Thought (ToT) overview](diagrams/tree-of-thought--overview.svg)
+
+Tree-of-Thought (ToT) is an advanced prompting architecture where a model explores multiple reasoning paths, evaluates them, and "backtracks" if a path leads to a dead end. It is the blueprint behind modern autonomous research agents.
+
+## A concrete example
+
+Tree-of-Thought (ToT) is an advanced prompting architecture where a model explores multiple reasoning paths, evaluates them, and "backtracks" if a path leads to a dead end. It is the blueprint behind modern autonomous research agents.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: When is ToT significantly better than simple CoT?
+
+**Strong answer:**
+ToT is superior when the problem has a "large search space" and requires "global consistency." For example, in a complex software refactor, a single Chain-of-Thought might start well but hit a constraint conflict 10 steps later. With ToT, the model can propose 3 different refactoring patterns, evaluate the impact of each on the codebase, and discard patterns that lead to circular dependencies before it writes any code.
+
+### Q: What is the main drawback of Tree-of-Thought in a consumer-facing app?
+
+**Strong answer:**
+The primary drawback is **Exponential Cost and Latency**. Exploring 3 branches to a depth of 5 can require 15-20 individual LLM calls. In a consumer app, this could result in a 30-second delay and a $0.50 cost for a single query. The standard mitigation is a "Hybrid Model": use ToT for high-stakes offline tasks (like generating golden datasets or security audits) and distill those results into a fast, linear model for real-time interaction.
+
+## Go deeper
+
+- [Upstream chapter (Tree-of-Thought (ToT))](https://github.com/ombharatiya/ai-system-design-guide/blob/main/05-prompting-and-context/04-tree-of-thought.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

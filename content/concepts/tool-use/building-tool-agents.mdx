@@ -1,0 +1,80 @@
+---
+title: Building Tool-Use Agents
+slug: building-tool-agents
+type: concept
+area: tool-use
+difficulty: intermediate
+tags:
+  - tool-use
+  - building
+  - tool
+  - agents
+diagrams:
+  - diagrams/building-tool-agents--overview.svg
+est_minutes: 15
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The 30-second version
+
+This chapter covers the practical engineering of tool-use agents: designing tool schemas that LLMs can call reliably, building MCP servers to host those tools, composing tools into workflows, and testing the entire system. These are the patterns that separate a demo from a production deployment.
+
+## The analogy
+
+Think of **Building Tool-Use Agents** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Building Tool-Use Agents overview](diagrams/building-tool-agents--overview.svg)
+
+This chapter covers the practical engineering of tool-use agents: designing tool schemas that LLMs can call reliably, building MCP servers to host those tools, composing tools into workflows, and testing the entire system. These are the patterns that separate a demo from a production deployment.
+
+## A concrete example
+
+This chapter covers the practical engineering of tool-use agents: designing tool schemas that LLMs can call reliably, building MCP servers to host those tools, composing tools into workflows, and testing the entire system. These are the patterns that separate a demo from a production deployment.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: You need to give an LLM agent access to 200 internal tools. How do you handle schema overload?
+
+**Strong answer:**
+I would not load all 200 tool schemas into the context. Instead, I would implement a two-phase approach. First, a tool discovery phase where the agent describes what it needs to do, and a lightweight search (embedding similarity or keyword match) returns the 5-10 most relevant tool schemas. Second, a tool execution phase where only the selected tools are included in the context for the actual LLM call.
+
+This mirrors Anthropic's Tool Search pattern. The discovery step can be a separate, cheaper LLM call or even a non-LLM search. The key insight is that context window space used by irrelevant tool schemas directly reduces the model's reasoning quality. I would measure tool selection accuracy as a key metric -- if the agent calls `search_customers` when it should call `get_customer_by_id`, the discovery phase needs tuning.
+
+For the MCP implementation, I would group tools into domain-specific servers (customer-service, billing, analytics) and only connect to the servers relevant to the current conversation.
+
+### Q: Design a testing strategy for a tool-use agent that handles customer support.
+
+**Strong answer:**
+I would test at three layers. First, unit tests for each tool handler: validate input edge cases, error messages, and output format. These run in CI on every commit with mocked dependencies.
+
+Second, integration tests that verify tools work against real (staging) databases. For example, `create_ticket` actually creates a record and `search_customers` returns it. These catch schema drift between the tool and the backend.
+
+Third, eval suites that test the full agent -- LLM plus tools. I would build a dataset of 100+ realistic customer queries with expected tool call sequences and output criteria. The eval measures tool selection accuracy (did it pick the right tool?), argument quality (were the arguments correct?), task completion rate (did it solve the problem?), and efficiency (how many tool calls did it take?).
+
+I would run evals on every model version change and every tool schema change. A 2% drop in tool selection accuracy after a schema change means the description needs revision, not the model.
+
+## Go deeper
+
+- [Upstream chapter (Building Tool-Use Agents)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/17-tool-use-and-computer-agents/05-building-tool-agents.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

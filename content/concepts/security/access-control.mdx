@@ -1,0 +1,121 @@
+---
+title: Access Control for LLM Systems
+slug: access-control
+type: concept
+area: security
+difficulty: intermediate
+tags:
+  - security
+  - access
+  - control
+diagrams:
+  - diagrams/access-control--overview.svg
+est_minutes: 8
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The 30-second version
+
+Secure access control is essential for multi-user and multi-tenant LLM applications. This chapter covers authentication, authorization, and data isolation patterns.
+
+## The analogy
+
+Think of **Access Control for LLM Systems** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Access Control for LLM Systems overview](diagrams/access-control--overview.svg)
+
+Secure access control is essential for multi-user and multi-tenant LLM applications. This chapter covers authentication, authorization, and data isolation patterns.
+
+## A concrete example
+
+Secure access control is essential for multi-user and multi-tenant LLM applications. This chapter covers authentication, authorization, and data isolation patterns.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: How do you implement multi-tenant isolation in a RAG system?
+
+**Strong answer:**
+
+"Multi-tenant isolation requires defense in depth:
+
+**Vector database level:**
+- Every vector includes tenant_id in metadata
+- All queries filter by tenant_id at the database level
+- Never filter after retrieval (data already leaked to memory)
+
+**Cache level:**
+- All cache keys prefixed with tenant_id
+- Semantic cache scoped to tenant
+- No cross-tenant cache hits even for identical queries
+
+**Prompt level:**
+- Validate context documents belong to requesting tenant before including
+- Never mix context from multiple tenants
+
+**Output level:**
+- Verify response does not contain cross-tenant information
+- Output filtering as additional safeguard
+
+**Audit:**
+- Log all access with tenant context
+- Monitor for cross-tenant access attempts
+
+The key principle: tenant_id is a mandatory filter at every data access point, not an optional parameter."
+
+### Q: How do you manage API keys for an LLM service?
+
+**Strong answer:**
+
+"Secure API key management:
+
+**Creation:**
+- Generate cryptographically random keys
+- Store only the hash, return raw key once
+- Associate with user, tenant, scopes, expiration
+
+**Validation:**
+- Hash incoming key, compare to stored hash
+- Check expiration and revocation status
+- Verify scopes match requested action
+
+**Rotation:**
+- Support key rotation with grace period
+- Old key works during transition (7 days)
+- Notify users of impending expiration
+
+**Security:**
+- Rate limit failed authentication attempts
+- Revoke immediately on suspected compromise
+- Audit all key operations
+
+**Scopes:**
+- Fine-grained: model access, operation type, daily limits
+- Least privilege by default
+
+The key principle: never store raw keys, support rotation, implement least privilege."
+
+## Go deeper
+
+- [Upstream chapter (Access Control for LLM Systems)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/12-security-and-access/02-access-control.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

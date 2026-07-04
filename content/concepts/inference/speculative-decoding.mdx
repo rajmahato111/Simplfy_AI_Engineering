@@ -1,0 +1,69 @@
+---
+title: Speculative Decoding
+slug: speculative-decoding
+type: concept
+area: inference
+difficulty: intermediate
+tags:
+  - inference
+  - speculative
+  - decoding
+diagrams:
+  - diagrams/speculative-decoding--overview.svg
+est_minutes: 8
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The 30-second version
+
+Speculative decoding is a now-standard technique that allows large Models (LLMs) to generate multiple tokens per forward pass, effectively breaking the memory-bandwidth bottleneck for sequential decoding.
+
+## The analogy
+
+Think of **Speculative Decoding** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Speculative Decoding overview](diagrams/speculative-decoding--overview.svg)
+
+Speculative decoding is a now-standard technique that allows large Models (LLMs) to generate multiple tokens per forward pass, effectively breaking the memory-bandwidth bottleneck for sequential decoding.
+
+## A concrete example
+
+Speculative decoding is a now-standard technique that allows large Models (LLMs) to generate multiple tokens per forward pass, effectively breaking the memory-bandwidth bottleneck for sequential decoding.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: Why doesn't Speculative Decoding work well for high-temperature creative writing?
+
+**Strong answer:**
+Speculative decoding relies on the "Draft Model" being able to accurately predict what the "Target Model" would say. In high-temperature creative writing, the probability distribution is "flatter," and the model is encouraged to pick less-likely tokens. This leads to a very low **Acceptance Rate** (the draft model's guesses are frequently rejected). When a guess is rejected, the target model's parallel pass was wasted compute, and the system falls back to standard sequential decoding, adding the overhead of the draft model's latency.
+
+### Q: How does Medusa differ from traditional Speculative Decoding?
+
+**Strong answer:**
+Traditional speculative decoding requires a separate, smaller model (the Draft Model) which takes up extra VRAM and requires its own KV cache management. Medusa, instead, adds multiple "heads" to the base model's final hidden state. Each head is trained to predict a different offset (e.g., next token, next+1, next+2). This eliminates the need for a second model and minimizes the communication overhead between steps, as all "guesses" are generated within the same base model architecture during a single forward pass.
+
+## Go deeper
+
+- [Upstream chapter (Speculative Decoding)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/04-inference-optimization/03-speculative-decoding.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

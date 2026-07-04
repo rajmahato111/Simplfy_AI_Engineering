@@ -1,0 +1,63 @@
+---
+title: Multi-Modal RAG
+slug: multimodal-rag
+type: concept
+area: retrieval
+difficulty: intermediate
+tags:
+  - retrieval
+  - multimodal
+  - rag
+diagrams:
+  - diagrams/multimodal-rag--overview.svg
+est_minutes: 15
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: reviewed
+---
+## The 30-second version
+
+Multi-modal RAG extends retrieval-augmented generation beyond plain text to handle images, tables, charts, audio, and mixed-layout documents. Production systems now routinely ingest PDFs with diagrams, slide decks, scanned invoices, and research papers where the visual layout *is* the meaning. Three architectures dominate: caption-and-index, unified vision-text embeddings (Cohere Embed v4, Voyage-Multimodal-3.5, Gemini Embedding 001), and page-as-image with late interaction (ColPali, ColQwen2.5, ColNomic).
+
+## The analogy
+
+Think of **Multi-Modal RAG** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Multi-Modal RAG overview](diagrams/multimodal-rag--overview.svg)
+
+Multi-modal RAG extends retrieval-augmented generation beyond plain text to handle images, tables, charts, audio, and mixed-layout documents. Production systems now routinely ingest PDFs with diagrams, slide decks, scanned invoices, and research papers where the visual layout *is* the meaning. Three architectures dominate: caption-and-index, unified vision-text embeddings (Cohere Embed v4, Voyage-Multimodal-3.5, Gemini Embedding 001), and page-as-image with late interaction (ColPali, ColQwen2.5, ColNomic).
+
+## A concrete example
+
+Multi-modal RAG extends retrieval-augmented generation beyond plain text to handle images, tables, charts, audio, and mixed-layout documents. Production systems now routinely ingest PDFs with diagrams, slide decks, scanned invoices, and research papers where the visual layout *is* the meaning. Three architectures dominate: caption-and-index, unified vision-text embeddings (Cohere Embed v4, Voyage-Multimodal-3.5, Gemini Embedding 001), and page-as-image with late interaction (ColPali, ColQwen2.5, ColNomic).
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+- What tradeoffs would you highlight in an interview?
+- How would you measure success in production?
+- What failure modes would you design for?
+
+## Go deeper
+
+- [Upstream chapter (Multi-Modal RAG)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/06-retrieval-systems/12-multimodal-rag.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)
