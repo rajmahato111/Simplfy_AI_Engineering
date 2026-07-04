@@ -1,14 +1,15 @@
 # Pre-PR testing plan (binding for orchestrators)
 
 > **No PR is raised until every applicable check below passes.**
-> The human does not merge — a **reviewer agent** reviews the PR and merges
-> after code + browser QA sign-off. Neither orchestrator asks the human to
-> merge.
+> **Only the merge approver (senior/lead engineer) merges to `main`.**
+> Implementing agents and reviewer agents prepare PRs and audits; they do not merge.
+> See [`pr-merge-governance.md`](./pr-merge-governance.md).
 
 Workflow position:
 
 ```
-Finish task → automated checks → Cursor Browser QA → commit + push → open PR → reviewer agent → merge
+Finish task → automated checks → Cursor Browser QA → commit + push → open PR (base: main)
+    → optional reviewer-agent audit → merge approver review → merge to main
 ```
 
 Cross-tool rules: [`dual-tool-coordination.md`](./dual-tool-coordination.md) · Board: [`agent-board.md`](./agent-board.md)
@@ -17,14 +18,14 @@ Cross-tool rules: [`dual-tool-coordination.md`](./dual-tool-coordination.md) · 
 
 ## 1. Who runs what
 
-| Role | Runs testing? | Opens PR? | Merges? |
-|------|---------------|-----------|---------|
-| **Implementing agent** (Claude Code or Cursor) | Yes — full checklist below | Yes — **only after Cursor Browser QA passes** | No |
-| **Reviewer agent** | Re-runs §2 + Cursor Browser spot-check on PR branch | No | Yes — if checklist + code review pass |
-| **Human** | Decides tooling exceptions; optional spot-check | No | No (unless emergency) |
+| Role | Runs testing? | Opens PR? | Merges to `main`? |
+|------|---------------|-----------|-------------------|
+| **Implementing agent** (Claude Code or Cursor) | Yes — full checklist below | Yes — **only after pre-PR checks pass** | **Never** |
+| **Reviewer agent** (optional) | Re-runs §2 + Browser spot-check | No | **Never** |
+| **Merge approver** (senior/lead engineer — human) | Final review + spot-check | No | **Yes — only role that merges** |
 
-**Human is the decision-maker** on tooling. Agents do not install dependencies or
-substitute test runners without explicit human approval in chat (recorded on the board).
+**Merge approver** is the designated senior/lead engineer (see [`pr-merge-governance.md`](./pr-merge-governance.md)).
+Agents do not install dependencies or substitute test runners without explicit human approval in chat.
 
 ---
 
@@ -71,7 +72,9 @@ Use **Cursor Browser Automation** — the built-in browser pane (globe icon) tha
 4. Fix failures; re-run until clean.
 5. Record on board + PR: `Browser QA: Cursor Browser — passed <date>` (note any screenshots).
 
-**Reviewer agent:** re-run the same matrix on the PR branch before merge.
+**Reviewer agent:** re-run the same matrix on the PR branch; post APPROVE / FIX REQUIRED — do not merge.
+
+**Merge approver:** review PR + CI; merge to `main` when satisfied.
 
 ### 3b. Cloud / headless sessions (no Browser in tool catalog)
 
@@ -159,9 +162,10 @@ Copy into PR description; all boxes must be true before opening/updating PR:
 - [ ] Browser smoke matrix (§4) passed in **Cursor Browser** (@Browser)
 - [ ] Screenshots / notes attached if UI changed
 - [ ] agent-board.md updated → `ready_for_review`
+- [ ] PR targets **`main`** (see pr-merge-governance.md)
 ```
 
-**Do not @-mention the human to merge.** PR is for the reviewer agent.
+**Do not merge.** PR is for the merge approver.
 
 ---
 
@@ -169,16 +173,26 @@ Copy into PR description; all boxes must be true before opening/updating PR:
 
 1. Check out PR branch.
 2. Re-run §2 automated checks (including `npm run test:e2e`).
-3. Re-run smoke matrix (§4) in **Cursor Browser** (`@Browser`).
+3. Re-run smoke matrix (§4) in **Cursor Browser** (`@Browser`) if UI/content changed.
 4. Code review: Ponytail (code) / style guide (content) / no Tier A doc drift.
-5. If pass → merge to integration branch; update agent-board → `merged`.
-6. If fail → `FIX REQUIRED` comment with file/line findings; do not merge.
-
-Playwright re-run is required in CI; reviewer may re-run locally if CI is pending.
+5. Post review comment: **APPROVE** or **FIX REQUIRED** with file/line findings.
+6. **Do not merge** — hand off to merge approver per [`pr-merge-governance.md`](./pr-merge-governance.md).
 
 ---
 
-## 7. Recording results on the board
+## 7. Merge approver checklist (human — only role that merges)
+
+1. Confirm CI green on the PR.
+2. Read reviewer-agent findings (if any) and PR description.
+3. Spot-check changed routes in Browser or locally when UI/content changed.
+4. Merge to **`main`** (squash recommended).
+5. Update agent-board → **Recently merged**; note `merged to main <date>`.
+
+Playwright re-run is required in CI; approver may re-run locally if CI is pending.
+
+---
+
+## 8. Recording results on the board
 
 When browser QA completes, add to the task block in `agent-board.md`:
 
@@ -196,9 +210,15 @@ If waiting on desktop Browser from a cloud session:
 **Browser QA:** pending — status ready_for_browser_qa; §2 automated checks passed
 ```
 
+When the merge approver merges:
+
+```markdown
+**Merge:** merged to main 2026-07-04 by @rajmahato111 — PR #N
+```
+
 ---
 
-## 8. When browser QA is skipped
+## 9. When browser QA is skipped
 
 Only with **explicit human approval** in chat, documented on the board:
 

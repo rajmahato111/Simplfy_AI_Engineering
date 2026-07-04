@@ -41,8 +41,9 @@ model: **Orchestrator → Sub-agents → Reviewer → Orchestrator approval → 
    designated branch. Nothing reaches GitHub without steps 3–4.
 6. **Pre-PR QA** — [`pre-pr-testing.md`](./pre-pr-testing.md): automated checks +
    Playwright E2E (`npm run test:e2e`) + **Cursor Browser** (`@Browser`) before PR.
-7. **PR + merge** — implementing agent opens PR; **reviewer agent** re-runs checks,
-   merges to integration branch. Human is not asked to merge.
+7. **PR + merge** — implementing agent opens PR targeting **`main`**; optional
+   reviewer agent posts audit findings; **merge approver (human)** reviews and merges.
+   See [`pr-merge-governance.md`](./pr-merge-governance.md).
 
 ## Conventions
 

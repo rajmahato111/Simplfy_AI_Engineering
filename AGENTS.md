@@ -8,7 +8,7 @@
 1. Read [`docs/agent-board.md`](docs/agent-board.md) — do not edit locked paths.
 2. Read [`docs/dual-tool-coordination.md`](docs/dual-tool-coordination.md) for branch and lock rules.
 3. Update the board while working; commit messages: `[claude] T-00N:` or `[cursor] T-00N:`.
-4. **Before opening a PR:** complete [`docs/pre-pr-testing.md`](docs/pre-pr-testing.md) — automated checks + **Cursor Browser** QA (`@Browser`). Do not ask the human to merge — the reviewer agent merges. Do not install tools or assume fallbacks without human approval.
+4. **Before opening a PR:** complete [`docs/pre-pr-testing.md`](docs/pre-pr-testing.md). **Only the merge approver merges to `main`** — see [`docs/pr-merge-governance.md`](docs/pr-merge-governance.md). Implementing agents and reviewer agents do not merge.
 
 ## 2. Product
 
@@ -31,6 +31,8 @@
 
 `docs/PRD.md`, `docs/content-style-guide.md`, `docs/source-analysis.md`, `CREDITS.md`
 
-## 6. Integration branch
+## Integration branch
 
-`claude/ai-interview-platform-prd-4si5f9` until promoted to `main`.
+**`main`** — all shipping PRs target `main`. Only the merge approver merges.
+Do not start new feature work until dependent PRs are merged to `main`.
+See [`docs/pr-merge-governance.md`](docs/pr-merge-governance.md).

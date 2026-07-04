@@ -1,10 +1,25 @@
 # Agent board — live task ledger
 
 > **Read this at every session start.** No agent edits a path unless it is
-> listed under their active task with an open lock. Integration branch:
-> `claude/ai-interview-platform-prd-4si5f9` (until promoted to `main`).
+> listed under their active task with an open lock. **Shipping branch: `main`.**
+> Only the merge approver merges — see [`pr-merge-governance.md`](./pr-merge-governance.md).
 
 Coordination rules: [`dual-tool-coordination.md`](./dual-tool-coordination.md)
+
+---
+
+## Merge gate (human)
+
+**No new feature work** until open PRs are reviewed and merged to **`main`** by the
+merge approver (senior/lead engineer). See [`pr-merge-governance.md`](./pr-merge-governance.md)
+for the bootstrap PR merge order (#1 → #4).
+
+| PR | Branch | Status | Merge approver |
+|----|--------|--------|----------------|
+| #1 | `cursor/coordination-and-foundation-42a0` | Awaiting human review | — |
+| #2 | `cursor/hello-interview-ui-42a0` | Awaiting human review | — |
+| #3 | `cursor/content-render-qa-42a0` | Awaiting human review | — |
+| #4 | `cursor/content-schema-42a0` | Awaiting human review | — |
 
 ---
 
