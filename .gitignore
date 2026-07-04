@@ -6,5 +6,7 @@ node_modules/
 .env
 .env.*
 .next/
+out/
 dist/
 __pycache__/
+*.tsbuildinfo

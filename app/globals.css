@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", "DejaVu Sans", sans-serif;
+}
+
+.prose h2 {
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.prose p,
+.prose li {
+  margin-bottom: 0.75rem;
+  line-height: 1.65;
+}
+
+.prose ul {
+  margin-left: 1.25rem;
+  list-style: disc;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.875rem;
+}
+
+.prose th,
+.prose td {
+  border: 1px solid #e2e8f0;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+.prose th {
+  background: #f8fafc;
+}
+
+.prose pre {
+  overflow-x: auto;
+  border-radius: 0.5rem;
+  background: #0f172a;
+  color: #f8fafc;
+  padding: 1rem;
+  font-size: 0.8125rem;
+  margin: 1rem 0;
+}
+
+.prose img {
+  max-width: 100%;
+  height: auto;
+  margin: 1rem 0;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+}
+
+.prose blockquote {
+  border-left: 3px solid #cbd5e1;
+  padding-left: 1rem;
+  color: #475569;
+  margin: 1rem 0;
+}
