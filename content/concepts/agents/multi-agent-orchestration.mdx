@@ -25,9 +25,9 @@ If the shoot is simple enough — one person, one location, one static shot — 
 
 Once the shoot spans multiple locations, a cast, sound, and a hard delivery date, one person can't do it all *and* keep up quality. So you bring in a crew with a clear structure. The **director** doesn't operate the camera or mix the audio — they read the script, break it into shot lists and daily assignments, and hand each assignment to a specialist: the **cinematographer** frames and lights the shots, the **sound recordist** captures clean audio, the **editor** assembles footage into scenes. Every evening the crew reviews the day's **dailies** together — a checkpoint where the director sees what actually got captured, catches problems early, and adjusts tomorrow's assignments. That's the **supervisor pattern**: one coordinator decomposes the job, dispatches it, and reconciles the output before it moves downstream.
 
-Contrast that with a **hand-off**. On some productions there's no single director orchestrating every department for every decision — the script supervisor finishes a pass and hands the marked-up script straight to the editor, who works directly from it without routing back through a center. Each specialist trusts the previous one's work and picks up where it left off — faster, with less overhead, but with no one checking the pieces add up to a coherent film until the very end.
+Contrast that with a **hand-off**. On some productions there's no director orchestrating every decision — the script supervisor finishes a pass and hands the marked-up script straight to the editor, who works directly from it without routing back through a center. Each specialist trusts the last one's work and picks up where it left off — faster, less overhead, but no one checks the pieces add up to a coherent film until the very end.
 
-And sometimes a production needs a specialist it doesn't employ — a visual-effects house on a different continent, running its own tools on its own schedule. The production doesn't fold that house into its internal crew; it sends a shot list and a delivery spec through a standard format and gets finished shots back. That's what crossing an organizational boundary looks like: you don't merge teams, you agree on an interface.
+And sometimes a production needs a specialist it doesn't employ — a visual-effects house on a different continent, running its own tools on its own schedule. The production sends a shot list and delivery spec through a standard format and gets finished shots back; it doesn't fold that house into its crew. That's crossing an organizational boundary: you don't merge teams, you agree on an interface.
 
 | Film production | Multi-agent system |
 |---|---|
@@ -78,11 +78,11 @@ The number that should drive the decision is how much of the task is actually pa
 
 ## Where people go wrong
 
-- **Adding agents to a task that's a strict dependency chain.** If step 2 always needs step 1's output, splitting it across agents adds a supervisor round-trip and buys you nothing but line items in a diagram.
-- **Letting shared state become a dumping ground.** Appending every worker's full reasoning trace to global state feels safe ("nothing gets lost") but it's how an orchestrator loses track of the original goal in its own context window.
-- **Dispatching sub-tasks without checking they're well-formed.** A worker given an inconsistent or underspecified sub-task will still produce a confident, wrong answer — it has no way to know the plan itself was broken.
-- **Reaching for a cross-vendor protocol inside a single team.** If one team owns every agent and they share a runtime, a network-based interoperability layer only adds latency and serialization you don't need.
-- **Treating "multi-agent" as a quality upgrade by default.** More agents means more places for a decomposition to go wrong, not an automatic accuracy boost — it buys parallelism and specialization, not correctness.
+- **Adding agents to a strict dependency chain.** If step 2 always needs step 1's output, splitting it across agents adds a supervisor round-trip and buys nothing but line items in a diagram.
+- **Letting shared state become a dumping ground.** Appending every worker's full trace to global state feels safe, but it's how an orchestrator loses track of the original goal in its own context.
+- **Dispatching sub-tasks without checking they're well-formed.** A worker given an inconsistent sub-task still produces a confident, wrong answer — it has no way to know the plan itself was broken.
+- **Reaching for a cross-vendor protocol inside a single team.** If one team owns every agent and shares a runtime, a network-based interoperability layer only adds latency you don't need.
+- **Treating "multi-agent" as a quality upgrade by default.** More agents means more places for a decomposition to go wrong, not an automatic accuracy boost.
 
 ## The interview lens
 
