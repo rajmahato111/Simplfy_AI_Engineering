@@ -4,6 +4,8 @@ import { ensureUser, listUserProgress } from "@/lib/progress";
 import { isDbConfigured } from "@/lib/db";
 import { listMyMockSessions } from "@/app/actions/mock";
 import { getQuestionBySlug } from "@/lib/questions";
+import { computeReadiness } from "@/lib/readiness";
+import { isProUser, isProBypassEnabled } from "@/lib/pro-access";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
@@ -15,18 +17,38 @@ export default async function DashboardPage() {
   const user = await ensureUser(session.user.email, session.user.name);
   const progress = user ? await listUserProgress(user.id) : [];
   const mocks = await listMyMockSessions();
+  const readiness = user ? await computeReadiness(user.id) : null;
+  const pro = user ? await isProUser(user.id) : false;
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
       <h1 className="text-3xl font-semibold text-zinc-900">Dashboard</h1>
       <p className="mt-2 text-zinc-600">
         Signed in as <strong>{session.user.email}</strong>
+        {(pro || isProBypassEnabled()) && (
+          <Badge className="ml-2">Pro</Badge>
+        )}
         {!isDbConfigured() && (
           <span className="block mt-1 text-sm text-amber-700">
             Set <code className="rounded bg-amber-50 px-1">DATABASE_URL</code> to persist progress and mock history.
           </span>
         )}
       </p>
+
+      {readiness && (
+        <section className="mt-8 rounded-xl border border-brand/20 bg-brand-muted p-6">
+          <h2 className="font-semibold text-zinc-900">Readiness score</h2>
+          <p className="mt-2 text-3xl font-semibold text-brand">{readiness.score}/100</p>
+          <p className="mt-1 text-sm text-zinc-600">{readiness.label}</p>
+          <p className="mt-2 text-xs text-zinc-500">
+            Chapters {readiness.chapterCoverage}% · Mock avg{" "}
+            {readiness.mockAverage != null ? `${readiness.mockAverage}/100` : "—"}
+          </p>
+          <Link href="/study-plan" className="mt-4 inline-block text-sm font-medium text-brand hover:underline">
+            Open study plan →
+          </Link>
+        </section>
+      )}
 
       {mocks.length > 0 && (
         <section className="mt-10">

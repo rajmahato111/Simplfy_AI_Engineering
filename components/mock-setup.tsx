@@ -30,7 +30,11 @@ function MockSetupInner({ questions }: { questions: QuestionOption[] }) {
     const sessionId = crypto.randomUUID();
     createMockSession(sessionId, slug);
     startTransition(async () => {
-      await startMockSession(sessionId, slug);
+      const result = await startMockSession(sessionId, slug);
+      if (!result.ok) {
+        alert(result.error);
+        return;
+      }
       router.push(`/mock/${sessionId}?question=${encodeURIComponent(slug)}`);
     });
   }

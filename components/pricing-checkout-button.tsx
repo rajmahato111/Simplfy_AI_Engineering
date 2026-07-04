@@ -15,7 +15,17 @@ export function PricingCheckoutButton() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({}),
       });
-      const data = (await res.json()) as { message?: string; mode?: string };
+      const data = (await res.json()) as {
+        ok?: boolean;
+        message?: string;
+        mode?: string;
+        url?: string;
+        redirectUrl?: string;
+      };
+      if (data.mode === "live" && data.url) {
+        window.location.href = data.url;
+        return;
+      }
       setStatus(data.message ?? "Checkout initiated");
     } catch {
       setStatus("Checkout request failed");

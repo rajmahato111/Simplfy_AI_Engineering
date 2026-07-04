@@ -19,7 +19,9 @@
     "ingest:patterns": "tsx scripts/ingest-patterns.ts",
     "ingest:questions": "tsx scripts/ingest-questions.ts",
     "ingest:frameworks": "tsx scripts/ingest-frameworks.ts",
-    "ingest:all": "npm run ingest:glossary && npm run ingest:patterns && npm run ingest:questions && npm run ingest:frameworks"
+    "ingest:meta-pages": "tsx scripts/ingest-meta-pages.ts",
+    "ingest:all": "npm run ingest:glossary && npm run ingest:patterns && npm run ingest:questions && npm run ingest:frameworks && npm run ingest:meta-pages",
+    "setup:env": "bash scripts/setup-env.sh"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.2",

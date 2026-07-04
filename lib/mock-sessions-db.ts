@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, and, isNotNull, sql } from "drizzle-orm";
 import { getDb } from "./db";
 import { mockSessions } from "./db/schema";
 import type { SpiderFeedback } from "./spider-feedback";
@@ -91,5 +91,19 @@ export function parseMockScorecard(raw: string | null): SpiderFeedback | null {
     return JSON.parse(raw) as SpiderFeedback;
   } catch {
     return null;
+  }
+}
+
+export async function countCompletedMocks(userId: string) {
+  const db = getDb();
+  if (!db) return 0;
+  try {
+    const [row] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(mockSessions)
+      .where(and(eq(mockSessions.userId, userId), isNotNull(mockSessions.completedAt)));
+    return row?.count ?? 0;
+  } catch {
+    return 0;
   }
 }
