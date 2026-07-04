@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1136" height="480" viewBox="0 0 1136 480" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN (8px grid, 24px padding)
+Canvas 1136x480. Title center (568,44).
+
+Nodes (h=64 unless noted):
+  Query (orange)              x=48  y=208 w=136 -> 48..184,  c=(116,240)
+  Dense retrieval (indigo)    x=256 y=96  w=200 -> 256..456, c=(356,128)
+  Sparse retrieval (indigo)   x=256 y=320 w=200 -> 256..456, c=(356,352)
+  RRF fusion (violet)         x=568 y=208 w=192 -> 568..760, c=(664,240)
+  Final ranking (orange)      x=872 y=208 w=176 -> 872..1048,c=(960,240)
+
+Arrows (#475569, ONE L-bend max, edge-midpoint to edge-midpoint, end 2px before target):
+  A1 Query top edge -> Dense left edge     (116,208)->(116,128)->(254,128)
+  A2 Query bottom edge -> Sparse left edge (116,272)->(116,352)->(254,352)
+  A3 Dense right edge -> Fusion top edge   (456,128)->(664,128)->(664,206)
+  A4 Sparse right edge -> Fusion bot edge  (456,352)->(664,352)->(664,274)
+  A5 Fusion right edge -> Final left edge  (760,240)->(870,240)             straight, label "fused ranking"
+-->
+  <rect width="1136" height="480" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="568" y="44" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">Reciprocal Rank Fusion: ranks in, one list out</text>
+
+  <!-- arrows -->
+  <polyline points="116,208 116,128 254,128" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <polyline points="116,272 116,352 254,352" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <polyline points="456,128 664,128 664,206" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <polyline points="456,352 664,352 664,274" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="760" y1="240" x2="870" y2="240" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- arrow labels (white backing) -->
+  <rect x="768" y="211" width="94" height="18" fill="#ffffff"/>
+  <text x="815" y="224" font-size="12" fill="#475569" text-anchor="middle">fused ranking</text>
+
+  <!-- nodes -->
+  <rect x="48" y="208" width="136" height="64" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="116" y="245" font-size="14" fill="#7C2D12" text-anchor="middle">Query</text>
+
+  <rect x="256" y="96" width="200" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="356" y="125" font-size="14" fill="#1E1B4B" text-anchor="middle">Dense retrieval<tspan x="356" dy="17">rank 1: doc-B</tspan></text>
+
+  <rect x="256" y="320" width="200" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="356" y="349" font-size="14" fill="#1E1B4B" text-anchor="middle">Sparse (BM25)<tspan x="356" dy="17">rank 1: doc-A</tspan></text>
+
+  <rect x="568" y="208" width="192" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="664" y="237" font-size="14" fill="#2E1065" text-anchor="middle">RRF fusion<tspan x="664" dy="17">Σ 1/(k+rank)</tspan></text>
+
+  <rect x="872" y="208" width="176" height="64" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="960" y="237" font-size="14" fill="#7C2D12" text-anchor="middle">Final ranking<tspan x="960" dy="17">one ordered list</tspan></text>
+</svg>

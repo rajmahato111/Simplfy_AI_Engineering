@@ -56,7 +56,7 @@ Cross-check: vertical x=656 spans y=346..552; row A nodes end at x=640; no cross
   <!-- arrow labels (white backing) -->
   <rect x="368" y="222" width="110" height="18" fill="#ffffff"/>
   <text x="372" y="235" font-size="12" fill="#475569">entities + edges</text>
-  <rect x="466" y="303" width="82" height="18" fill="#ffffff"/>
+  <rect x="459" y="303" width="96" height="18" fill="#ffffff"/>
   <text x="507" y="316" font-size="12" fill="#475569" text-anchor="middle">communities</text>
   <rect x="368" y="370" width="122" height="18" fill="#ffffff"/>
   <text x="372" y="383" font-size="12" fill="#475569">traverse 1–2 hops</text>

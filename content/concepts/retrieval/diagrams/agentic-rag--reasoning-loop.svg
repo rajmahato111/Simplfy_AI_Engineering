@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1136" height="512" viewBox="0 0 1136 512" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN (8px grid)
+Canvas 1136x512. Title center (568,44).
+Loop container: x=32 y=80 w=904 h=328 (32..936, 80..408), caption (48,102)
+
+Row 1 (main flow) y=136, h=64:
+  User query (orange)     x=48  w=136 y=136 -> 48..184,  c=(116,168)
+  Plan / route (indigo)   x=248 w=152 y=136 -> 248..400, c=(324,168)
+  Retrieve (indigo)       x=464 w=152 y=136 -> 464..616, c=(540,168)
+  Evaluate (violet)       x=680 w=152 y=136 -> 680..832, c=(756,168)
+  Generator (violet)      x=968 w=136 y=136 -> 968..1104, c=(1036,168)
+
+Row 2 (loop-back) y=320, h=64:
+  Revise sub-goal (indigo) x=452 w=176 y=320 -> 452..628, c=(540,352)
+  Turn budget is explained in the container caption text only (no box), so
+  nothing sits in the arrow's path between Evaluate and Revise sub-goal.
+
+Arrows (one L-bend max, end 2px before target edge):
+  A1 query->plan     (184,168)->(246,168)
+  A2 plan->retrieve  (400,168)->(462,168)
+  A3 retrieve->evaluate (616,168)->(678,168)
+  A4 evaluate->generator (832,168)->(966,168) label "evidence sufficient" above
+  A5 evaluate->revise: polyline (756,200)-(756,352)-(630,352), vertical then horizontal, one bend, enters revise box right edge (628)
+  A6 revise->retrieve: straight vertical (540,320)->(540,202), both boxes share center x=540
+-->
+  <rect width="1136" height="512" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="568" y="44" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">Agentic RAG: retrieve, evaluate, loop or exit</text>
+
+  <rect x="32" y="80" width="904" height="328" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="48" y="102" font-size="12" fill="#64748B">Reasoning loop — capped at 3–5 turns</text>
+
+  <!-- arrows -->
+  <line x1="184" y1="168" x2="246" y2="168" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="400" y1="168" x2="462" y2="168" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="616" y1="168" x2="678" y2="168" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="832" y1="168" x2="966" y2="168" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <polyline points="756,200 756,352 632,352" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="540" y1="320" x2="540" y2="202" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- labels -->
+  <rect x="826" y="140" width="140" height="18" fill="#ffffff"/>
+  <text x="899" y="153" font-size="12" fill="#475569" text-anchor="middle">evidence sufficient</text>
+  <rect x="766" y="270" width="98" height="18" fill="#ffffff"/>
+  <text x="770" y="283" font-size="12" fill="#475569">weak evidence</text>
+  <rect x="546" y="252" width="96" height="18" fill="#ffffff"/>
+  <text x="550" y="265" font-size="12" fill="#475569">new sub-goal</text>
+
+  <!-- row 1 nodes -->
+  <rect x="48" y="136" width="136" height="64" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="116" y="173" font-size="14" fill="#7C2D12" text-anchor="middle">User query</text>
+
+  <rect x="248" y="136" width="152" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="324" y="165" font-size="14" fill="#1E1B4B" text-anchor="middle">Plan<tspan x="324" dy="17">(route / decompose)</tspan></text>
+
+  <rect x="464" y="136" width="152" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="540" y="173" font-size="14" fill="#1E1B4B" text-anchor="middle">Retrieve</text>
+
+  <rect x="680" y="136" width="152" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="756" y="165" font-size="14" fill="#2E1065" text-anchor="middle">Evaluate<tspan x="756" dy="17">(relevant? supported?)</tspan></text>
+
+  <rect x="968" y="136" width="136" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="1036" y="173" font-size="14" fill="#2E1065" text-anchor="middle">Generator</text>
+
+  <!-- row 2 node -->
+  <rect x="452" y="320" width="176" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="540" y="349" font-size="14" fill="#1E1B4B" text-anchor="middle">Revise sub-goal<tspan x="540" dy="17">(next hop)</tspan></text>
+</svg>

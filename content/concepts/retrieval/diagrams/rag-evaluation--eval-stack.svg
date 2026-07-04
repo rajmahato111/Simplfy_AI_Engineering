@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="752" viewBox="0 0 1200 752" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN (8px grid)
+Canvas 1200x752 (content ends y=628; QC headroom included in H).
+Title center (600,44).
+
+Container 1 "Pipeline under test": x=32 y=76 w=1136 h=264 (32..1168, 76..340)
+  caption (48,98)
+  Row P (pipeline) y=112 h=64 (112..176) c_y=144
+    Query (orange)      x=48  w=128 (48..176)   c=(112,144)
+    Retriever (indigo)  x=248 w=160 (248..408)  c=(328,144)
+    Generator (violet)  x=520 w=160 (520..680)  c=(600,144)
+    Answer (orange)     x=880 w=176 (880..1056) c=(968,144)
+  Row M (metric taps) y=248 h=64 (248..312) c_y=280
+    Retrieval metrics (yellow)  x=248 w=160 (248..408) c=(328,280), under Retriever
+    Generation metrics (yellow) x=488 w=224 (488..712) c=(600,280), under Generator (same x center)
+
+Container 2 "Judge and gates": x=32 y=396 w=1136 h=232 (32..1168, 396..628)
+  caption (48,418)
+  Row1 (top, offline)  y=436 h=64 (436..500) c_y=468
+    Golden set (green)        x=64  w=176 (64..240)   c=(152,468)
+    Ship / block gate (red)   x=792 w=200 (792..992)  c=(892,468)
+  Row2 (bottom, online) y=532 h=64 (532..596) c_y=564
+    Production sample (green) x=64  w=176 (64..240)   c=(152,564)
+    Dashboard & alerts (gray) x=792 w=200 (792..992)  c=(892,564)
+  Center y=484 h=64 (484..548) c_y=516
+    LLM-as-judge (violet)     x=404 w=224 (404..628)  c=(516,516)
+
+Arrows (#475569, end 2px before target edge, one L-bend max):
+  P1 Query->Retriever         (176,144)->(246,144)
+  P2 Retriever->Generator     (408,144)->(518,144)
+  P3 Generator->Answer        (680,144)->(878,144)
+  M1 Retriever->RetMetrics    (328,176)->(328,246) , straight, same x
+  M2 Generator->GenMetrics    (600,176)->(600,246) , straight, same x
+  J1 GoldenSet->Judge         (240,468)->(240,516)->(402,516)
+  J2 ProdSample->Judge        (240,564)->(240,516)->(402,516)
+  J3 Judge->ShipBlock         (628,516)->(628,468)->(790,468)
+  J4 Judge->Dashboard         (628,516)->(628,564)->(790,564)
+-->
+  <rect width="1200" height="752" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="600" y="44" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">The RAG evaluation stack</text>
+
+  <!-- group containers -->
+  <rect x="32" y="76" width="1136" height="264" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="48" y="98" font-size="12" fill="#64748B">Pipeline under test</text>
+  <rect x="32" y="396" width="1136" height="232" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="48" y="418" font-size="12" fill="#64748B">Judge and gates</text>
+
+  <!-- container 1 arrows -->
+  <line x1="176" y1="144" x2="246" y2="144" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="408" y1="144" x2="518" y2="144" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="680" y1="144" x2="878" y2="144" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="328" y1="176" x2="328" y2="246" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="600" y1="176" x2="600" y2="246" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- container 2 arrows -->
+  <polyline points="240,468 240,516 402,516" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <polyline points="240,564 240,516 402,516" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <polyline points="628,516 628,468 790,468" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <polyline points="628,516 628,564 790,564" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Row P nodes -->
+  <rect x="48" y="112" width="128" height="64" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="112" y="149" font-size="14" fill="#7C2D12" text-anchor="middle">Query</text>
+
+  <rect x="248" y="112" width="160" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="328" y="149" font-size="14" fill="#1E1B4B" text-anchor="middle">Retriever</text>
+
+  <rect x="520" y="112" width="160" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="600" y="149" font-size="14" fill="#2E1065" text-anchor="middle">Generator</text>
+
+  <rect x="880" y="112" width="176" height="64" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="968" y="149" font-size="14" fill="#7C2D12" text-anchor="middle">Answer</text>
+
+  <!-- Row M nodes -->
+  <rect x="248" y="248" width="160" height="64" rx="10" fill="#FEFCE8" stroke="#CA8A04" stroke-width="1.5"/>
+  <text x="328" y="277" font-size="14" fill="#713F12" text-anchor="middle">Retrieval<tspan x="328" dy="17">metrics</tspan></text>
+
+  <rect x="488" y="248" width="224" height="64" rx="10" fill="#FEFCE8" stroke="#CA8A04" stroke-width="1.5"/>
+  <text x="600" y="277" font-size="14" fill="#713F12" text-anchor="middle">Generation<tspan x="600" dy="17">metrics</tspan></text>
+
+  <!-- Row1 nodes (offline) -->
+  <rect x="64" y="436" width="176" height="64" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="152" y="465" font-size="14" fill="#064E3B" text-anchor="middle">Golden set<tspan x="152" dy="17">(offline)</tspan></text>
+
+  <rect x="792" y="436" width="200" height="64" rx="10" fill="#FEF2F2" stroke="#DC2626" stroke-width="1.5"/>
+  <text x="892" y="465" font-size="14" fill="#7F1D1D" text-anchor="middle">Ship / block<tspan x="892" dy="17">(CI gate)</tspan></text>
+
+  <!-- Row2 nodes (online) -->
+  <rect x="64" y="532" width="176" height="64" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="152" y="561" font-size="14" fill="#064E3B" text-anchor="middle">Production<tspan x="152" dy="17">sample (~5%)</tspan></text>
+
+  <rect x="792" y="532" width="200" height="64" rx="10" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <text x="892" y="561" font-size="14" fill="#334155" text-anchor="middle">Dashboard<tspan x="892" dy="17">&amp; alerts</tspan></text>
+
+  <!-- Center node -->
+  <rect x="404" y="484" width="224" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="516" y="513" font-size="14" fill="#2E1065" text-anchor="middle">LLM-as-judge<tspan x="516" dy="17">(calibrated)</tspan></text>
+</svg>
