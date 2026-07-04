@@ -16,6 +16,7 @@
 
 | PR | Task | Merged |
 |----|------|--------|
+| #20 | P3: AI mock interviewer shell (SPIDER + scorecard) | 2026-07-04 |
 | #19 | Tier 5: Grounded tutor, SPIDER feedback, frameworks, T-003 brief | 2026-07-04 |
 | #18 | T-040–043: Glossary, patterns, 121-question bank ingest | 2026-07-04 |
 | #15 | T-001 Claude: Pilot content batch (retrieval) | 2026-07-04 |
