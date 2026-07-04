@@ -73,7 +73,7 @@ Coordination rules: [`dual-tool-coordination.md`](./dual-tool-coordination.md)
 
 ---
 
-### T-012 — Cursor — in_progress
+### T-012 — Cursor — ready_for_browser_qa
 
 **Requirement:** Fix MDX table/diagram rendering; add automated content render QA (static + Playwright).
 
@@ -85,7 +85,7 @@ Coordination rules: [`dual-tool-coordination.md`](./dual-tool-coordination.md)
 - [x] Frontmatter diagrams appear on concept pages
 - [x] `npm run validate:content` + `e2e/content-rendering.spec.ts` pass
 - [x] `docs/content-render-qa.md` documents the QA loop
-- [ ] Committed and pushed
+- [x] Committed and pushed — PR #3 (`cursor/content-render-qa-42a0` → `cursor/hello-interview-ui-42a0`)
 
 **Playwright E2E:** passed locally 2026-07-04 — 46/46 tests (includes content-rendering QA)
 
