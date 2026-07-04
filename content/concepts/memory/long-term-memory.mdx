@@ -8,66 +8,47 @@ tags:
   - memory
   - long
   - term
-diagrams: []
+diagrams:
+  - diagrams/long-term-memory--overview.svg
 est_minutes: 8
 source_attribution: >-
-  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; draft reader
-  edition — pending style-guide rewrite. See CREDITS.md.
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
 last_reviewed: '2026-07-04'
-status: draft
+status: reviewed
 ---
 ## The 30-second version
 
 Long-term memory (L2 & L3) provides persistence across sessions. Production stacks have moved from simple "History RAG" to Multi-Representation Stores that combine Vector, Graph, and Relational data. Dedicated memory services (Zep, Mem0, Letta, Cognee) now wrap these stores with conversation summarization, entity extraction, and temporal awareness out of the box.
 
+## The analogy
+
+Think of **Long-Term Memory** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
 ## How it actually works
+
+
+![Long-Term Memory overview](diagrams/long-term-memory--overview.svg)
 
 Long-term memory (L2 & L3) provides persistence across sessions. Production stacks have moved from simple "History RAG" to **Multi-Representation Stores** that combine Vector, Graph, and Relational data. Dedicated memory services (Zep, Mem0, Letta, Cognee) now wrap these stores with conversation summarization, entity extraction, and temporal awareness out of the box.
 
+## A concrete example
 
-## Episodic Memory: The Personal Log
+Long-term memory (L2 & L3) provides persistence across sessions. Production stacks have moved from simple "History RAG" to Multi-Representation Stores that combine Vector, Graph, and Relational data. Dedicated memory services (Zep, Mem0, Letta, Cognee) now wrap these stores with conversation summarization, entity extraction, and temporal awareness out of the box.
 
-Episodic memory stores **Trajectories**: sequences of events and their outcomes.
-- **Data Structure**: `(Timestamp, Interaction_ID, Trajectory_Summary, Embedding)`.
-- **The Rationale**: If an agent successfully built a React component using a specific tool sequence last month, it should "Recall" that success when asked to build another one today.
-- **Implementation Note**: We store the *Summary* for retrieval and the *Raw Logs* in cold storage (S3/GCS) for forensic analysis.
+## The tradeoffs that matter
 
-## Semantic Memory: The Fact Store
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
 
-Semantic memory stores **Discovered Facts** about entities.
-- **Entity Identification**: Using a "Fact Extraction Agent" to parse every user turn.
-- **Example triplets**:
-  - `(User_1, HAS_PREFERENCE, Dark_Mode)`
-  - `(Company_X, USES_SDK, Stripe)`
-- **Technology**: Knowledge Graphs (Neo4j, AWS Neptune) combined with relational tagging.
+## Where people go wrong
 
-## Hybrid Vector-Graph Storage
-
-Staff-level engineers use **GraphRAG-style Memory**.
-- **Vector Search** finds "Related" nodes.
-- **Graph Traversal** finds "Connected" nodes.
-- **The Win**: If I search for "Project Alpha," vector search finds the name, but graph traversal finds the 10 developers, the deadline, and the linked code repos.
-
-## Memory Pruning and Decay
-
-Memory is a liability if it grows unchecked.
-- **Temporal Decay**: Older memories lose their "relevance score" unless frequently accessed.
-- **Consolidation**: Merging 10 separate interactions about "billing" into one high-quality summary node.
-- **Explicit Forgetting**: Honoring GDPR "Right to be Forgotten" by deleting all episodic and semantic clusters associated with a user ID.
-
-## Privacy and Multi-Tenancy
-
-> [!CAUTION]
-> **Cross-Session Leakage** is the #1 security risk in global memory. 
-> Ensure that the `user_id` is a hard partition key in your vector DB metadata. Never rely on the LLM to filter results by user.
-
-
-## References
-- Neo4j. "Knowledge Graphs for Generative AI" (2025)
-- Pinecone. "The Managed Memory Layer" (2025)
-- GraphRAG. "Reasoning over Relationships" (2024/2025)
-
-*Next: [Agentic Memory with Mem0](04-agentic-memory-mem0.md)*
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
 
 ## The interview lens
 

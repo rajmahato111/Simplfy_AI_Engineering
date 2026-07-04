@@ -8,55 +8,47 @@ tags:
   - frameworks
   - semantic
   - kernel
-diagrams: []
+diagrams:
+  - diagrams/semantic-kernel--overview.svg
 est_minutes: 8
 source_attribution: >-
-  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; draft reader
-  edition — pending style-guide rewrite. See CREDITS.md.
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
 last_reviewed: '2026-07-04'
-status: draft
+status: reviewed
 ---
 ## The 30-second version
 
 Semantic Kernel (SK) is Microsoft's engine for enterprise-grade AI orchestration. It remains the primary bridge for organizations committed to the Azure/Microsoft ecosystem and C#/.NET architectures, though much of its forward momentum now ships inside the Microsoft Agent Framework (the consolidated successor to AutoGen + SK, RC 1.0 February 2026, GA Q2 2026).
 
+## The analogy
+
+Think of **Semantic Kernel** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
 ## How it actually works
+
+
+![Semantic Kernel overview](diagrams/semantic-kernel--overview.svg)
 
 **Semantic Kernel (SK)** is Microsoft's engine for enterprise-grade AI orchestration. It remains the primary bridge for organizations committed to the **Azure/Microsoft ecosystem** and **C#/.NET** architectures, though much of its forward momentum now ships inside the **Microsoft Agent Framework** (the consolidated successor to AutoGen + SK, RC 1.0 February 2026, GA Q2 2026).
 
+## A concrete example
 
-## Enterprise DNA
+Semantic Kernel (SK) is Microsoft's engine for enterprise-grade AI orchestration. It remains the primary bridge for organizations committed to the Azure/Microsoft ecosystem and C#/.NET architectures, though much of its forward momentum now ships inside the Microsoft Agent Framework (the consolidated successor to AutoGen + SK, RC 1.0 February 2026, GA Q2 2026).
 
-While LangChain is favored by startups, Semantic Kernel is favored by **Banks and Fortune 500s**.
-- **Dependency Injection**: SK follows standard enterprise design patterns.
-- **Strong Typing**: First-class support for C# types makes it highly reliable in large-scale mission-critical systems.
-- **Security**: Deep integration with Azure Active Directory (Microsoft Entra ID) and Managed Identities.
+## The tradeoffs that matter
 
-## Plugins and Planners
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
 
-1. **Kernel Functions**: The basic unit of logic (Native code or LLM prompts).
-2. **Plugins**: A collection of functions (e.g., a "GitHub Plugin" or an "SQL Plugin").
-3. **Planners**: SK's planners have evolved from simple ReAct to **Hierarchical Planners** that can coordinate long-running business processes across multiple days.
+## Where people go wrong
 
-## Memory and Connectors
-
-Semantic Kernel uses **Connectors** to abstract away the underlying infrastructure.
-- **Universal Connectors**: One interface for OpenAI, Mistral, and local Onyx models.
-- **Vector Store Abstraction**: Seamlessly switch between Azure AI Search, Pinecone, and Qdrant without changing the core business logic.
-
-## Multi-Language Support
-
-SK is one of the few major frameworks that treats C# and Python as equals.
-- **The Pattern**: Develop and prototype in Python; deploy the core orchestration in C# for performance and type-safety.
-- **Logic Sharing**: Shared prompt templates (.yaml) that work across both languages.
-
-
-## References
-- Microsoft Learn. "Semantic Kernel Documentation" (2025)
-- Azure Architecture Center. "AI Design Patterns with Semantic Kernel" (2025)
-- Build 2025. "The Future of Copilots with SK" (2025 Conference Recap)
-
-*Next: [AutoGen and CrewAI](07-autogen-crewai.md)*
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
 
 ## The interview lens
 

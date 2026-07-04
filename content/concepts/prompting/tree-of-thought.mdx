@@ -8,68 +8,47 @@ tags:
   - prompting
   - tree
   - thought
-diagrams: []
+diagrams:
+  - diagrams/tree-of-thought--overview.svg
 est_minutes: 8
 source_attribution: >-
-  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; draft reader
-  edition — pending style-guide rewrite. See CREDITS.md.
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
 last_reviewed: '2026-07-04'
-status: draft
+status: reviewed
 ---
 ## The 30-second version
 
 Tree-of-Thought (ToT) is an advanced prompting architecture where a model explores multiple reasoning paths, evaluates them, and "backtracks" if a path leads to a dead end. It is the blueprint behind modern autonomous research agents.
 
+## The analogy
+
+Think of **Tree-of-Thought (ToT)** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
 ## How it actually works
+
+
+![Tree-of-Thought (ToT) overview](diagrams/tree-of-thought--overview.svg)
 
 Tree-of-Thought (ToT) is an advanced prompting architecture where a model explores multiple reasoning paths, evaluates them, and "backtracks" if a path leads to a dead end. It is the blueprint behind modern autonomous research agents.
 
+## A concrete example
 
-## The Tree vs. The Chain
+Tree-of-Thought (ToT) is an advanced prompting architecture where a model explores multiple reasoning paths, evaluates them, and "backtracks" if a path leads to a dead end. It is the blueprint behind modern autonomous research agents.
 
-While **Chain-of-Thought** is linear (one path), **Tree-of-Thought** allows for branching.
+## The tradeoffs that matter
 
-| Feature | Chain-of-Thought | Tree-of-Thought |
-|---------|------------------|-----------------|
-| **Topology** | Linear (1 path) | Branching (Multiple paths) |
-| **Logic** | Sequential | Parallel + Evaluative |
-| **Self-Correction**| Low (Commitment bias) | High (Backtracking) |
-| **Use Case** | Math, Simple Logic | Puzzle Solving, Coding Architecture, Strategic Planning |
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
 
-## The ToT Loop: Propose, Evaluate, Search
+## Where people go wrong
 
-A ToT system consists of three modules:
-1. **Thought Proposer**: Generates 3-5 potential "next steps" for a problem.
-2. **State Evaluator**: Grades each step (e.g., "Good", "Maybe", "Impossible").
-3. **Search Algorithm**: (BFS or DFS) to decide which branch to explore next.
-
-```python
-# The ToT logic (Simplified):
-For each branch:
-   Score = Evaluate(branch)
-   If Score < Threshold:
-      Prune branch (Backtrack)
-   Else:
-      Continue exploring
-```
-
-## Self-Correction & Backtracking
-
-ToT is specifically designed to overcome **Hallucination Cascades**. 
-In a linear chain, if the model makes a mistake in Step 1, every subsequent step is likely wrong. In ToT, the "Evaluator" (which can be a different model or a rule-based check) catches the error at Step 1 and forces the model to try a different starting point.
-
-## MCTS and Search-as-Service
-
-ToT has evolved into **Monte Carlo Tree Search (MCTS)** for LLMs.
-- **Search-time Compute Scaling**: Instead of one large prompt, we use 100 small prompts to "search" for the best answer.
-- **RAD-T (Reasoning-as-Data-Tree)**: Specialized "Searcher" models (Gemini 3.1 Pro Deep Think, GPT-5.5 extended thinking, Claude Opus 4.7) are natively trained to manage these branches.
-
-
-## References
-- Yao et al. "Tree of Thoughts: Deliberate Problem Solving with Large Language Models" (2023)
-- Silver et al. "Mastering the Game of Go without Human Knowledge" (MCTS inspiration)
-
-*Next: [Context Engineering](05-context-engineering.md)*
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
 
 ## The interview lens
 

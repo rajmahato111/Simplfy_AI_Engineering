@@ -9,82 +9,47 @@ tags:
   - synthetic
   - data
   - generation
-diagrams: []
+diagrams:
+  - diagrams/synthetic-data-generation--overview.svg
 est_minutes: 8
 source_attribution: >-
-  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; draft reader
-  edition — pending style-guide rewrite. See CREDITS.md.
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
 last_reviewed: '2026-07-04'
-status: draft
+status: reviewed
 ---
 ## The 30-second version
 
 The industry has hit the "Data Wall", the exhaustion of high-quality human text on the web. Synthetic data is now the primary engine for model improvement, sitting at the core of every modern frontier-model recipe.
 
+## The analogy
+
+Think of **Synthetic Data Generation** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
 ## How it actually works
+
+
+![Synthetic Data Generation overview](diagrams/synthetic-data-generation--overview.svg)
 
 The industry has hit the "Data Wall", the exhaustion of high-quality human text on the web. Synthetic data is now the primary engine for model improvement, sitting at the core of every modern frontier-model recipe.
 
+## A concrete example
 
-## After the "Data Wall": The Synthetic Shift
+The industry has hit the "Data Wall", the exhaustion of high-quality human text on the web. Synthetic data is now the primary engine for model improvement, sitting at the core of every modern frontier-model recipe.
 
-Frontier models (Llama 4, GPT-5.5, Claude Opus 4.7, Gemini 3.1 Pro) are trained on 100T+ tokens. There simply isn't enough human text to sustain this scaling.
-**The reality:** More than **50% of the training mixture** for frontier fine-tuning (and 10% of pretraining) is now synthetic.
+## The tradeoffs that matter
 
-| Source | Human Data | Synthetic Data |
-|--------|------------|----------------|
-| **Volume** | Fixed (Finite) | Infinite |
-| **Quality** | Variable (Noisy) | Controllable (Purified) |
-| **Cost** | High (Human Labelers) | Cheap (Inference/GPU) |
-| **Bias** | Mirror of internet | Can be manually balanced |
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
 
-## Evol-Instruct Pattern
+## Where people go wrong
 
-Evol-Instruct is a recursive process where an LLM takes a simple instruction and evolves it into a more complex one.
-
-**The Evolution Directions:**
-1. **Breadth**: Increase the number of tasks.
-2. **Depth**: Add constraints, complicating factors, or multi-step logic.
-3. **De-noising**: Clean up phrasing to remove "AI-isms."
-
-```python
-# Simple Instruction: "Write a function to add two numbers."
-# Evolved Instruction: "Write a thread-safe Python class that performs 
-# matrix addition with error handling and unit tests, adhering to PEP8."
-```
-
-## Constitutional AI & AI Feedback (RLAIF)
-
-Developed by Anthropic and widely adopted across the industry, RLAIF uses a "Constitution" (a set of rules) to guide a model in evaluating and improving its own data.
-
-**The Loop:**
-1. **Propose**: Model A generates a response.
-2. **Critique**: Model B (the constitutional judge) identifies flaws based on guidelines.
-3. **Revise**: Model A produces a better version based on the critique.
-4. **Train**: The final (Prompt, Revise) pair is added to the SFT set.
-
-## Verifiable Synthetic Data
-
-The biggest risk of synthetic data is **Model Collapse** (the model learning its own mistakes).
-**The 2025 Solution**: Focus on domains where the "Truth" is verifiable without an LLM.
-
-- **Math**: Use Formal Verification (Lean/Isabelle) or Python execution to verify answers.
-- **Code**: Run generated code against test cases (Unit Tests).
-- **RAG**: Use "Gold Context" to generate questions where the answer is explicitly in the text.
-
-## De-biasing and Diversity
-
-Synthetic data is used to "fill the gaps" in human data.
-- **Languages**: Generating high-quality text in low-resource languages (e.g., Swahili, Marathi) by translating conceptual templates.
-- **Logic**: Creating 1,000,000 variations of a specific logical fallacy to "harden" the model against it.
-
-
-## References
-- Xu et al. "WizardLM: Empowering Large Language Models to Follow Complex Instructions" (2023)
-- Bai et al. "Constitutional AI: Harmlessness from AI Feedback" (2022)
-- OpenAI. "Weak-to-Strong Generalization" (2023)
-
-*Next: [Quantization Deep Dive](07-quantization-deep-dive.md)*
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
 
 ## The interview lens
 

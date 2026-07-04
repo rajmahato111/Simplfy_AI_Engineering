@@ -9,68 +9,47 @@ tags:
   - state
   - management
   - patterns
-diagrams: []
+diagrams:
+  - diagrams/state-management-patterns--overview.svg
 est_minutes: 8
 source_attribution: >-
-  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; draft reader
-  edition — pending style-guide rewrite. See CREDITS.md.
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
 last_reviewed: '2026-07-04'
-status: draft
+status: reviewed
 ---
 ## The 30-second version
 
 State management in AI systems has moved from simple "sessions" to Stateful Agent Graphs. Managing the flow and persistence of an agent's "mind" is as critical as the LLM itself: it is one of the main reasons LangGraph has become the default control-flow runtime for LangChain-built agents.
 
+## The analogy
+
+Think of **State Management Patterns** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
 ## How it actually works
+
+
+![State Management Patterns overview](diagrams/state-management-patterns--overview.svg)
 
 State management in AI systems has moved from simple "sessions" to **Stateful Agent Graphs**. Managing the flow and persistence of an agent's "mind" is as critical as the LLM itself: it is one of the main reasons LangGraph has become the default control-flow runtime for LangChain-built agents.
 
+## A concrete example
 
-## The State Object
+State management in AI systems has moved from simple "sessions" to Stateful Agent Graphs. Managing the flow and persistence of an agent's "mind" is as critical as the LLM itself: it is one of the main reasons LangGraph has become the default control-flow runtime for LangChain-built agents.
 
-The "State" is the **Single Source of Truth** for an agent session.
-```python
-class AgentState(TypedDict):
-    messages: Annotated[list[AnyMessage], add_messages]
-    plan: list[str]
-    current_task: str
-    tool_results: dict[str, Any]
-    user_context: dict[str, Any]
-    iteration_count: int
-```
-**Best practice**: State should be **Strictly Typed** and **Append-Only** whenever possible to prevent data loss during long execution loops.
+## The tradeoffs that matter
 
-## State Machines (LangGraph)
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
 
-Industry has converged on **Cyclic Graphs** (State Machines).
-- **Nodes**: Functions that take the state and return an update.
-- **Edges**: Conditional logic that determines the next node based on state values (e.g., `if state['error'] -> goto 'recovery_node'`).
+## Where people go wrong
 
-## Checkpointing and Resume
-
-In production, agents can run for minutes or hours.
-- **Persistence Layer**: Every state update is saved to a DB (Postgres/Redis).
-- **Resiliancy**: If the server crashes, the orchestrator retrieves the last `checkpoint_id` and resumes exactly where it left off.
-- **UX**: This allows for **Asynchronous Agents** where the user gets an "I'm working on it" message and a notification 10 minutes later when the state is "Complete."
-
-## Parallel State (Fork/Join)
-
-For complex tasks, we **Fork** the state.
-1. **Fan-out**: Send the state to 3 sub-agents (e.g., Researcher A, B, and C).
-2. **Fan-in (Join)**: A "Manager" agent receives the outputs of all three and merges them back into the main state object.
-
-## Time-Travel (State Rewriting)
-
-As covered in the HITL chapter, state management allows for **Human Intervention**.
-- A developer can browse the session history, find a "bad turn," edit the state object at that specific timestamp, and **Re-run** the graph from that point.
-
-
-## References
-- LangChain. "LangGraph: Multi-Agent Workflows" (2024/2025)
-- Temporal.io. "Stateful AI Agents at Scale" (2025)
-- AWS Bedrock. "Managing Long-Running Agent Sessions" (2025)
-
-*Next: [Section 09: Frameworks and Tools](../09-frameworks-and-tools/01-langchain-deep-dive.md)*
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
 
 ## The interview lens
 

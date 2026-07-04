@@ -9,92 +9,47 @@ tags:
   - lora
   - qlora
   - peft
-diagrams: []
+diagrams:
+  - diagrams/lora-qlora-peft--overview.svg
 est_minutes: 8
 source_attribution: >-
-  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; draft reader
-  edition — pending style-guide rewrite. See CREDITS.md.
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
 last_reviewed: '2026-07-04'
-status: draft
+status: reviewed
 ---
 ## The 30-second version
 
 Parameter-Efficient Fine-Tuning (PEFT) is the industry standard for adapting LLMs. This chapter covers the mechanics and advanced variants of LoRA and other PEFT methods.
 
+## The analogy
+
+Think of **LoRA, QLoRA, and PEFT** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
 ## How it actually works
+
+
+![LoRA, QLoRA, and PEFT overview](diagrams/lora-qlora-peft--overview.svg)
 
 Parameter-Efficient Fine-Tuning (PEFT) is the industry standard for adapting LLMs. This chapter covers the mechanics and advanced variants of LoRA and other PEFT methods.
 
+## A concrete example
 
-## The PEFT Revolution
+Parameter-Efficient Fine-Tuning (PEFT) is the industry standard for adapting LLMs. This chapter covers the mechanics and advanced variants of LoRA and other PEFT methods.
 
-Full fine-tuning of frontier models (GPT-5.5, Claude Opus 4.7, Llama 4 405B) is economically unfeasible for most enterprises. PEFT allows:
-1. **Memory Efficiency**: Train 70B models on a single A100.
-2. **Speed**: 2x faster training by updating &lt;1% of weights.
-3. **Modularity**: Swap "skills" (adapters) onto a shared base model without reloading weights.
+## The tradeoffs that matter
 
-## LoRA Mechanics
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
 
-LoRA (Low-Rank Adaptation) injects trainable rank-decomposition matrices into the transformer layers.
+## Where people go wrong
 
-```python
-# The LoRA Equation for a Weight Matrix W:
-h = Wx + (BA)x * (alpha/r)
-```
-- **W**: Pretrained weights (Frozen, Gradient = None)
-- **A, B**: LoRA adapters (Trainable)
-- **r**: Rank (e.g., 8, 16, 64)
-- **alpha**: Scaling factor (typically 2 * rank)
-
-### Principal Nuance: Target Modules
-Historically, we only targeted query/value projections (`q_proj`, `v_proj`).
-**Modern standard**: Target **all** linear layers (`q, k, v, o, gate, up, down`) for maximum stability and performance, even at lower ranks.
-
-## QLoRA: 4-bit Fine-Tuning
-
-QLoRA pushes efficiency further by quantizing the base model to 4-bit (NF4) while maintaining 16-bit gradients.
-
-| Optimization | Method | Benefit |
-|--------------|--------|---------|
-| **NF4 Quantization** | Normalized Float 4 | Better info density than standard Int4 |
-| **Double Quant** | Quantizing the quant constants | Saves ~0.5 GB VRAM per model |
-| **Paging** | Unified Memory (Nvidia) | Prevents OOM by spilling to CPU RAM |
-
-## Advanced Variants
-
-### 1. DoRA (Weight-Decomposed Low-Rank Adaptation)
-DoRA decomposes the weight update into **Magnitude** and **Direction**.
-- **Result**: Learns 2x faster than LoRA and performs closer to full fine-tuning.
-- **Why it wins**: It allows the model to adjust how much it changes vs. what it's changing independently.
-
-### 2. Vera (Vector-based Random Aggregation)
-Instead of low-rank matrices `A` and `B`, Vera uses fixed random projections with a small trainable vector.
-- **Efficiency**: Reduces adapter size by **10x** compared to LoRA.
-- **Use Case**: Massive-scale Multi-LoRA serving.
-
-### 3. RS-LoRA (Rank-Stabilized LoRA)
-Uses a scaling factor of `alpha / sqrt(r)`.
-- **Benefit**: Allows you to increase rank (to 256+) without the model becoming unstable or requiring a lower learning rate.
-
-## Multi-LoRA Serving (Adapters)
-
-Production systems now serve one base model (e.g., Llama 4 70B) and dynamically swap adapters in the same batch.
-
-```python
-# vLLM/LMCache Multi-LoRA Pattern:
-# Request 1 -> Base + Finance_Adapter
-# Request 2 -> Base + Legal_Adapter
-# Request 3 -> Base + Medical_Adapter
-```
-**The Tech**: **Continuous Batching + PagedAttention v3** allows serving 100+ adapters with only a 5-10% latency overhead compared to the base model.
-
-
-## References
-- Hu et al. "LoRA: Low-Rank Adaptation of Large Language Models" (2021)
-- Liu et al. "DoRA: Weight-Decomposed Low-Rank Adaptation" (2024)
-- Dettmers et al. "QLoRA: Efficient Finetuning of Quantized LLMs" (2023)
-
-*Next: [RLHF and DPO](04-rlhf-and-dpo.md)*
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
 
 ## The interview lens
 

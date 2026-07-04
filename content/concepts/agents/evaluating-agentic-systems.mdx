@@ -9,80 +9,50 @@ tags:
   - evaluating
   - agentic
   - systems
-diagrams: []
+diagrams:
+  - diagrams/evaluating-agentic-systems--overview.svg
 est_minutes: 8
 source_attribution: >-
-  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; draft reader
-  edition — pending style-guide rewrite. See CREDITS.md.
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
 last_reviewed: '2026-07-04'
-status: draft
+status: reviewed
 ---
 ## The 30-second version
 
 Evaluating agents is fundamentally different from evaluating RAG. While RAG is about "Accuracy," Agents are about "Reliability," "Efficiency," and "Safety." Production agent eval relies on Trajectory Benchmarks and LLM-as-Judge for multi-step reasoning, with tools like Langfuse, LangWatch, Braintrust, and Arize Phoenix offering native trace-level scoring.
 
+## The analogy
+
+Think of **Evaluating Agentic Systems** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
 ## How it actually works
+
+
+![Evaluating Agentic Systems overview](diagrams/evaluating-agentic-systems--overview.svg)
 
 Evaluating agents is fundamentally different from evaluating RAG. While RAG is about "Accuracy," Agents are about **"Reliability," "Efficiency," and "Safety."** Production agent eval relies on **Trajectory Benchmarks** and **LLM-as-Judge** for multi-step reasoning, with tools like Langfuse, LangWatch, Braintrust, and Arize Phoenix offering native trace-level scoring.
 
 > [!NOTE]
 > For standard RAG evaluation (Retrieval vs. Generation metrics), see [06-retrieval-systems/09-advanced-retrieval-patterns.md](../06-retrieval-systems/09-advanced-retrieval-patterns.md) and Section 14. This chapter focuses specifically on the *Execution Path* of an agent.
 
+## A concrete example
 
-## The Evaluation Shift
+Evaluating agents is fundamentally different from evaluating RAG. While RAG is about "Accuracy," Agents are about "Reliability," "Efficiency," and "Safety." Production agent eval relies on Trajectory Benchmarks and LLM-as-Judge for multi-step reasoning, with tools like Langfuse, LangWatch, Braintrust, and Arize Phoenix offering native trace-level scoring.
 
-| Metric | RAG App | Agentic App |
-|--------|---------|-------------|
-| **Unit of Eval** | Single Response | The **Trajectory** (All steps) |
-| **Success Criteria**| Groundedness/Faithfulness | Task Completion / Logical Soundness |
-| **Complexity** | Low (Text similarity) | High (Tool state validation) |
+## The tradeoffs that matter
 
-## Trajectory Benchmarks
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
 
-Modern eval scores the **"Path to the Result."**
-1. **Optimal Path**: The shortest sequence of tools to solve the task.
-2. **Agent Path**: The actual steps taken.
-3. **The Score**: `Efficiency = (Optimal Steps / Agent Steps)`. A score of `0.2` means the agent meandered or looped excessively.
+## Where people go wrong
 
-**Common Benchmarks**:
-- **SWE-bench**: Fixing GitHub issues (Code Agency).
-- **WebArena**: Navigating menus and forms (Browser Agency).
-- **GAIA**: General tool-use tasks (Assistant Agency).
-
-## Key Metrics
-
-### 1. Task Success Rate (TSR)
-The percentage of tasks where the final state is correct.
-> [!IMPORTANT]
-> A "Correct Answer" via a "Wrong Path" is a score of 0 in senior production settings.
-
-### 2. Action Success Rate (ASR)
-The percentage of individual tool calls that returned valid data (not errors or hallucinations).
-
-### 3. Unit Cost per Task
-Total tokens + infrastructure cost (Sandboxes, API calls) per completed goal.
-
-## LLM-as-Judge for Step Quality
-
-We use a stronger model (Claude Opus 4.7, GPT-5.5 reasoning) to review the **Reasoning Log** of a smaller agent.
-- **Thought Quality**: Did the agent's logic for using Tool X follow from Observation Y?
-- **Redundancy Check**: Did the agent repeat a search it just performed?
-- **Feedback Loop**: This "Judge" output is then used for **DPO (Direct Preference Optimization)** to align the agent's future behavior.
-
-## Production Evaluation
-
-Production teams use **Shadow Execution**.
-1. **V1 Agent** responds to the user.
-2. **V2 (Experimental) Agent** runs the same query in a "Hidden Sandbox."
-3. **The Comparison**: We compare the two trajectories. If V2 consistently solves tasks in fewer steps without safety violations, we promote it to production.
-
-
-## References
-- Jimenez et al. "SWE-bench: Can Language Models Resolve Real-World GitHub Issues?" (2024/2025 update)
-- Microsoft Research. "AgentBench: A Comprehensive Benchmark for AI Agents" (2024)
-- RAGAS. "Agentic Evaluation Module" (2025)
-
-*Next: [Durable Execution for Long-Running Agents](11-durable-execution.md)*
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
 
 ## The interview lens
 

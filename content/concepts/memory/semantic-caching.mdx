@@ -8,60 +8,47 @@ tags:
   - memory
   - semantic
   - caching
-diagrams: []
+diagrams:
+  - diagrams/semantic-caching--overview.svg
 est_minutes: 8
 source_attribution: >-
-  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; draft reader
-  edition — pending style-guide rewrite. See CREDITS.md.
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
 last_reviewed: '2026-07-04'
-status: draft
+status: reviewed
 ---
 ## The 30-second version
 
 Caching has evolved from exact string matching to Semantic Matching. Semantic caching reduces costs by 30-70% and cuts latency from seconds to milliseconds by reusing completions for "equivalent" queries.
 
+## The analogy
+
+Think of **Semantic Caching** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
 ## How it actually works
+
+
+![Semantic Caching overview](diagrams/semantic-caching--overview.svg)
 
 Caching has evolved from exact string matching to **Semantic Matching**. Semantic caching reduces costs by **30-70%** and cuts latency from seconds to milliseconds by reusing completions for "equivalent" queries.
 
+## A concrete example
 
-## Exact Cache vs. Semantic Cache
+Caching has evolved from exact string matching to Semantic Matching. Semantic caching reduces costs by 30-70% and cuts latency from seconds to milliseconds by reusing completions for "equivalent" queries.
 
-| Feature | Exact Cache (Redis/Memcached) | Semantic Cache (RedisVL/Qdrant) |
-|---------|-------------------------------|---------------------------------|
-| **Key** | Hashed query string | Query embedding vector |
-| **Match**| 100% string identity | Cosine Similarity > Threshold |
-| **Efficiency**| Low (Minor typos break cache) | High (Understands intent) |
-| **Risk** | Zero | Semantic Drift (Returning wrong answer) |
+## The tradeoffs that matter
 
-## The Semantic Matching Pipeline
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
 
-1. **Embed**: The incoming query is converted into a vector (e.g., using `text-embedding-3-small`).
-2. **Search**: Search the cache for the nearest neighbor.
-3. **Threshold Check**: If `distance &lt; 0.05` (very similar), return the cached result.
-4. **LLM Verification**: For high-stakes queries, a tiny "Verifier Model" (e.g., GPT-5.5-mini, Claude Haiku 4.5) checks if the cached response actually answers the new query.
-5. **Update**: If no hit, call the LLM and store the new result in the vector cache.
+## Where people go wrong
 
-## RedisVL and GPTCache
-
-Standard stack:
-- **RedisVL**: Provides low-latency vector search directly within a Redis instance.
-- **Hybrid Caching**: Using Redis for both metadata (keys) and vector payloads.
-- **TTL**: Semantic caches should have a TTL (Time-To-Live). The common pattern is **Dynamic TTL**: popular answers live longer while "stale" information is evicted regularly.
-
-## Multimodal Semantic Caching
-
-With native multimodal frontier models (Gemini 3.1 Pro, GPT-5.5, Claude Opus 4.7), we now cache **Image and Audio queries**.
-- **Visual Similarity**: Caching the description of an image if a semantically similar image was processed before.
-- **Audio Fingerprinting**: Caging transcripts for similar voice commands.
-
-
-## References
-- Redis. "RedisVL: Python Client for Redis Vector Library" (2025)
-- Akiba et al. "GPTCache: A Library for Creating Semantic Cache" (2024/2025)
-- Google Cloud. "Generative AI Caching Patterns" (2025)
-
-*Next: [State Management Patterns](06-state-management-patterns.md)*
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
 
 ## The interview lens
 

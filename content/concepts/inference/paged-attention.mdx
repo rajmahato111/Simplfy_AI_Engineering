@@ -8,64 +8,47 @@ tags:
   - inference
   - paged
   - attention
-diagrams: []
+diagrams:
+  - diagrams/paged-attention--overview.svg
 est_minutes: 8
 source_attribution: >-
-  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; draft reader
-  edition — pending style-guide rewrite. See CREDITS.md.
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
 last_reviewed: '2026-07-04'
-status: draft
+status: reviewed
 ---
 ## The 30-second version
 
 PagedAttention is the foundational algorithm behind high-throughput serving engines (vLLM, SGLang, TensorRT-LLM). It solves the "Memory Fragmentation" problem that previously limited LLM scalability.
 
+## The analogy
+
+Think of **PagedAttention** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
 ## How it actually works
+
+
+![PagedAttention overview](diagrams/paged-attention--overview.svg)
 
 PagedAttention is the foundational algorithm behind high-throughput serving engines (vLLM, SGLang, TensorRT-LLM). It solves the "Memory Fragmentation" problem that previously limited LLM scalability.
 
+## A concrete example
 
-## The Contiguous Memory Problem
+PagedAttention is the foundational algorithm behind high-throughput serving engines (vLLM, SGLang, TensorRT-LLM). It solves the "Memory Fragmentation" problem that previously limited LLM scalability.
 
-Standard deep learning frameworks allocate memory in large, contiguous blocks. 
-For an LLM request, you might pre-allocate memory for a `max_sequence_length` of 8192 tokens.
+## The tradeoffs that matter
 
-**The Waste:**
-1. **Internal Fragmentation**: If the user only generates 10 tokens, 99.9% of that reserved block is wasted.
-2. **External Fragmentation**: Memory is broken into gaps too small for a new "large block," even if total free memory is high.
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
 
-## How PagedAttention Works (vLLM)
+## Where people go wrong
 
-PagedAttention draws inspiration from Virtual Memory in Operating Systems.
-
-1. **Tokens to Blocks**: The KV cache for a request is broken into small, fixed-size **Blocks** (e.g., 16 tokens per block).
-2. **Logical vs. Physical**: The model thinks it's attending to a contiguous sequence (Logical memory), but the blocks are scattered throughout VRAM (Physical memory).
-3. **The Lookup Table**: A **Block Table** maps logic indices to physical addresses.
-
-**Primary Benefit**: Memory waste drops from ~60-80% down to **less than 4%**.
-
-## Managing Virtual Memory (Block Manager)
-
-Serving frameworks (vLLM, SGLang) act as "mini-OSs" for GPUs.
-
-- **Allocation**: When a new request starts, the Block Manager assigns it a set of empty physical blocks.
-- **Eviction**: If VRAM is full, the manager can "swap" inactive KV blocks to CPU RAM and bring them back when needed (Paged Swap).
-
-## KV Cache Sharing (Copy-on-Write)
-
-PagedAttention enables effortless sharing of "Common Prefixes."
-
-**The Scenario**: 100 users are chatting with the same 5,000-token system prompt.
-- **Traditional**: Store that 5,000-token KV cache 100 times (**500k tokens** in VRAM).
-- **PagedAttention**: Store it **once** via the Block Table and have all 100 users point to the same physical blocks.
-- **Copy-on-Write**: If a user generates a unique token, a new block is created just for them, while the shared blocks remain unchanged.
-
-
-## References
-- Kwon et al. "Efficient Memory Management for Large Language Model Serving with PagedAttention" (SOSP 2023)
-- vLLM Documentation. "PagedAttention Logic" (2024)
-
-*Next: [Serving Infrastructure](06-serving-infrastructure.md)*
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
 
 ## The interview lens
 

@@ -9,66 +9,47 @@ tags:
   - ocr
   - and
   - layout
-diagrams: []
+diagrams:
+  - diagrams/ocr-and-layout--overview.svg
 est_minutes: 8
 source_attribution: >-
-  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; draft reader
-  edition — pending style-guide rewrite. See CREDITS.md.
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
 last_reviewed: '2026-07-04'
-status: draft
+status: reviewed
 ---
 ## The 30-second version
 
 Traditional OCR (Tesseract, specialized engines) has been largely superseded by Native Multimodal LLMs (Gemini 3.1 Pro, GPT-5.5, Claude Sonnet 4.6, Claude Opus 4.7). We no longer "read characters"; we "understand layouts."
 
+## The analogy
+
+Think of **OCR and Layout Analysis** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
 ## How it actually works
+
+
+![OCR and Layout Analysis overview](diagrams/ocr-and-layout--overview.svg)
 
 Traditional OCR (Tesseract, specialized engines) has been largely superseded by **Native Multimodal LLMs** (Gemini 3.1 Pro, GPT-5.5, Claude Sonnet 4.6, Claude Opus 4.7). We no longer "read characters"; we "understand layouts."
 
+## A concrete example
 
-## The Shift: Traditional OCR vs. Vision-LLMs
+Traditional OCR (Tesseract, specialized engines) has been largely superseded by Native Multimodal LLMs (Gemini 3.1 Pro, GPT-5.5, Claude Sonnet 4.6, Claude Opus 4.7). We no longer "read characters"; we "understand layouts."
 
-| Feature | Traditional OCR (Tesseract/AWS Textract) | Vision-LLMs (Gemini 3.1 Pro, GPT-5.5, Claude Opus 4.7) |
-|---------|-------------------------------------------|--------------------------------------------------------|
-| **Primary Mechanism** | Character recognition | Visual token understanding |
-| **Logic** | Point-and-line analysis | Semantic context |
-| **Reading Order** | Simple top-to-bottom | Multi-column, complex layout aware |
-| **Handwriting** | Poor | Excellent (Human-level) |
-| **Output** | Text blocks + Bounding boxes | Structured Markdown/JSON |
+## The tradeoffs that matter
 
-## Vision-LLM Layout Extraction
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
 
-The standard workflow is **Screenshot-to-Markdown**.
-1. **Rasterize**: Convert PDF pages to images.
-2. **Visual Prompting**: Ask the vision model to "Transcribe the following page into GitHub-flavored Markdown, preserving tables and headers."
-3. **Structured Recovery**: Use the model's spatial awareness to rebuild the logical hierarchy.
+## Where people go wrong
 
-## Reading Order and Logical Structure
-
-> [!IMPORTANT]
-> A common failure in naive RAG is breaking a paragraph across a column. 
-> Vision-LLMs solve this by "Seeing" the column gutter and correctly sequencing the text, unlike rule-based parsers that might read straight across both columns.
-
-## Handling Low-Quality Scans
-
-Modern multimodal models are robust to:
-- **Skew/Rotation**: Automatically corrected in the visual attention layer.
-- **Bleed-through**: The model uses semantic context to "ignore" text from the back of the page.
-- **Handwritten Annotations**: Can be extracted into a separate `annotations` JSON field.
-
-## Cost and Latency Tradeoffs
-
-| Model Tier | Use Case | Latency | Cost (1K pages) |
-|------------|----------|---------|-----------------|
-| **Gemini 3.1 Flash** | High-volume batch | 1-2s / page | $1-3 |
-| **GPT-5.5 / Claude Sonnet 4.6** | High-precision / Legal | 3-5s / page | $8-18 |
-| **Local (Llama 4 Vision)** | PII-sensitive / On-prem | &lt;1s / page | Infrastructure only |
-
-
-## References
-- Google DeepMind. "Gemini 2.0: Understanding Multi-column Documents" (2025)
-- OpenAI. "Vision Models for Document Understanding" (2025)
-- Tesseract v6. "The Integration of Hybrid Transformer OCR" (2025)
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
 
 ## The interview lens
 

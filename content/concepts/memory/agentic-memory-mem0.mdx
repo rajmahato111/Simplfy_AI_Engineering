@@ -8,69 +8,47 @@ tags:
   - memory
   - agentic
   - mem0
-diagrams: []
+diagrams:
+  - diagrams/agentic-memory-mem0--overview.svg
 est_minutes: 8
 source_attribution: >-
-  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; draft reader
-  edition — pending style-guide rewrite. See CREDITS.md.
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
 last_reviewed: '2026-07-04'
-status: draft
+status: reviewed
 ---
 ## The 30-second version
 
 Mem0 (and its peers Zep, Letta, Cognee) represents the shift from "passive logs" to Active Memory. These systems automatically digest conversations to create a persistent, evolving user profile that enhances personalization across every interaction. Pick Mem0 for the broadest standalone memory layer; Zep for temporal-aware production pipelines; Letta for long-running agents that need OS-style paging; Cognee for knowledge-graph-first RAG.
 
+## The analogy
+
+Think of **Agentic Memory with Mem0** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
 ## How it actually works
+
+
+![Agentic Memory with Mem0 overview](diagrams/agentic-memory-mem0--overview.svg)
 
 **Mem0** (and its peers Zep, Letta, Cognee) represents the shift from "passive logs" to **Active Memory**. These systems automatically digest conversations to create a persistent, evolving user profile that enhances personalization across every interaction. Pick Mem0 for the broadest standalone memory layer; Zep for temporal-aware production pipelines; Letta for long-running agents that need OS-style paging; Cognee for knowledge-graph-first RAG.
 
+## A concrete example
 
-## The Mem0 Philosophy
+Mem0 (and its peers Zep, Letta, Cognee) represents the shift from "passive logs" to Active Memory. These systems automatically digest conversations to create a persistent, evolving user profile that enhances personalization across every interaction. Pick Mem0 for the broadest standalone memory layer; Zep for temporal-aware production pipelines; Letta for long-running agents that need OS-style paging; Cognee for knowledge-graph-first RAG.
 
-Traditional memory stores *everything*. 
-Mem0 stores **Insights**.
-Instead of storing "The user said they like blue coffee mugs," Mem0 stores the fact `(User, Preferred_Mug_Color, Blue)`.
+## The tradeoffs that matter
 
-## How it Works: The Digest Loop
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
 
-1. **Observe**: The agent monitors the conversation in L1.
-2. **Extract**: A background "Memory Agent" identifies a memorable fact.
-3. **Compare**: Check if this fact already exists in L3.
-4. **Merge/Update**: If it's new, add it. If it conflicts (e.g., user changed their mind), update the existing record with a new timestamp.
+## Where people go wrong
 
-## Self-Updating Memories
-
-Modern agentic memory is **Recursive**.
-- If a user mentions a task: "I need to finish the budget by Friday."
-- On Thursday, the agent should recall this and ask: "How is the budget coming along?"
-- This is achieved by **Periodic Reflection**. The memory layer runs a job once a day to review active "Goal Nodes" and generate "Proactive Reminders."
-
-## Integrating Mem0 with LangGraph
-
-In a state-machine architecture, Mem0 acts as an **External State Provider**.
-
-```python
-# Conceptual LangGraph node
-def memory_node(state: AgentState):
-    # Pull user preferences from Mem0
-    user_prefs = mem0.get(user_id=state.user_id)
-    # Inject into the global reasoning state
-    return {"user_profile": user_prefs}
-```
-
-## Personalization at Scale
-
-For enterprise apps (millions of users), Mem0 manages:
-- **Consistency**: The AI "remembers" the user's name across the Web App, Mobile App, and Slack Bot.
-- **Friction Reduction**: Not asking the same qualifying questions twice.
-
-
-## References
-- Mem0. "Learning User Preferences across Sessions" (2025)
-- TMemory. "Temporal Logic in AI Agents" (2024/2025)
-- NVIDIA. "Memory Banks for Intelligent Assistants" (2025)
-
-*Next: [Semantic Caching](05-semantic-caching.md)*
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
 
 ## The interview lens
 

@@ -7,67 +7,47 @@ difficulty: intermediate
 tags:
   - frameworks
   - dspy
-diagrams: []
+diagrams:
+  - diagrams/dspy--overview.svg
 est_minutes: 8
 source_attribution: >-
-  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; draft reader
-  edition — pending style-guide rewrite. See CREDITS.md.
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
 last_reviewed: '2026-07-04'
-status: draft
+status: reviewed
 ---
 ## The 30-second version
 
 DSPy has become the industry reference for high-reliability AI systems. It represents a paradigm shift from "Prompt Engineering" (trial and error) to Prompt Compilation (automated optimization), and benchmarks consistently show a 10-40% quality lift over hand-tuned prompts.
 
+## The analogy
+
+Think of **DSPy: Programming Language Models** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
 ## How it actually works
+
+
+![DSPy: Programming Language Models overview](diagrams/dspy--overview.svg)
 
 **DSPy** has become the industry reference for high-reliability AI systems. It represents a paradigm shift from "Prompt Engineering" (trial and error) to **Prompt Compilation** (automated optimization), and benchmarks consistently show a 10-40% quality lift over hand-tuned prompts.
 
+## A concrete example
 
-## The Programming Paradigm
+DSPy has become the industry reference for high-reliability AI systems. It represents a paradigm shift from "Prompt Engineering" (trial and error) to Prompt Compilation (automated optimization), and benchmarks consistently show a 10-40% quality lift over hand-tuned prompts.
 
-DSPy treats an LLM application like a **Neural Network**.
-- **The Module**: A reusable block of logic (e.g., `ChainOfThought`).
-- **The Signature**: A declarative specification of what the module does (Input -> Output).
-- **The Optimizer**: A process that finds the best "Weights" (Prompts) for the module based on a metric.
+## The tradeoffs that matter
 
-## Signatures: Describing the Task
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
 
-Instead of writing a 100-line prompt, you write a **Signature**:
-```python
-class ResearchAssistant(dspy.Signature):
-    """Answer the question by synthesizing the provided web context."""
-    context = dspy.InputField(desc="Scraped web content")
-    question = dspy.InputField()
-    answer = dspy.OutputField(desc="A technical summary with citations")
-```
-**Winning Nuance**: Signatures are **Model-Agnostic**. You can compile them for Claude Opus 4.7, Claude Sonnet 4.6, GPT-5.5, Gemini 3.1 Pro, or Llama 4 8B without changing a single line of code.
+## Where people go wrong
 
-## Optimizers and MIPROv2
-
-**MIPROv2 (Multi-stage Instruction PRoposal Optimizer)** is the flagship DSPy optimizer.
-1. **Instruction Proposal**: An "Assistant Model" proposes 10-20 different ways to write the system prompt for the task.
-2. **Bayesian Optimization**: DSPy runs the proposed prompts against a small training set and scores them using a metric.
-3. **Selection**: It picks the prompt that maximizes your metric (e.g., Factuality score).
-
-## Assertions and Constraints
-
-DSPy allows for **Hard and Soft Assertions**.
-- `dspy.Suggest(...)`: If the model fails a check (e.g., "The answer must be under 50 words"), DSPy **automatically re-prompts** the model with the failure reason to correct itself.
-- `dspy.Assert(...)`: If a hard constraint is broken (e.g., "Must not contain PII"), the execution stops and enters a recovery state.
-
-## Managing Model Drift
-
-When OpenAI or Anthropic releases a weight update, hand-crafted prompts often break.
-- **The 2025 Solution**: With DSPy, you simply **Re-compile**. The optimizer finds the new "optimal" tokens for the updated model architecture, maintaining consistency without human labor.
-
-
-## References
-- Khattab et al. "DSPy: Compiling Declarative Language Model Calls" (2024/2025)
-- Stanford NLP. "The MIPROv2 Technical Report" (2025)
-- Databricks. "Productionizing Programmed Prompts" (2025)
-
-*Next: [Semantic Kernel: Enterprise AI](06-semantic-kernel.md)*
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
 
 ## The interview lens
 

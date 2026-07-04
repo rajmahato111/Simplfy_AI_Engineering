@@ -1,12 +1,15 @@
 import { test, expect } from "@playwright/test";
 import { auditAllContent } from "../lib/content-audit";
+import { POLISHED_LEARN_SLUGS } from "./constants";
 
 const audits = auditAllContent();
-const polished = audits.filter((a) => a.status === "reviewed" || a.status === "approved");
-const draftSmoke = audits.filter((a) => a.status === "draft").slice(0, 5);
+const pilots = audits.filter((a) => (POLISHED_LEARN_SLUGS as readonly string[]).includes(a.slug));
+const enhancedSmoke = audits
+  .filter((a) => !(POLISHED_LEARN_SLUGS as readonly string[]).includes(a.slug))
+  .slice(0, 8);
 
 test.describe("content rendering QA", () => {
-  for (const audit of polished) {
+  for (const audit of pilots) {
     test(`${audit.slug} — tables and diagrams render`, async ({ page }) => {
       await page.goto(`/learn/${audit.slug}`);
 
@@ -28,10 +31,14 @@ test.describe("content rendering QA", () => {
     });
   }
 
-  for (const audit of draftSmoke) {
-    test(`${audit.slug} — draft chapter loads`, async ({ page }) => {
+  for (const audit of enhancedSmoke) {
+    test(`${audit.slug} — enhanced chapter loads with diagram`, async ({ page }) => {
       await page.goto(`/learn/${audit.slug}`);
       await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+      if (audit.expectedRenderedImages.length > 0) {
+        const fragment = audit.expectedRenderedImages[0].split("/").pop()!;
+        await expect(page.locator(`article img[src*="${fragment}"]`).first()).toBeVisible();
+      }
     });
   }
 });

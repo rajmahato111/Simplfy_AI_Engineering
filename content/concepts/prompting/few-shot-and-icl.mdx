@@ -10,75 +10,47 @@ tags:
   - shot
   - and
   - icl
-diagrams: []
+diagrams:
+  - diagrams/few-shot-and-icl--overview.svg
 est_minutes: 8
 source_attribution: >-
-  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; draft reader
-  edition — pending style-guide rewrite. See CREDITS.md.
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
 last_reviewed: '2026-07-04'
-status: draft
+status: reviewed
 ---
 ## The 30-second version
 
 In-Context Learning (ICL) is the ability of an LLM to learn a new task simply by seeing examples in the prompt, without any weight updates. Maximizing ICL efficiency is a key lever for prompt stability.
 
+## The analogy
+
+Think of **Few-Shot and In-Context Learning (ICL)** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
 ## How it actually works
+
+
+![Few-Shot and In-Context Learning (ICL) overview](diagrams/few-shot-and-icl--overview.svg)
 
 In-Context Learning (ICL) is the ability of an LLM to learn a new task simply by seeing examples in the prompt, without any weight updates. Maximizing ICL efficiency is a key lever for prompt stability.
 
+## A concrete example
 
-## The Anatomy of a Few-Shot Example
+In-Context Learning (ICL) is the ability of an LLM to learn a new task simply by seeing examples in the prompt, without any weight updates. Maximizing ICL efficiency is a key lever for prompt stability.
 
-A high-quality example consists of three parts:
-1. **Input**: A realistic sample of potential user data.
-2. **Reasoning (Optional)**: A short explanation of *why* the output is what it is.
-3. **Output**: The "Gold Standar" result.
+## The tradeoffs that matter
 
-```markdown
-User: "The weather is okay, but the flight was late."
-Reasoning: The user is neutral about the weather but negative about the service.
-Sentiment: Mixed
-```
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
 
-## How many examples?
+## Where people go wrong
 
-| Model Size | Sweet Spot | Scaling Behavior |
-|------------|------------|------------------|
-| **Small (8B)** | 5 - 10 | Gains continue until ~20 examples. |
-| **Medium (70B)**| 3 - 5 | Plateaus early; more examples increase latency. |
-| **Frontier (405B)**| 1 - 2 | Highly capable; "Instruction Following" usually suffices. |
-
-**Rule of thumb**: If you need more than 20 examples to get a stable output, your task is likely too complex for the model, or you should consider **Fine-tuning**.
-
-## Dynamic Example Selection
-
-In production RAG or Classification, don't use the same static examples for every user.
-**The Dynamic Pattern:**
-1. User provides a query.
-2. Search a "Vector DB of Gold Examples" for the 3 most **semantically similar** cases.
-3. Inject those 3 specific cases into the prompt.
-
-**Result**: Drastically higher accuracy because the model sees "local" patterns relevant to the current user.
-
-## The Importance of Labelling Nuance
-
-Frontier models are sensitive to **Distribution Bias** in examples.
-- If you provide 5 "Positive" examples and 1 "Negative," the model will bias toward "Positive."
-- **Fix**: Always use **Label Balancing**. Ensure your few-shot examples roughly mirror the expected output distribution or are perfectly balanced (1:1).
-
-## Advanced ICL: Analogy and "Few-Shot CoT"
-
-**Analogy Prompting**: Instead of saying "Do X," provide an analogy. 
-"Translate this code like a translator would move a poem from French to English—preserving the soul (logic) but changing the syntax."
-
-**Few-Shot CoT**: Providing 2 examples where the reasoning is explicit. This "primes" the model's attention to focus on logic rather than just mimicking the output string.
-
-
-## References
-- Brown et al. "Language Models are Few-Shot Learners" (2020)
-- Min et al. "Rethinking the Role of Demonstrations: What Makes In-Context Learning Work?" (2022)
-
-*Next: [Chain-of-Thought](03-chain-of-thought.md)*
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
 
 ## The interview lens
 

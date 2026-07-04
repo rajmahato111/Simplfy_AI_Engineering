@@ -7,76 +7,47 @@ difficulty: beginner
 tags:
   - inference
   - fundamentals
-diagrams: []
+diagrams:
+  - diagrams/inference-fundamentals--overview.svg
 est_minutes: 8
 source_attribution: >-
-  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; draft reader
-  edition — pending style-guide rewrite. See CREDITS.md.
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
 last_reviewed: '2026-07-04'
-status: draft
+status: reviewed
 ---
 ## The 30-second version
 
 Inference is the process of generating predictions from a trained model. Inference optimization has shifted from "simple speedups" to "architectural efficiency" to handle reasoning-heavy workloads on Hopper (H100) and Blackwell (B200) class hardware.
 
+## The analogy
+
+Think of **Inference Fundamentals** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
 ## How it actually works
+
+
+![Inference Fundamentals overview](diagrams/inference-fundamentals--overview.svg)
 
 Inference is the process of generating predictions from a trained model. Inference optimization has shifted from "simple speedups" to "architectural efficiency" to handle reasoning-heavy workloads on Hopper (H100) and Blackwell (B200) class hardware.
 
+## A concrete example
 
-## The Two Phases of Inference
+Inference is the process of generating predictions from a trained model. Inference optimization has shifted from "simple speedups" to "architectural efficiency" to handle reasoning-heavy workloads on Hopper (H100) and Blackwell (B200) class hardware.
 
-LLM inference is not a single operation; it consists of two distinct computational phases.
+## The tradeoffs that matter
 
-### 1. The Prefill Phase (Prompt Processing)
-The model processes the entire input prompt in a single pass.
-- **Computation**: High-parallelism matrix multiplications.
-- **Bottleneck**: **Compute-bound** (limited by GPU TFLOPS).
-- **Time Complexity**: $O(N)$ where $N$ is input length (but parallelized).
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
 
-### 2. The Decode Phase (Token Generation)
-The model generates tokens one by one, where each token depends on the previous ones.
-- **Computation**: Sequential processing, one row of the weight matrix at a time.
-- **Bottleneck**: **Memory-bound** (limited by memory bandwidth).
-- **Time Complexity**: $O(M)$ where $M$ is output length (sequential).
+## Where people go wrong
 
-## Bottlenecks: Compute-Bound vs. Memory-Bound
-
-Understanding where your system is bottlenecked is critical for choosing the right optimization.
-
-| Phase | Bottleneck | Why? | Primary Optimization |
-|-------|------------|------|----------------------|
-| **Prefill** | Compute (FLOPs) | Parallel processing saturates the GPU's arithmetic units. | FlashAttention, FP8/FP16 precision. |
-| **Decode** | Memory Bandwidth | Weights must be loaded from VRAM for *every single token*. | Quantization (4-bit), GQA, Batching. |
-
-**The Memory Wall insight**
-As models grow larger, memory bandwidth (HBM3/HBM3e) has not scaled as fast as compute (TFLOPS). This makes the Decode phase the primary target for production optimization.
-
-## Performance Metrics
-
-| Metric | Full Form | Goal | Importance |
-|--------|-----------|------|------------|
-| **TTFT** | Time To First Token | &lt; 200ms | User-perceived responsiveness. |
-| **TPOT** | Time Per Output Token | &lt; 30ms | Reading speed and conversational flow. |
-| **Throughput** | Tokens/Second (Agg) | Maximize | Determining cost per query. |
-| **Latency** | End-to-End Time | &lt; 2.0s | Total turn-around for the agent. |
-
-## Hardware-Enabled Optimizations (FP8)
-
-**FP8 (8-bit Floating Point)** is the native precision for inference on H100 and B200 GPUs.
-
-- **Benefit**: 2x faster than FP16/BF16 with negligible (&lt;0.1%) accuracy loss.
-- **How it works**: Uses a smaller mantissa and larger exponent than Int8, allowing it to represent the dynamic range of LLM activations more accurately without complex calibration.
-
-**Principal-level Nuance**: Serving frameworks now use **Dynamic FP8 Scaling**, which adjust the quantization scales per-layer to prevent outliers from degrading the entire model's logic.
-
-
-## References
-- Pope et al. "Efficiently Scaling Transformer Inference" (2022)
-- NVIDIA. "Transformer Engine Documentation" (2024)
-- vLLM Blog. "Understanding LLM Inference Latency" (2023)
-
-*Next: [KV Cache and Context Caching](02-kv-cache-and-context-caching.md)*
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
 
 ## The interview lens
 

@@ -55,7 +55,25 @@ const SAMPLE_LABELS = ["Sample Answer"];
 const FOLLOW_LABELS = ["Follow-up to expect", "Follow-ups", "Follow-up"];
 
 const RUBRIC_HEADERS =
-  "Sample Answer|Follow-up to expect|Follow-ups|Follow-up|Key insight to mention|Key insight|Requirements|What interviewers look for|Strong answer covers|Strong answer structure|Strong answer framework|Strong answer(?!\\s+framework)";
+  "Sample Answer|Follow-up to expect|Follow-ups|Follow-up|Key insight to mention|Key insight|Key points to cover|Requirements|What interviewers look for|Strong answer covers|Strong answer structure|Strong answer framework|Strong answer(?!\\s+framework)";
+
+function extractStrongAnswerBlock(body: string) {
+  const specific = extractFirstBlock(body, [
+    "Strong answer covers",
+    "Strong answer structure",
+    "Strong answer framework",
+    "Strong answer",
+  ]);
+  if (specific) return specific;
+
+  const m = body.match(/\*\*Strong answer(?:\s+\([^)]+\))?:\*\*\s*/i);
+  if (!m || m.index === undefined) return "";
+  const after = body.slice(m.index + m[0].length);
+  if (/^\s*\n/.test(after)) {
+    return extractMultiline(after.replace(/^\s*\n+/, ""));
+  }
+  return after.trimStart().split("\n")[0].trim();
+}
 
 function extractMultiline(afterHeader: string) {
   const stopRe = new RegExp(`(?=\\n\\*\\*(?:${RUBRIC_HEADERS})|\\n---|\\n###)`);
@@ -125,7 +143,7 @@ function parseTableFirstColumn(text: string) {
       .map((c) => c.trim())
       .filter(Boolean);
     const first = cells[0]?.replace(/\*\*/g, "").trim();
-    if (first && !/^(factor|strategy|pattern|feature|metric)$/i.test(first)) items.push(first);
+    if (first && !/^(factor|strategy|pattern|feature|metric|database)$/i.test(first)) items.push(first);
   }
   return items;
 }
@@ -139,6 +157,21 @@ function parseBoldSections(text: string) {
     items.push(title);
   }
   return items;
+}
+
+function parseProseCovers(text: string) {
+  const paren = [...text.matchAll(/\(\d+\)\s+([^.\n(]+)/g)]
+    .map((m) => m[1].replace(/\*\*/g, "").trim())
+    .filter(Boolean);
+  if (paren.length >= 2) return paren;
+  const sentences = text
+    .replace(/\*\*/g, "")
+    .split(/(?<=[.!?])\s+/)
+    .map((s) => s.trim())
+    .filter((s) => s.length > 25 && s.length < 220);
+  if (sentences.length >= 3) return sentences.slice(0, 6);
+  if (text.trim().length > 80) return [excerpt(text, 200)];
+  return [];
 }
 
 function parseStrongAnswer(text: string) {
@@ -156,8 +189,9 @@ function parseStrongAnswer(text: string) {
   if (tableRows.length >= 2) return tableRows;
   if (boldSections.length >= 2) return [...new Set([...boldSections, ...bullets])];
 
-  const mixed = [...numbered, ...bullets, ...tableRows, ...boldSections];
-  return [...new Set(mixed)].filter(Boolean);
+  const mixed = [...new Set([...numbered, ...bullets, ...tableRows, ...boldSections])].filter(Boolean);
+  if (mixed.length >= 2) return mixed;
+  return parseProseCovers(text);
 }
 
 function parseFollowUps(raw: string) {
@@ -220,11 +254,15 @@ export function parseQuestionBank(md: string): Question[] {
     }
 
     const looksFor = parseBullets(extractBlock(body, "What interviewers look for"));
-    const strongBlock = extractFirstBlock(body, STRONG_LABELS);
-    const strong = parseStrongAnswer(strongBlock);
+    const strongBlock =
+      extractStrongAnswerBlock(body) || extractBlock(body, "Key points to cover");
+    let strong = parseStrongAnswer(strongBlock);
     let sample = extractFirstBlock(body, SAMPLE_LABELS);
-    if (!sample && strongBlock.length > 150) {
+    if (!sample && strongBlock.length > 80) {
       sample = strongBlock;
+    }
+    if (!strong.length && sample) {
+      strong = parseStrongAnswer(sample);
     }
     const requirements = extractBlock(body, "Requirements");
     const followRaw = extractFirstBlock(body, FOLLOW_LABELS);

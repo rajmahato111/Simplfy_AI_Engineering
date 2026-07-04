@@ -9,76 +9,47 @@ tags:
   - cost
   - optimization
   - playbook
-diagrams: []
+diagrams:
+  - diagrams/cost-optimization-playbook--overview.svg
 est_minutes: 8
 source_attribution: >-
-  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; draft reader
-  edition — pending style-guide rewrite. See CREDITS.md.
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
 last_reviewed: '2026-07-04'
-status: draft
+status: reviewed
 ---
 ## The 30-second version
 
 AI costs are no longer "magic." They are measurable, predictable, and highly optimizable. With API pricing down 30-60% over the past year, the cost lever is now mostly about *routing* and *caching*, not just picking a cheaper provider. This chapter covers the strategies to reduce inference costs by 10x without sacrificing quality.
 
+## The analogy
+
+Think of **Cost Optimization Playbook** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
 ## How it actually works
+
+
+![Cost Optimization Playbook overview](diagrams/cost-optimization-playbook--overview.svg)
 
 AI costs are no longer "magic." They are measurable, predictable, and highly optimizable. With API pricing down 30-60% over the past year, the cost lever is now mostly about *routing* and *caching*, not just picking a cheaper provider. This chapter covers the strategies to reduce inference costs by 10x without sacrificing quality.
 
+## A concrete example
 
-## The Unit Economics of AI
+AI costs are no longer "magic." They are measurable, predictable, and highly optimizable. With API pricing down 30-60% over the past year, the cost lever is now mostly about *routing* and *caching*, not just picking a cheaper provider. This chapter covers the strategies to reduce inference costs by 10x without sacrificing quality.
 
-We measure success by **Tokens per Dollar ($)**.
+## The tradeoffs that matter
 
-| Component | Cost Driver | Optimization |
-|-----------|-------------|--------------|
-| **Compute** | GPU Time ($/hr) | Better utilization (Batching). |
-| **VRAM** | KV Cache Size | GQA, Quantization. |
-| **Network** | Payload Size | Compression, Local serving. |
-| **API** | Per-token pricing | Caching, Model selection. |
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
 
-## Model Cascading (Efficiency Tiers)
+## Where people go wrong
 
-The most effective cost-saving strategy is to use the **cheapest model capable of the task.**
-
-**The cascade pattern:**
-1. **Classifier**: A tiny model (0.5B) determines query complexity ($0.00).
-2. **Tier 1 (SLM)**: 90% of queries (greetings, simple Q&A) go to an 8B model ($).
-3. **Tier 2 (Frontier)**: 9% of queries (complex reasoning) go to a 405B/Claude Sonnet 4.6 / GPT-5.5 / Gemini 3.1 Pro tier model ($$$).
-4. **Tier 3 (Reasoning)**: 1% of queries (expert-level) go to thinking models like Claude Opus 4.7 or GPT-5.5 with extended thinking ($$$$$).
-
-**Net result**: 80% cost reduction vs. sending all traffic to Tier 2.
-
-## Small Language Models (SLMs) for Production
-
-3B-8B models (Llama 4 8B, Gemini 3.1 Flash, Claude Haiku 4.5) now match or beat the original GPT-4 from 2023 on most benchmarks.
-- **Use Case**: Entity extraction, sentiment analysis, simple RAG.
-- **Cost**: 100x cheaper to run than frontier models.
-- **Latency**: &lt; 100ms response times.
-
-### The DeepSeek V4 Floor
-
-DeepSeek V4 Flash (released April 24, 2026) reset the floor for cheap frontier-class inference at **$0.14 / $0.28 per 1M tokens** with a 1M context window and cache-hit input at $0.0028/M. DeepSeek V4 Pro is roughly 10x cheaper than Claude Opus 4.7 ($0.435 / $0.87 vs $5 / $25 per 1M) after the 75% discount was made permanent on May 22, 2026. For cache-heavy, high-volume workloads where the prefix is reused often (RAG with shared knowledge bases, batch classification, codebase agents), V4 Flash or V4 Pro is now the dominant cost-optimization lever before you even start cascading. Verify on the [DeepSeek pricing page](https://api-docs.deepseek.com/quick_start/pricing) before committing.
-
-## Spot Instance Strategies
-
-For non-real-time workloads (batch processing, data extraction), use **GPU Spot Instances** (AWS Spot, Azure Spot, Lambda Labs).
-
-- **Risk**: GPU can be reclaimed with 30-sec notice.
-- **Mitigation**: **Live KV-Cache Migration**. Serving frameworks can stream the KV cache of ongoing requests to another node as soon as the "Reclamation Signal" is received, ensuring no work is lost.
-
-## The "Token Tax" Optimization
-
-- **System Prompt Caching**: Hard-code common prefixes to get 90% discounts.
-- **Output Truncation**: Strictly limit `max_tokens`.
-- **Negative Prompting**: "Don't be wordy" saves ~15% in output tokens (and thus cost).
-
-
-## References
-- Google Cloud. "Cost Optimization for Generative AI" (2024)
-- Anyscale. "LLM Inference: API vs. Self-Hosted Costs" (2024)
-
-*Next: [Diffusion Language Models](08-diffusion-llms.md)*
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
 
 ## The interview lens
 

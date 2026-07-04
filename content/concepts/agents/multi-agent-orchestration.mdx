@@ -9,131 +9,47 @@ tags:
   - multi
   - agent
   - orchestration
-diagrams: []
+diagrams:
+  - diagrams/multi-agent-orchestration--overview.svg
 est_minutes: 8
 source_attribution: >-
-  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; draft reader
-  edition — pending style-guide rewrite. See CREDITS.md.
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
 last_reviewed: '2026-07-04'
-status: draft
+status: reviewed
 ---
 ## The 30-second version
 
 Complex systems are rarely one agent. They are teams of specialized agents. Orchestration has matured from "Blind Managers" to Hierarchical Supervisors, Dynamic Swarms, and Cross-Vendor Agent Networks enabled by interoperability protocols like A2A. Gartner projects that 40% of enterprise applications will feature task-specific AI agents by end of 2026, up from under 5% in early 2025.
 
+## The analogy
+
+Think of **Multi-Agent Orchestration** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
 ## How it actually works
+
+
+![Multi-Agent Orchestration overview](diagrams/multi-agent-orchestration--overview.svg)
 
 Complex systems are rarely one agent. They are teams of specialized agents. Orchestration has matured from "Blind Managers" to **Hierarchical Supervisors**, **Dynamic Swarms**, and **Cross-Vendor Agent Networks** enabled by interoperability protocols like A2A. Gartner projects that 40% of enterprise applications will feature task-specific AI agents by end of 2026, up from under 5% in early 2025.
 
+## A concrete example
 
-## Why Multi-Agent?
+Complex systems are rarely one agent. They are teams of specialized agents. Orchestration has matured from "Blind Managers" to Hierarchical Supervisors, Dynamic Swarms, and Cross-Vendor Agent Networks enabled by interoperability protocols like A2A. Gartner projects that 40% of enterprise applications will feature task-specific AI agents by end of 2026, up from under 5% in early 2025.
 
-A single agent with 50 tools experiences **Cognitive Load**.
-1. **Specialization**: A "Code Agent" can use a model optimized for Python, while a "Search Agent" uses a model optimized for RAG.
-2. **Parallelism**: Multiple agents can work on independent sub-tasks simultaneously.
-3. **Decoupled Evaluation**: You can evaluate the "Writer Agent" separately from the "Researcher Agent."
+## The tradeoffs that matter
 
-## The Supervisor Pattern (Hierarchical)
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
 
-The most common enterprise pattern as of 2026.
+## Where people go wrong
 
-- **The Supervisor**: A high-reasoning model (Claude Opus 4.7, GPT-5.5 reasoning, Gemini 3.1 Pro Deep Think) that decomposes the user prompt and delegates to workers.
-- **Workers**: Fast, cost-efficient models (Claude Haiku 4.5, Gemini 3.1 Flash, GPT-5.5-mini) that perform the work.
-- **Reviewer**: A separate agent that validates the consolidated output against the supervisor's original plan.
-
-**Architecture**: LangGraph remains the dominant framework for implementing these state-aware hierarchical loops. The Claude Agent SDK, Google ADK, and Microsoft Agent Framework all support this pattern natively as of 2026.
-
-## Swarms (The OpenAI Pattern)
-
- popularized in late 2024, **Swarms** focus on "Handoffs."
-
-- One agent "Hands off" the conversation to another.
-- **Key concept**: `Handoff(TargetAgent)`.
-- **Benefit**: No central "Manager" bottleneck. The conversation flows naturally between specialized entities.
-
-## Graph-Based Orchestration (2026 Dominant Pattern)
-
-The architectural momentum in 2026 has shifted decisively toward **graph-based orchestration**, where agent workflows are modeled as directed graphs with typed state.
-
-### Why Graphs Won
-
-- **Explicit control flow**: Nodes are agents or functions; edges define transitions, including conditional branches and loops
-- **Visualizable**: Teams can inspect and debug the workflow as a diagram
-- **State-aware**: Typed state objects pass through the graph, enabling checkpointing and resumption
-
-### Framework Support
-
-| Framework | Graph Model | Key Differentiator |
-|-----------|-------------|-------------------|
-| **LangGraph** (24k stars) | Imperative DAG with typed state | Most mature, broadest community |
-| **Google ADK** (17k stars) | Agent graphs with built-in A2A | Native Google Cloud integration |
-| **Microsoft Agent Framework** | Workflow graphs (sequential, concurrent, handoff) | Unified .NET + Python, enterprise governance |
-| **Claude Agent SDK** | Supervisor-based hierarchical trees | Built-in tools (bash, editor), production-ready |
-
-### The Paperclip Pattern (Hierarchical Agents at Scale)
-
-A notable 2026 development is **Paperclip** (44,900 GitHub stars within three weeks of its March 2026 launch). It uses a hierarchical model where a CEO agent receives a top-level goal, decomposes it, and delegates to manager agents who spawn and coordinate worker agents. This pattern demonstrates how deeply hierarchical multi-agent trees can handle complex real-world tasks.
-
-> *Verified May 2026.*
-
-## Cross-Vendor Agent Orchestration via A2A
-
-The **Agent-to-Agent (A2A) protocol** (see [Tool Use and MCP](03-tool-use-and-mcp.md#a2a)) enables a new multi-agent pattern: **cross-vendor orchestration**. Before A2A, multi-agent systems required all agents to share the same framework and runtime. Now:
-
-1. **Agent Discovery**: An orchestrator finds specialist agents via their **Agent Cards** (JSON metadata describing capabilities)
-2. **Task Delegation**: The orchestrator sends a structured task to a remote agent via HTTP/SSE
-3. **Async Progress**: The remote agent streams status updates back; the orchestrator can delegate to other agents in parallel
-4. **Result Collection**: Final artifacts are returned and integrated into the orchestrator's state
-
-**Production example**: A procurement system where the orchestrator (LangGraph) delegates compliance checking to a specialized agent (Google ADK), inventory lookup to an MCP-connected tool, and contract generation to a CrewAI crew — all communicating via A2A and MCP respectively.
-
-> *Verified May 2026. Source: a2a-protocol.org*
-
-## The 2026 Framework Landscape for Multi-Agent
-
-Every major AI lab now ships an agent framework. The multi-agent orchestration landscape as of May 2026:
-
-| Framework | Provider | Multi-Agent Model | Status |
-|-----------|----------|-------------------|--------|
-| **LangGraph** | LangChain | Graph-based, most flexible | Production (126k stars) |
-| **Claude Agent SDK** | Anthropic | Supervisor trees with built-in tools | GA (Python + TypeScript) |
-| **Google ADK** | Google | Graph-based with A2A native support | GA (Python, TS, Java, Go) |
-| **Microsoft Agent Framework** | Microsoft | Workflows + group chat patterns | RC 1.0 (Feb 2026), GA Q2 2026 |
-| **OpenAI Agents SDK** | OpenAI | Handoff-based swarms with guardrails | GA (Python + TypeScript) |
-| **CrewAI** | CrewAI Inc. | Role-based crews with Flows | v1.13 (60%+ Fortune 500) |
-| **Smolagents** | HuggingFace | Lightweight, open-source | Active development |
-
-**Key trend**: No single framework excels at all four multi-agent patterns (supervisor, swarm, pipeline, debate). Teams increasingly combine frameworks — e.g., LangGraph for complex orchestration with CrewAI for business-user-facing automations.
-
-> *Verified May 2026.*
-
-## State Management
-
-The biggest challenge in multi-agent systems is the **Shared Blackboard**.
-
-1. **Local State**: Context only visible to a specific agent.
-2. **Global State**: Shared memory (e.g., the final draft) visible to all.
-3. **Write Conflicts**: When two agents try to modify the same Global State.
-   - **Best practice**: Use **Transactional Handoffs**. An agent can only write to the global state when it "Owns" the lock.
-
-## Peer-to-Peer (P2P) Debate
-
-For high-accuracy tasks (e.g., Legal or Medical), we use **Agentic Debate**.
-- **Agent A**: Proposes an answer.
-- **Agent B**: Tries to find flaws in Agent A's answer.
-- **Agent A**: Refines the answer based on B's critique.
-- **Result**: Convergence on a higher-quality result than any single agent could produce.
-
-
-## References
-- Wu et al. "AutoGPT: An Autonomous GPT-4 Experiment" (Historical/2025 update)
-- Li et al. "Camel: Communicative Agents for 'Mind' Exploration" (2023/2025)
-- OpenAI. "Swarms Framework" (2024/2025)
-- Google. "Agent2Agent Protocol" (2025/2026)
-- Gartner. "Predicts 2026: AI Agent Market" (2025)
-- Andrew Ng. "Agentic Design Patterns" (2025/2026)
-
-*Next: [Agent Memory and State](05-agent-memory-and-state.md)*
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
 
 ## The interview lens
 

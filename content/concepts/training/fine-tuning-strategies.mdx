@@ -9,83 +9,47 @@ tags:
   - fine
   - tuning
   - strategies
-diagrams: []
+diagrams:
+  - diagrams/fine-tuning-strategies--overview.svg
 est_minutes: 8
 source_attribution: >-
-  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; draft reader
-  edition — pending style-guide rewrite. See CREDITS.md.
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
 last_reviewed: '2026-07-04'
-status: draft
+status: reviewed
 ---
 ## The 30-second version
 
 Fine-tuning adapts a pretrained model to specific tasks, domains, or styles. Today, fine-tuning is less about "teaching facts" and more about "teaching format and behavior."
 
+## The analogy
+
+Think of **Fine-Tuning Strategies** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
 ## How it actually works
+
+
+![Fine-Tuning Strategies overview](diagrams/fine-tuning-strategies--overview.svg)
 
 Fine-tuning adapts a pretrained model to specific tasks, domains, or styles. Today, fine-tuning is less about "teaching facts" and more about "teaching format and behavior."
 
+## A concrete example
 
-## When to Fine-Tune
+Fine-tuning adapts a pretrained model to specific tasks, domains, or styles. Today, fine-tuning is less about "teaching facts" and more about "teaching format and behavior."
 
-Before fine-tuning, ask: **Can this be solved with Prompt Engineering or RAG?**
+## The tradeoffs that matter
 
-| Requirement | Better Solution | Why |
-|-------------|-----------------|-----|
-| New Facts / Knowledge | **RAG** | LLMs are bad at memorizing facts from FT; RAG is easier to update. |
-| Specific Output Format | **Fine-Tuning** | Teaches the model to reliably output JSON/XML without complex prompting. |
-| Tone / Persona | **Fine-Tuning** | Much more consistent than system prompts. |
-| Latency Reduction | **Fine-Tuning** | Reduces the need for long few-shot prompts. |
-| Private Domain Language| **Continued Pretraining** | Teaches specialized vocabulary (medical, legal, custom code). |
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
 
-## Supervised Fine-Tuning (SFT)
+## Where people go wrong
 
-The first step after pretraining. The model is trained on `(Prompt, Response)` pairs.
-
-### The Quality Hierarchy
-**1,000 "Perfect" examples beat 1,000,000 noisy examples.**
-- **Golden Sets:** Hand-curated by domain experts (PhD level for technical tasks).
-- **Negative Constraint Training:** Including examples of what the model **should not** do (e.g., "Don't apologize," "Don't mention you are an AI").
-
-## Continued Pretraining (Domain Adaptation)
-
-Also known as "Second-stage Pretraining."
-- **How**: Train on raw text from a specific domain (e.g., all SEC filings for a finance model).
-- **Objective**: Learn the statistical distribution of the domain language.
-- **Nuance**: Requires a much lower learning rate (~1/10th of original) to prevent "catastrophic forgetting."
-
-## PEFT vs. Full-Parameter
-
-| Feature | Full-Parameter FT | PEFT (LoRA, QLoRA) |
-|---------|-------------------|--------------------|
-| GPU VRAM | Very High (Model Size * 4-12) | Low (Model Size * 1.5) |
-| Speed | Base | 2x-3x Faster |
-| Risk | High (Catastrophic Forgetting) | Low |
-| Deployment | One model per task | One base model + multiple adapters |
-| **Verdict**| Reserved for foundation training | **The Production Standard** |
-
-## Hyperparameter Tuning
-
-### 1. Learning Rate (LR)
-- **SFT**: `1e-5` to `5e-5` is standard.
-- **Too high**: Model "collapses" and starts repeating or speaking gibberish.
-
-### 2. Rank (r) for LoRA
-- Higher ranks (`r=64` to `r=256`) for complex reasoning tasks.
-- Lower ranks (`r=8`) for simple style/tone changes.
-
-### 3. Packaged Training (Packing)
-To maximize throughput, we "pack" multiple short examples into a single 4k or 8k sequence, separated by EOS tokens.
-- **Challenge**: Self-attention might leak across examples.
-- **Solution**: **FlashAttention with block-masking** to prevent cross-example attention.
-
-
-## References
-- Hu et al. "LoRA: Low-Rank Adaptation of Large Language Models" (2021)
-- Ouyang et al. "Training language models to follow instructions" (InstructGPT, 2022)
-- Dettmers et al. "QLoRA: Efficient Finetuning of Quantized LLMs" (2023)
-
-*Next: [LoRA, QLoRA, and PEFT](03-lora-qlora-peft.md)*
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
 
 ## The interview lens
 

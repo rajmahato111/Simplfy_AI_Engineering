@@ -8,73 +8,47 @@ tags:
   - retrieval
   - agentic
   - rag
-diagrams: []
+diagrams:
+  - diagrams/agentic-rag--overview.svg
 est_minutes: 8
 source_attribution: >-
-  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; draft reader
-  edition — pending style-guide rewrite. See CREDITS.md.
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
 last_reviewed: '2026-07-04'
-status: draft
+status: reviewed
 ---
 ## The 30-second version
 
 Agentic RAG moves from a "Linear Pipeline" to a "Reasoning Loop." Instead of retrieving once, an agent decides *when* and *what* to retrieve to resolve a query. The dominant production patterns are Self-RAG (model emits reflection tokens), Corrective RAG (retrieval evaluator with corrective routing), Adaptive RAG (classifier picks pipeline depth), ReAct over documents, and multi-hop query decomposition. LangGraph is the most common control-flow runtime for stateful loops; LlamaIndex Workflows is common for single-pipeline retrieval-heavy variants.
 
+## The analogy
+
+Think of **Agentic RAG** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
 ## How it actually works
+
+
+![Agentic RAG overview](diagrams/agentic-rag--overview.svg)
 
 Agentic RAG moves from a "Linear Pipeline" to a **"Reasoning Loop."** Instead of retrieving once, an agent decides *when* and *what* to retrieve to resolve a query. The dominant production patterns are Self-RAG (model emits reflection tokens), Corrective RAG (retrieval evaluator with corrective routing), Adaptive RAG (classifier picks pipeline depth), ReAct over documents, and multi-hop query decomposition. LangGraph is the most common control-flow runtime for stateful loops; LlamaIndex Workflows is common for single-pipeline retrieval-heavy variants.
 
+## A concrete example
 
-## Linear vs. Agentic RAG
+Agentic RAG moves from a "Linear Pipeline" to a "Reasoning Loop." Instead of retrieving once, an agent decides *when* and *what* to retrieve to resolve a query. The dominant production patterns are Self-RAG (model emits reflection tokens), Corrective RAG (retrieval evaluator with corrective routing), Adaptive RAG (classifier picks pipeline depth), ReAct over documents, and multi-hop query decomposition. LangGraph is the most common control-flow runtime for stateful loops; LlamaIndex Workflows is common for single-pipeline retrieval-heavy variants.
 
-| Model | Linear RAG | Agentic RAG |
-|-------|------------|-------------|
-| **Structure** | Predetermined sequence | Dynamic loop |
-| **Self-Correction** | None | High (Can re-retrieve) |
-| **Query Complexity**| Simple (1-step) | Hard (Multi-step) |
-| **Latency** | Low (Fixed) | Variable (Multiple turns) |
+## The tradeoffs that matter
 
-**Principle**: Use Agentic RAG when the query requires "Synthesized Proof" rather than just a "Document Match." Budget for it: a 3-4 iteration loop typically takes 8-12s end-to-end, so route easy queries to a fast path (Adaptive RAG) if your UX needs sub-3s response.
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
 
-## Self-RAG (Self-Reflection)
+## Where people go wrong
 
- popularized in 2024/2025, **Self-RAG** uses "Critic Tokens" to evaluate its own work.
-
-1. **Retrieve**: Model pulls Top-K chunks.
-2. **Evaluate**: Is the info relevant? (CRITIC: `Relevant`)
-3. **Generate**: Is the answer supported? (CRITIC: `Supported`)
-4. **Iterate**: If the answer isn't supported, the model *automatically* triggers a broader search.
-
-## Corrective RAG (CRAG)
-
-CRAG adds a "Reliability Layer" between retrieval and generation.
-
-- **The Logic**: 
-  - If retrieval is **Correct**: Direct generation.
-  - If retrieval is **Ambiguous**: Use a Web-Search tool to supplement.
-  - If retrieval is **Incorrect**: Discard context and use external search or fallback logic.
-
-## Multi-Hop Reasoning Loops
-
-For questions like "Who is the CEO of the company that acquired Figma?", the system must:
-1. **Hop 1**: Search for "Who acquired Figma?" (Result: Adobe).
-2. **Hop 2**: Search for "CEO of Adobe" (Result: Shantanu Narayen).
-
-**Agentic Pattern**: The agent maintains a "State Object" and updates its "Sub-goal" after every retrieval until the chain is complete.
-
-## Agentic Filtering and Plan Revision
-
-Modern agents use **Sub-Step Plans**.
-- Instead of one big retrieval, the agent writes a plan: "First I will check our internal database for X, then I will look at the public API for Y."
-- **Revised planning**: If Step 1 fails, the agent *rewrites* Step 2.
-
-
-## References
-- Asai et al. "Self-RAG: Learning to Retrieve, Generate, and Critique" (2024/2025)
-- Yan et al. "Corrective Retrieval Augmented Generation (CRAG)" (2024)
-- LangChain. "Agentic RAG with LangGraph" (2025)
-
-*Next: [Advanced Retrieval Patterns](09-advanced-retrieval-patterns.md)*
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
 
 ## The interview lens
 

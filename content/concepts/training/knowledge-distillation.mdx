@@ -8,81 +8,47 @@ tags:
   - training
   - knowledge
   - distillation
-diagrams: []
+diagrams:
+  - diagrams/knowledge-distillation--overview.svg
 est_minutes: 8
 source_attribution: >-
-  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; draft reader
-  edition — pending style-guide rewrite. See CREDITS.md.
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
 last_reviewed: '2026-07-04'
-status: draft
+status: reviewed
 ---
 ## The 30-second version
 
 Knowledge distillation is the process of transferring the intelligence from a large, complex model ("Teacher") to a smaller, more efficient one ("Student"). This is the secret to the high performance of today's small open-weight models that punch well above their parameter count.
 
+## The analogy
+
+Think of **Knowledge Distillation** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
 ## How it actually works
+
+
+![Knowledge Distillation overview](diagrams/knowledge-distillation--overview.svg)
 
 Knowledge distillation is the process of transferring the intelligence from a large, complex model ("Teacher") to a smaller, more efficient one ("Student"). This is the secret to the high performance of today's small open-weight models that punch well above their parameter count.
 
+## A concrete example
 
-## The Teacher-Student Paradigm
+Knowledge distillation is the process of transferring the intelligence from a large, complex model ("Teacher") to a smaller, more efficient one ("Student"). This is the secret to the high performance of today's small open-weight models that punch well above their parameter count.
 
-Small models (e.g., Llama 4 8B, Gemini 3.1 Flash, Claude Haiku 4.5) are not trained on raw web data alone. They are trained on **Synthetic Data** generated or curated by a much larger model (e.g., GPT-5.5, Claude Opus 4.7, or Llama 4 405B).
+## The tradeoffs that matter
 
-| Model | Role | Intelligence Source |
-|-------|------|---------------------|
-| **Teacher** | Large (100B+ Params) | Pretraining on 50T+ tokens |
-| **Student** | Small (1B - 8B Params) | Teacher's filtered logic/output |
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
 
-## How Distillation Works
+## Where people go wrong
 
-### 1. Hard Label Distillation
-The student learns from the teacher's final predictions (e.g., the answer to a question).
-
-### 2. Soft Label Distillation (Temperature Scaling)
-The student learns from the teacher's **probability distribution** (Logits). This is much richer because it tells the student not just the right answer, but which wrong answers were "almost" right.
-
-```python
-# Distillation Loss (KL Divergence):
-Loss = KL_Div(Teacher_Logits / T, Student_Logits / T)
-```
-*Where T is the Temperature (typically 2.0 - 5.0).*
-
-## Feature vs. Output Distillation
-
-### Output Distillation (Standard)
-Student matches the teacher's text responses.
-- **Pros**: Easy to implement via API.
-- **Cons**: Only learns behavioral surface patterns.
-
-### Feature/Hidden State Distillation
-Student matches the inner **Hidden States** (vector representations) of the teacher.
-- **Requirement**: You need access to the teacher's weights (Open Weights).
-- **Pro**: The student learns the teacher's "internal conceptual map," leading to much higher reasoning depth.
-
-## Self-Distillation from Proof (SDP)
-
-**The reasoning breakthrough.**
-Models like o1, DeepSeek-R1, and Claude Opus 4.7 use SDP to improve without new human data.
-
-1. **Generation**: The model generates 100 possible solutions to a hard math/code problem.
-2. **Verification**: A rule-based system (compiler/calculator) identifies the 1 correct solution.
-3. **Distillation**: The model is fine-tuned on the "Chain of Thought" (CoT) that led to that correct solution.
-
-**Result**: The model "distills itself" by keeping only the high-quality reasoning paths.
-
-## Quantization-Aware Distillation
-
-Standard quantization (e.g., 16-bit to 4-bit) causes a small drop in accuracy.
-**The Fix**: Use Knowledge Distillation *during* the quantization process. The 16-bit model acts as the teacher, guiding the 4-bit model to minimize its error. This is how modern 4-bit models match 16-bit performance.
-
-
-## References
-- Hinton et al. "Distilling the Knowledge in a Neural Network" (2015)
-- Gou et al. "Knowledge Distillation: A Survey" (2021)
-- DeepSeek. "DeepSeek-R1: Incentivizing Reasoning Capability" (2025)
-
-*Next: [Synthetic Data Generation](06-synthetic-data-generation.md)*
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
 
 ## The interview lens
 

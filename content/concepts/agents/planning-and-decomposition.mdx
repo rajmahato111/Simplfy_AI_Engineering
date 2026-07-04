@@ -9,72 +9,47 @@ tags:
   - planning
   - and
   - decomposition
-diagrams: []
+diagrams:
+  - diagrams/planning-and-decomposition--overview.svg
 est_minutes: 8
 source_attribution: >-
-  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; draft reader
-  edition — pending style-guide rewrite. See CREDITS.md.
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
 last_reviewed: '2026-07-04'
-status: draft
+status: reviewed
 ---
 ## The 30-second version
 
 Planning is the "System 2" component that allows agents to solve multi-stage problems without "wandering." Production agents have moved from simple "Chain-of-Thought" to Recursive Decomposition and Tree Search, with reasoning-native models (Claude Opus 4.7, GPT-5.5 extended thinking, DeepSeek-R2) doing the heavy planning internally.
 
+## The analogy
+
+Think of **Planning and Decomposition** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
 ## How it actually works
+
+
+![Planning and Decomposition overview](diagrams/planning-and-decomposition--overview.svg)
 
 Planning is the "System 2" component that allows agents to solve multi-stage problems without "wandering." Production agents have moved from simple "Chain-of-Thought" to **Recursive Decomposition** and **Tree Search**, with reasoning-native models (Claude Opus 4.7, GPT-5.5 extended thinking, DeepSeek-R2) doing the heavy planning internally.
 
+## A concrete example
 
-## The Planning Spectrum
+Planning is the "System 2" component that allows agents to solve multi-stage problems without "wandering." Production agents have moved from simple "Chain-of-Thought" to Recursive Decomposition and Tree Search, with reasoning-native models (Claude Opus 4.7, GPT-5.5 extended thinking, DeepSeek-R2) doing the heavy planning internally.
 
-| Method | Strategy | Complexity | Best For |
-|--------|----------|------------|----------|
-| **Linear** | One step at a time | Low | Simple tools |
-| **Branching** | If-Then-Else logic | Medium | Conditional flows |
-| **Hierarchical** | Master-Plan -> Sub-Plans | High | Software engineering |
-| **Search-Based** | Try multiple paths internally | Max | Scientific Research |
+## The tradeoffs that matter
 
-## Static vs. Dynamic Planning
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
 
-### Static (Plan-and-Solve)
-The agent writes a 10-step plan and follows it strictly.
-- **Pros**: High performance, easy to parallelize.
-- **Cons**: Brittle. If step 2 fails, steps 3-10 are useless.
+## Where people go wrong
 
-### Dynamic (Adaptive)
-The agent writes a plan, but **Re-evaluates** after every tool call.
-- **Best practice**: Use **Checkpointed Planning**. The agent is forced to "Commit" its progress to a state store after every major sub-goal to allow for recovery and "Backtracking" if the plan fails.
-
-## CoT and o1 Reasoning
-
-The model's internal "Thinking" window (Inference scaling) acts as a **Hidden Planner**.
-- Instead of using a separate "Planner LLM," we use a reasoning model (Claude Opus 4.7, GPT-5.5 extended thinking, DeepSeek-R2) to generate a "Mental Draft."
-- This draft is translated into a **Task DAG (Directed Acyclic Graph)** that the orchestrator executes.
-
-## Recursive Task Decomposition
-
-For massive tasks (e.g., "Build a full-stack app"), we use **Sub-Agent Spawning**.
-1. **Master Agent**: Decomposes "Project" into "Frontend," "Backend," and "DB."
-2. **Sub-Agents**: Each receives a "Sub-Goal" and performs its own decomposition.
-3. **Consolidation**: The Master Agent merges the results.
-
-**Critical Nuance**: Each sub-agent is given a **Minimal Context** (only what it needs) to prevent token bloat and hallucination.
-
-## Tree Search (MCTS)
-
-For high-stakes decisions, we use **Monte Carlo Tree Search (MCTS)** within the agent loop.
-- The agent "Simulates" 10 possible tool calls.
-- A **Reward Model** (or a separate LLM prompt) scores each simulation.
-- The agent follows the path with the highest reward.
-
-
-## References
-- Silver et al. "Mastering the game of Go with deep neural networks and tree search" (Applied to LLMs, 2024/2025)
-- Wang et al. "Self-Consistency Improves Chain of Thought Reasoning" (2022/2025 update)
-- LangGraph. "Multi-Agent Planning Patterns" (2025)
-
-*Next: [Error Handling and Recovery](07-error-handling-and-recovery.md)*
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
 
 ## The interview lens
 

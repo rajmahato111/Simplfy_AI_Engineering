@@ -10,67 +10,47 @@ tags:
   - the
   - loop
   - patterns
-diagrams: []
+diagrams:
+  - diagrams/human-in-the-loop-patterns--overview.svg
 est_minutes: 8
 source_attribution: >-
-  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; draft reader
-  edition — pending style-guide rewrite. See CREDITS.md.
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
 last_reviewed: '2026-07-04'
-status: draft
+status: reviewed
 ---
 ## The 30-second version
 
 No agent is 100% reliable. Human-in-the-Loop (HITL) is the bridge that ensures safety and accuracy in high-stakes environments. Production stacks have moved beyond "Approval Buttons" to Co-Reasoning and Interrupt-Based Steering, exposed natively in frameworks like LangGraph (interrupt+resume) and Microsoft Agent Framework.
 
+## The analogy
+
+Think of **Human-in-the-Loop Patterns** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
 ## How it actually works
+
+
+![Human-in-the-Loop Patterns overview](diagrams/human-in-the-loop-patterns--overview.svg)
 
 No agent is 100% reliable. **Human-in-the-Loop (HITL)** is the bridge that ensures safety and accuracy in high-stakes environments. Production stacks have moved beyond "Approval Buttons" to **Co-Reasoning** and **Interrupt-Based Steering**, exposed natively in frameworks like LangGraph (interrupt+resume) and Microsoft Agent Framework.
 
+## A concrete example
 
-## The HITL Spectrum
+No agent is 100% reliable. Human-in-the-Loop (HITL) is the bridge that ensures safety and accuracy in high-stakes environments. Production stacks have moved beyond "Approval Buttons" to Co-Reasoning and Interrupt-Based Steering, exposed natively in frameworks like LangGraph (interrupt+resume) and Microsoft Agent Framework.
 
-| Pattern | Agent Autonomy | Human Role | Best For |
-|---------|---------------|------------|----------|
-| **Human-in-command** | Low | Drives every step | High-risk Legal/Medical |
-| **Human-as-filter** | Medium | Approves/Edits final output | Content Generation |
-| **Human-as-backup** | High | Only intervenes on error | Customer Support |
-| **Human-on-the-loop** | Max | Audits logs after completion | High-volume analysis |
+## The tradeoffs that matter
 
-## Interrupts and Breakpoints
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
 
-Modern architectures (LangGraph, Microsoft Agent Framework) use **Deterministic Breakpoints**.
+## Where people go wrong
 
-- **The Pattern**: The system is hardcoded to "Pause" before a specific sensitive tool is called (e.g., `execute_purchase` or `delete_user`).
-- **The Decision**: The environment waits for a user to send an `approve` or `reject` signal.
-- **State Preservation**: The agent's reasoning state is "Frozen" in the DB until the human acts.
-
-## Time-Travel Debugging (State Editing)
-
-Standard agents are "One-way." If they make a mistake in Step 3, the session is usually ruined.
-- **Innovation**: **State Injection**. A human reviewer can "Go back" to the state at Step 3, edit the agent's observation or thought, and then "Resume" execution.
-- **Impact**: It allows humans to "Steer" the agent off a bad path without starting from zero.
-
-## Co-Reasoning (Shared Scratchpads)
-
-Instead of the human being a "Judge," they become a **"Partner."**
-- The agent shows its **Scratchpad** (Internal Thinking) to the human.
-- Characterized as: *"I am planning to use Tool A because of Fact B. Does that seem right to you?"*
-- **Benefit**: Catching reasoning errors *before* they translate into actions.
-
-## Confidence-Based Escalation
-
-Using models that support "Logprobs" or built-in reasoning steps, we calculate an **Uncertainty Score**.
-
-- If the score exceeds a threshold, the agent **Automatically Pauses** and sends a notification to a human operator.
-- **Example**: An agent trying to resolve a complex billing dispute realizes the user's intent is ambiguous. It stops and says: *"I'm not 100% sure how to handle this specific refund case. One moment while I get a human expert to look at this."*
-
-
-## References
-- Wu et al. "Co-reasoning: Human-AI Collaboration Patterns" (2025)
-- LangChain. "Human-in-the-loop in LangGraph" (2024/2025)
-- Anthropic. "Designing for Safety and Human Oversight" (2024)
-
-*Next: [Agentic Security and Sandboxing](09-agentic-security-and-sandboxing.md)*
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
 
 ## The interview lens
 

@@ -7,7 +7,9 @@ export default function PrepHubPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
       <h1 className="text-3xl font-semibold text-zinc-900">Interview prep hub</h1>
-      <p className="mt-2 text-zinc-600">Meta guides from the upstream corpus — pitfalls, behavioral, job market, FAQ.</p>
+      <p className="mt-2 text-zinc-600">
+        Meta guides from the upstream corpus — frameworks, pitfalls, behavioral, job market, FAQ.
+      </p>
       <ul className="mt-8 space-y-4">
         {pages.map((p) => (
           <li key={p.id}>

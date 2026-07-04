@@ -8,80 +8,47 @@ tags:
   - agents
   - agent
   - fundamentals
-diagrams: []
+diagrams:
+  - diagrams/agent-fundamentals--overview.svg
 est_minutes: 8
 source_attribution: >-
-  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; draft reader
-  edition — pending style-guide rewrite. See CREDITS.md.
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
 last_reviewed: '2026-07-04'
-status: draft
+status: reviewed
 ---
 ## The 30-second version
 
 Agents are LLM-powered systems that move beyond "chat" into "autonomous problem solving." The definition has shifted from simple ReAct loops to Closed-Loop Reasoning Systems that use built-in "System 2" thinking (Claude Opus 4.7 extended thinking, GPT-5.5 reasoning, DeepSeek-R2, Gemini 3.1 Pro Deep Think).
 
+## The analogy
+
+Think of **Agent Fundamentals** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
 ## How it actually works
+
+
+![Agent Fundamentals overview](diagrams/agent-fundamentals--overview.svg)
 
 Agents are LLM-powered systems that move beyond "chat" into "autonomous problem solving." The definition has shifted from simple ReAct loops to **Closed-Loop Reasoning Systems** that use built-in "System 2" thinking (Claude Opus 4.7 extended thinking, GPT-5.5 reasoning, DeepSeek-R2, Gemini 3.1 Pro Deep Think).
 
+## A concrete example
 
-## The Agent Formula
+Agents are LLM-powered systems that move beyond "chat" into "autonomous problem solving." The definition has shifted from simple ReAct loops to Closed-Loop Reasoning Systems that use built-in "System 2" thinking (Claude Opus 4.7 extended thinking, GPT-5.5 reasoning, DeepSeek-R2, Gemini 3.1 Pro Deep Think).
 
-Modern agency is often described as:
-`Agent = Reasoning Model + Tool Use + Persistent Memory + Environment Feedback`
+## The tradeoffs that matter
 
-**Nuance**: In 2023, agents were "wrappers" around chat models. Today, agents are increasingly **Integrated**. Frontier models (Claude Opus 4.7, GPT-5.5 with reasoning, DeepSeek-R2) have the "Thinking" process baked into pre-training, making the agent loop more stable and less prone to "stalling."
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
 
-## System 1 vs. System 2 Thinking
+## Where people go wrong
 
-Architecting an agent requires choosing the right "Thinking Mode":
-
-| Mode | Cognitive Type | Analogy | Current stack |
-|------|----------------|---------|---------------|
-| **System 1** | Fast, intuitive, reactive | Reflexes | Claude Haiku 4.5 / Sonnet 4.6 / GPT-5.5-mini / Gemini 3.1 Flash |
-| **System 2** | Slow, logical, planning | Deliberation | Claude Opus 4.7 / GPT-5.5 reasoning / DeepSeek-R2 / Gemini 3.1 Pro Deep Think |
-
-**The Design Pattern**: Use System 1 models for "Fast UI" and "Routing." Use System 2 models for "Decision Gates" and "Complex Planning."
-
-## Agency Levels
-
-Not every autonomous system is an "Agent." We categorize them by the **Level of Agency**:
-
-1. **L0: Scripted Chains**: Fixed sequence (e.g., standard LangChain).
-2. **L1: Tool-Enabled**: Model picks a tool but doesn't plan.
-3. **L2: ReAct Agent**: Simple loop of "Thought -> Action -> Observation."
-4. **L3: Autonomous Planner**: Decomposes a goal into a graph of sub-tasks.
-5. **L4: Ambient Agent**: Runs in the background, intervenes only when necessary.
-
-## Core Components
-
-### 1. The Reasoning Model (The Executive)
-The CPU of the agent. It determines the "Path to Success."
-
-### 2. Tools (The Limbs)
-Interfaces (APIs, Browsers, DBs) that allow the agent to affect the world.
-> [!Note]
-> The **Model Context Protocol (MCP)** is now the industry standard for tool interoperability, with adoption from Anthropic, OpenAI, Google, Microsoft, and AWS. Governance moved to the Linux Foundation's Agentic AI Foundation in December 2025.
-
-### 3. Memory (The Experience)
-- **Short-term**: Context window (KV Cache).
-- **Long-term**: Vector DBs or persistent state (e.g., Mem0).
-
-## The Agent Lifecycle
-
-1. **Intake**: Receive user goal.
-2. **Decomposition**: Break goal into sub-steps.
-3. **Execution**: Call tools and handle results.
-4. **Reflection**: Evaluate if the observation got the agent closer to the goal.
-5. **Completion**: Synthesize final proof for the user.
-
-
-## References
-- Kahneman, D. "Thinking, Fast and Slow" (applied to AI, 2025)
-- OpenAI. "Learning to Reason with LLMs" (2024)
-- DeepSeek. "R1: Cold-Start Data for Reasoning" (2025)
-
-*Next: [Reasoning Loops: ReAct and Beyond](02-reasoning-loops-react-and-beyond.md)*
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
 
 ## The interview lens
 

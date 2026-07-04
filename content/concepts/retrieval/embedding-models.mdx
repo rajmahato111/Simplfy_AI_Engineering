@@ -8,79 +8,47 @@ tags:
   - retrieval
   - embedding
   - models
-diagrams: []
+diagrams:
+  - diagrams/embedding-models--overview.svg
 est_minutes: 8
 source_attribution: >-
-  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; draft reader
-  edition — pending style-guide rewrite. See CREDITS.md.
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
 last_reviewed: '2026-07-04'
-status: draft
+status: reviewed
 ---
 ## The 30-second version
 
 Embedding models convert text into high-dimensional vectors. The frontier has moved past static single-vector representations to multi-resolution, late-interaction, and multimodal embeddings.
 
+## The analogy
+
+Think of **Embedding Models** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
 ## How it actually works
+
+
+![Embedding Models overview](diagrams/embedding-models--overview.svg)
 
 Embedding models convert text into high-dimensional vectors. The frontier has moved past static single-vector representations to **multi-resolution, late-interaction, and multimodal** embeddings.
 
+## A concrete example
 
-## The Embedding Frontier: Matryoshka Embeddings
+Embedding models convert text into high-dimensional vectors. The frontier has moved past static single-vector representations to multi-resolution, late-interaction, and multimodal embeddings.
 
-Traditionally, if you embedded text into 1,536 dimensions, you were stuck using all 1,536 dimensions for search. 
+## The tradeoffs that matter
 
-**Matryoshka Representation Learning (MRL)**
-- Models are trained to "store" the most important info in the first few dimensions.
-- **The Win**: You can embed at 1,536 dims, but index only the first **64 dims** for a "fast search" pass, then refine the top results with the full 1,536 dims.
-- **Efficiency**: 20x reduction in memory/index size with &lt;2% drop in accuracy.
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
 
-## Late Interaction: ColBERT v2
+## Where people go wrong
 
-Standard embeddings are "Bi-Encoders" (one vector per chunk). **ColBERT** (Contextualized Late Interaction over BERT) uses a "token-level" approach.
-
-- **How**: Instead of 1 vector per chunk, ColBERT stores 1 vector **per token**.
-- **Interaction**: At query time, the model compares every token in your query to every token in the documents (the "MaxSim" operation).
-- **Status**: ColBERT v2 (and successors like ColPali, ColQwen2.5, ColNomic for documents and pages-as-images) is drastically compressed via PLAID indexing, making it feasible for production. It achieves much higher precision for "needle in a haystack" technical queries.
-
-## Binary and Int8 Quantization
-
-Storing `float32` vectors is expensive. Production indexes lean heavily on **in-model quantization**.
-
-- **Binary Embeddings**: Convert vectors to 1s and 0s. 
-  - **Memory**: 32x reduction.
-  - **Speed**: Hamming distance (XOR operations) is 10x faster than Cosine similarity on modern CPUs.
-- **Int8/Int4**: Supported natively by models like `text-embedding-3-small`.
-
-## Model Selection Criteria
-
-| Model | Provider | Features | Context |
-|-------|----------|----------|---------|
-| **Gemini Embedding 001** | Google | Multimodal (text, image, video, audio, PDF), shared 3072-dim space, MTEB-English leader | 8k |
-| **Qwen3-Embedding-8B** | Open Source | MTEB-Multilingual leader, instruction-tuned, long-doc strength | 32k |
-| **Llama-Embed-Nemotron-8B** | NVIDIA | Top multilingual scores, open weights | 8k |
-| **Cohere Embed v4** | Cohere | Multimodal (text + image), Matryoshka, binary quantization | 128k |
-| **Voyage-Multimodal-3.5** | Voyage AI | Unified text/image, retrieval-tuned | 32k |
-| **OpenAI text-embedding-3-large** | OpenAI | Matryoshka, Native Int8, broad support | 8k |
-| **BGE-M3** | Open Source | Multilingual, multi-granularity (dense + sparse + late-interaction) | 8k |
-| **Jina-Embeddings-v3** | Jina AI | Late-interaction support, long context | 128k |
-
-Open-weight models (Qwen3, Llama-Embed-Nemotron, BGE) now match or beat the commercial APIs on pure MTEB scores. Pick commercial when you want managed infra and SLAs; pick open weights when cost-per-query at high volume matters more than latency floor.
-
-## Multimodal Embeddings
-
-Text-only RAG silently throws away the charts, tables, diagrams, and layout signal that often hold the answer. Modern stacks treat pages, screenshots, and figures as first-class retrieval objects:
-
-- **Unified vision-text embeddings**: Cohere Embed v4, Voyage-Multimodal-3.5, Gemini Embedding 001 all share a single vector space, so you can query "where is the emergency shutoff valve?" against schematics.
-- **Page-as-image with late interaction**: ColPali, ColQwen2.5, and ColNomic embed each page render directly, skipping fragile OCR and preserving visual hierarchy.
-- **CLIP-family models**: Still useful for image-heavy catalogs (e-commerce, media) where text-image alignment is the core signal.
-
-
-## References
-- Kusupati et al. "Matryoshka Representation Learning" (2022/2024 update)
-- Khattab et al. "ColBERT v1 & v2: Efficient Late Interaction" (2021/2023)
-- OpenAI. "Introducing New Embedding Models with Matryoshka Support" (2024)
-
-*Next: [Vector Databases](04-vector-databases.md)*
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
 
 ## The interview lens
 
