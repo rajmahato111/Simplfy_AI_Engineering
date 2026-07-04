@@ -34,6 +34,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run db:push
+      - run: npm run db:reindex
+      - run: npm run ingest:validate
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run validate:content

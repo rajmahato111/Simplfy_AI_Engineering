@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { searchContent } from "@/lib/search";
+import { searchContentHybrid } from "@/lib/search-hybrid";
 import { Badge } from "@/components/ui/badge";
 
 export const metadata: Metadata = {
@@ -13,7 +13,7 @@ type Props = { searchParams: Promise<{ q?: string }> };
 export default async function SearchPage({ searchParams }: Props) {
   const { q } = await searchParams;
   const query = q?.trim() ?? "";
-  const results = query ? searchContent(query) : [];
+  const results = query ? await searchContentHybrid(query) : [];
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">

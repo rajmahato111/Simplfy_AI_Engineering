@@ -1,0 +1,8 @@
+{
+  "mdx": [
+    "content/concepts/retrieval/rag-fundamentals.mdx",
+    "content/concepts/retrieval/chunking-strategies.mdx",
+    "content/walkthroughs/design-a-production-rag-system.mdx"
+  ],
+  "questions": "data/questions.json"
+}

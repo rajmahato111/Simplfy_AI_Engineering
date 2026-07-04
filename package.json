@@ -12,7 +12,9 @@
     "validate:content": "tsx scripts/content-render-qc.ts",
     "validate:frontmatter": "tsx scripts/validate-frontmatter.ts",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "db:reindex": "tsx scripts/rebuild-search-index.ts",
+    "ingest:validate": "tsx scripts/ingest-validate.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.2",
