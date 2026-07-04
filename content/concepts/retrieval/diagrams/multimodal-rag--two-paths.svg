@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="712" viewBox="0 0 1200 712" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN (8px grid)
+Canvas 1200x712 (content ends y=596; +116 QC headroom already included in H).
+Title center (600,44).
+
+Container 1 "Ingestion (offline)": x=32 y=76 w=824 h=232 (32..856, 76..308)
+  caption (48,98)
+  Row A y=120 h=64 (120..184) c_y=152
+    Document page image (green)  x=48  w=176 (48..224)  c=(136,152)
+    Vision-LLM extraction (violet) x=344 w=200 (344..544) c=(444,152)
+    Text index (green)           x=632 w=160 (632..792) c=(712,152)
+  Row B y=216 h=64 (216..280) c_y=248
+    Vision encoder + patches (violet) x=344 w=200 (344..544) c=(444,248)
+    Multi-vector index (green)        x=632 w=192 (632..824) c=(728,248)
+
+Container 2 "Query (online)": x=32 y=364 w=1136 h=232 (32..1168, 364..596)
+  caption (48,386)
+  Row1 y=404 h=64 (404..468) c_y=436
+    Text index search (indigo)  x=232 w=176 (232..408) c=(320,436)
+  Row2 y=500 h=64 (500..564) c_y=532
+    Visual index search (indigo) x=232 w=176 (232..408) c=(320,532)
+  Center row y=452 h=64 (452..516) c_y=484
+    Query (orange)              x=48  w=128 (48..176)   c=(112,484)
+    Fusion & rerank (yellow)    x=456 w=192 (456..648)  c=(552,484)
+    VLM Generator (violet)      x=712 w=176 (712..888)  c=(800,484)
+    Answer with citations (orange) x=952 w=176 (952..1128) c=(1040,484)
+
+Arrows (#475569, end 2px before target edge, one L-bend max):
+  I1 DocImage->VisionLLM        (224,152)->(342,152)
+  I2 DocImage->VisionEncoder    (136,184)->(136,248)->(342,248)   [branch down]
+  I3 VisionLLM->TextIndex       (544,152)->(630,152)
+  I4 VisionEncoder->MultiVecIdx (544,248)->(630,248)
+  Q1 Query->TextSearch          (176,484)->(176,436)->(230,436)
+  Q2 Query->VisualSearch        (176,484)->(176,532)->(230,532)
+  Q3 TextSearch->Fusion         (408,436)->(552,436)->(552,450)
+  Q4 VisualSearch->Fusion       (408,532)->(552,532)->(552,518)
+  Q5 Fusion->VLMGenerator       (648,484)->(710,484)
+  Q6 VLMGenerator->Answer       (888,484)->(950,484)
+  I5 TextIndex->TextSearch      (632,152)->(588,152)->(588,436)->(410,436)  [2-bend: right-margin
+      gap corridor avoids Multi-vector index box below it; verified collision-free]
+  I6 MultiVecIdx->VisualSearch  (824,248)->(900,248)->(900,532)->(410,532)  [2-bend: far-right
+      corridor (clear of VLM Generator) then a jog below the whole center row]
+
+Labels (12px #475569, white backing rect):
+  "text chunks"  rect(435,414,90,18) text(480,427), above Q3 line
+  "page images"  rect(435,536,90,18) text(480,549), below Q4 line
+-->
+  <rect width="1200" height="712" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="600" y="44" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">Two paths to a retrievable page</text>
+
+  <!-- group containers -->
+  <rect x="32" y="76" width="824" height="232" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="48" y="98" font-size="12" fill="#64748B">Ingestion (offline) — render each page, then choose a path</text>
+  <rect x="32" y="364" width="1136" height="232" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="48" y="386" font-size="12" fill="#64748B">Query (online)</text>
+
+  <!-- container 1 arrows -->
+  <line x1="224" y1="152" x2="342" y2="152" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <polyline points="136,184 136,248 342,248" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="544" y1="152" x2="630" y2="152" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="544" y1="248" x2="630" y2="248" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- container 2 arrows -->
+  <polyline points="176,484 176,436 230,436" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <polyline points="176,484 176,532 230,532" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <polyline points="408,436 552,436 552,450" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <polyline points="408,532 552,532 552,518" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="648" y1="484" x2="710" y2="484" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="888" y1="484" x2="950" y2="484" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <polyline points="632,152 588,152 588,436 410,436" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <polyline points="824,248 900,248 900,532 410,532" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- arrow labels (white backing) -->
+  <rect x="435" y="414" width="90" height="18" fill="#ffffff"/>
+  <text x="480" y="427" font-size="12" fill="#475569" text-anchor="middle">text chunks</text>
+  <rect x="435" y="536" width="90" height="18" fill="#ffffff"/>
+  <text x="480" y="549" font-size="12" fill="#475569" text-anchor="middle">page images</text>
+
+  <!-- Row A nodes -->
+  <rect x="48" y="120" width="176" height="64" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="136" y="149" font-size="14" fill="#064E3B" text-anchor="middle">Document<tspan x="136" dy="17">page image</tspan></text>
+
+  <rect x="344" y="120" width="200" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="444" y="149" font-size="14" fill="#2E1065" text-anchor="middle">Vision-LLM<tspan x="444" dy="17">extraction</tspan></text>
+
+  <rect x="632" y="120" width="160" height="64" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="712" y="157" font-size="14" fill="#064E3B" text-anchor="middle">Text index</text>
+
+  <!-- Row B nodes -->
+  <rect x="344" y="216" width="200" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="444" y="245" font-size="14" fill="#2E1065" text-anchor="middle">Vision encoder<tspan x="444" dy="17">+ patches</tspan></text>
+
+  <rect x="632" y="216" width="192" height="64" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="728" y="245" font-size="14" fill="#064E3B" text-anchor="middle">Multi-vector<tspan x="728" dy="17">index</tspan></text>
+
+  <!-- container 2 nodes -->
+  <rect x="48" y="452" width="128" height="64" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="112" y="489" font-size="14" fill="#7C2D12" text-anchor="middle">Query</text>
+
+  <rect x="232" y="404" width="176" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="320" y="433" font-size="14" fill="#1E1B4B" text-anchor="middle">Text index<tspan x="320" dy="17">search</tspan></text>
+
+  <rect x="232" y="500" width="176" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="320" y="529" font-size="14" fill="#1E1B4B" text-anchor="middle">Visual index<tspan x="320" dy="17">search</tspan></text>
+
+  <rect x="456" y="452" width="192" height="64" rx="10" fill="#FEFCE8" stroke="#CA8A04" stroke-width="1.5"/>
+  <text x="552" y="481" font-size="14" fill="#713F12" text-anchor="middle">Fusion &amp;<tspan x="552" dy="17">rerank</tspan></text>
+
+  <rect x="712" y="452" width="176" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="800" y="481" font-size="14" fill="#2E1065" text-anchor="middle">VLM<tspan x="800" dy="17">Generator</tspan></text>
+
+  <rect x="952" y="452" width="176" height="64" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="1040" y="481" font-size="14" fill="#7C2D12" text-anchor="middle">Answer<tspan x="1040" dy="17">with citations</tspan></text>
+</svg>

@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1152" height="520" viewBox="0 0 1152 520" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN (8px grid)
+Canvas 1152x520. Title center (576,44).
+Three containers, each w=320 h=296 y=80 (80..376), 64px gaps between:
+  Col1 (Bi-encoder)        x=32  -> 32..352,  caption (48,102)
+  Col2 (Late interaction)  x=416 -> 416..736, caption (432,102)
+  Col3 (Cross-encoder)     x=800 -> 800..1120, caption (816,102)
+
+Per-column internal template (X0 = container left edge), all straight vertical
+arrows, no bends, so no fan-out routing risk:
+  Query box:    x=X0+16  y=136 w=128 h=48
+  Document box: x=X0+176 y=136 w=128 h=48
+  Encoder box:  x=X0+16  y=208 w=288 h=48  (spans under both inputs)
+  2-line label: centered at column center x, white backing rect y=264 h=34
+  Score box:    x=X0+16  y=304 w=288 h=56
+
+Col1 (X0=32):    Query c=(112,160) Document c=(272,160) Encoder c=(192,232) Score c=(192,332)
+Col2 (X0=416):   Query c=(496,160) Document c=(656,160) Encoder c=(576,232) Score c=(576,332)
+Col3 (X0=800):   Query c=(880,160) Document c=(1040,160) Encoder c=(960,232) Score c=(960,332)
+
+Arrows per column (straight vertical, end 2px before target edge):
+  Query bottom (184) -> Encoder top (208-2=206)
+  Document bottom (184) -> Encoder top (206)
+  Encoder bottom (256) -> Score top (304-2=302)
+-->
+  <rect width="1152" height="520" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="576" y="44" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">The retrieval spectrum: when query and document interact</text>
+
+  <!-- ============ COLUMN 1: BI-ENCODER ============ -->
+  <rect x="32" y="80" width="320" height="296" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="48" y="102" font-size="12" fill="#64748B">Bi-encoder — ~10ms/query</text>
+
+  <line x1="112" y1="184" x2="112" y2="206" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="272" y1="184" x2="272" y2="206" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="192" y1="256" x2="192" y2="302" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="102" y="264" width="180" height="34" fill="#ffffff"/>
+  <text x="192" y="278" font-size="12" fill="#475569" text-anchor="middle">1 vector each</text>
+  <text x="192" y="294" font-size="12" fill="#475569" text-anchor="middle">doc precomputed offline</text>
+
+  <rect x="48" y="136" width="128" height="48" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="112" y="165" font-size="14" fill="#7C2D12" text-anchor="middle">Query</text>
+
+  <rect x="208" y="136" width="128" height="48" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="272" y="165" font-size="14" fill="#064E3B" text-anchor="middle">Document</text>
+
+  <rect x="48" y="208" width="288" height="48" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="192" y="237" font-size="14" fill="#1E1B4B" text-anchor="middle">Encode independently</text>
+
+  <rect x="48" y="304" width="288" height="56" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="192" y="337" font-size="14" fill="#2E1065" text-anchor="middle">Dot product</text>
+
+  <!-- ============ COLUMN 2: LATE INTERACTION (COLBERT) ============ -->
+  <rect x="416" y="80" width="320" height="296" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="432" y="102" font-size="12" fill="#64748B">Late interaction (ColBERT) — ~30–50ms</text>
+
+  <line x1="496" y1="184" x2="496" y2="206" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="656" y1="184" x2="656" y2="206" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="576" y1="256" x2="576" y2="302" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="486" y="264" width="180" height="34" fill="#ffffff"/>
+  <text x="576" y="278" font-size="12" fill="#475569" text-anchor="middle">N and M token vectors</text>
+  <text x="576" y="294" font-size="12" fill="#475569" text-anchor="middle">doc precomputed offline</text>
+
+  <rect x="432" y="136" width="128" height="48" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="496" y="165" font-size="14" fill="#7C2D12" text-anchor="middle">Query</text>
+
+  <rect x="592" y="136" width="128" height="48" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="656" y="165" font-size="14" fill="#064E3B" text-anchor="middle">Document</text>
+
+  <rect x="432" y="208" width="288" height="48" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="576" y="237" font-size="14" fill="#1E1B4B" text-anchor="middle">Encode independently</text>
+
+  <rect x="432" y="304" width="288" height="56" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="576" y="337" font-size="14" fill="#2E1065" text-anchor="middle">MaxSim (token-level)</text>
+
+  <!-- ============ COLUMN 3: CROSS-ENCODER ============ -->
+  <rect x="800" y="80" width="320" height="296" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="816" y="102" font-size="12" fill="#64748B">Cross-encoder — ~500ms+/pair</text>
+
+  <line x1="880" y1="184" x2="880" y2="206" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="1040" y1="184" x2="1040" y2="206" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="960" y1="256" x2="960" y2="302" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="870" y="264" width="180" height="34" fill="#ffffff"/>
+  <text x="960" y="278" font-size="12" fill="#475569" text-anchor="middle">single joint vector</text>
+  <text x="960" y="294" font-size="12" fill="#475569" text-anchor="middle">no precomputation</text>
+
+  <rect x="816" y="136" width="128" height="48" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="880" y="165" font-size="14" fill="#7C2D12" text-anchor="middle">Query</text>
+
+  <rect x="976" y="136" width="128" height="48" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="1040" y="165" font-size="14" fill="#064E3B" text-anchor="middle">Document</text>
+
+  <rect x="816" y="208" width="288" height="48" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="960" y="237" font-size="13" fill="#1E1B4B" text-anchor="middle">Joint encoder (full attn.)</text>
+
+  <rect x="816" y="304" width="288" height="56" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="960" y="337" font-size="14" fill="#2E1065" text-anchor="middle">Attention score</text>
+</svg>

@@ -1,153 +1,101 @@
 ---
-title: Vector Databases
+title: "Vector Databases: What They Actually Do Under the Hood"
 slug: vector-databases
 type: concept
 area: retrieval
 difficulty: intermediate
-tags:
-  - retrieval
-  - vector
-  - databases
+tags: [vector-databases, ann, hnsw, retrieval, rag]
 diagrams:
-  - diagrams/vector-databases--overview.svg
-est_minutes: 5
-source_attribution: >-
-  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
-  edition with interview lens. See CREDITS.md.
-last_reviewed: '2026-07-04'
-status: draft
+  - diagrams/vector-databases--query-path.svg
+est_minutes: 13
+source_attribution: "Factual basis: AI System Design Guide (MIT) by Om Bharatiya; rewritten and expanded. See CREDITS.md."
+last_reviewed: 2026-07-04
+status: reviewed
 ---
+
 ## The 30-second version
 
-Vector databases are purpose-built systems for storing, indexing, and searching high-dimensional embeddings. The market has split into Managed Serverless and Specialized High-Performance engines. We no longer ask "Does it support vector search?" (Postgres, Redis, and Mongo all do). We ask "Does it scale to 100M+ vectors with sub-100ms P99 and full metadata filtering?"
+A vector database stores embeddings and answers one question fast, over and over: "which of my millions of stored vectors are closest to this query vector?" The naive answer — compare the query to every stored vector — works fine at 10,000 rows and falls over at 10 million, because it's O(n): double the data, double the wait. Approximate Nearest Neighbor (ANN) indexes like HNSW (Hierarchical Navigable Small World) and IVF (Inverted File Index) trade a sliver of accuracy for sub-linear search time — the entire reason "vector database" is a category, not just a column type. Everything else — metadata filtering, namespaces, multi-tenancy — constrains that search to the right subset of rows without breaking the speed the index exists to provide. And the recurring decision isn't "which vendor" — it's whether you need a dedicated engine at all, or whether pgvector inside a database you already run is enough.
 
 ## The analogy
 
-Think of **Vector Databases** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+A vector database is a warehouse's internal routing system, and the vectors are pallets on the shelves.
+
+Picture a small warehouse where a worker eyeballs every pallet to find the one you need — brute-force search, fine until a few hundred thousand pallets make eyeballing take all day. A real fulfillment center builds routing signage instead: broad highway signs first ("aisles 1–50 this way"), then local aisle signs, then a specific shelf. That layered, always-narrowing signage is HNSW: search starts at a sparse top layer for big jumps, descends through denser layers, and lands near the right shelf in a handful of hops instead of a full walk. IVF zones the warehouse upfront by zip code instead: every pallet is pre-assigned to one of, say, 200 zones by nearest zone center, so a search only walks the zones likely to hold your item.
+
+Now the client cages. This warehouse serves multiple companies, and Acme's forklift driver must never load a Globex pallet — the metadata filter. Here's the trap: "grab any ten pallets, then throw back the ones that aren't Acme's" can come back with two pallets, or zero, if Acme's cage is small and scattered. The competent warehouse instead paints "Acme only" on the routing signage itself, narrowing the search *while* navigating — not after.
+
+And the last decision: build a dedicated, professionally run fulfillment center, or clear out a supply closet in the office you already have? A supply closet (pgvector bolted onto a Postgres you already run) is nearly free and plenty for a few hundred thousand pallets. A dedicated center (Pinecone, Qdrant, Weaviate, Milvus) is built for signage and client cages at a scale a closet was never designed for.
+
+| Warehouse element | Technical element |
+|---|---|
+| Worker eyeballing every pallet | Brute-force / flat search — exact, O(n) |
+| Highway signs, then aisle signs, then shelf | HNSW's layered graph — coarse-to-fine navigation |
+| Pre-assigning pallets to zip-code zones | IVF clustering (centroids, `nlist`/`nprobe`) |
+| "Acme only" painted on the routing signage | Metadata pre-filtering during the graph walk |
+| Grab ten, throw back the wrong ones | Post-filtering — can return too few or zero rows |
+| Client cage per company | Namespace / collection per tenant |
+| Office supply closet | pgvector inside a Postgres you already operate |
+| Dedicated fulfillment center | Purpose-built vector database (Pinecone, Qdrant, Weaviate, Milvus) |
 
 ## How it actually works
 
+![A query embedding and a metadata filter both feed the ANN index inside the vector database, which returns top-k IDs to the payload store for the final chunk text; a callout warns that filtering must happen during the graph walk, not after it](diagrams/vector-databases--query-path.svg)
 
-![Vector Databases overview](diagrams/vector-databases--overview.svg)
+Follow the diagram left to right. A query embedding arrives from the left and enters the ANN index directly — the geometry problem: find the nearest stored points. A metadata filter (tenant ID, date range, document type) arrives from above and feeds into that *same* index node, not a separate stage before or after it. That's deliberate: a competent vector database narrows the graph walk to allowed rows while navigating, never wasting hops on candidates the filter would reject anyway. Once the index returns a shortlist of top-k IDs, they cross into the payload store — the plain database beside the index holding the actual chunk text, since the index itself typically stores just enough per vector to compare and identify it. The payload store resolves IDs to text, and that becomes your top-k chunks, which feed a reranker in the [reranking chapter](./reranking-strategies.mdx).
 
-Vector databases are purpose-built systems for storing, indexing, and searching high-dimensional embeddings. The market has split into **Managed Serverless** and **Specialized High-Performance** engines. We no longer ask "Does it support vector search?" (Postgres, Redis, and Mongo all do). We ask **"Does it scale to 100M+ vectors with sub-100ms P99 and full metadata filtering?"**
+The red callout names the classic mistake: filter *after* the graph walk instead of during it. Run an unfiltered search for the top 10 neighbors, then discard anything failing the tenant check, and a narrow filter can leave you with 2 results, or 0 — the nearest neighbors overall were simply never near this tenant's slice of the space. Production-grade indexes fix this with filter-aware traversal: the walk itself only considers nodes satisfying the boolean constraint, at the cost of extra bookkeeping (bitmasks, SIMD-accelerated checks) to keep the filtered walk fast.
+
+Two index families dominate. **HNSW** builds a multi-layer graph — sparse at the top for long jumps, dense at the bottom where every vector lives — and search descends layer by layer, greedily moving to the closest neighbor. No training pass, good update support, excellent recall for its speed — at the cost of holding the whole graph in memory (roughly 1.5–2x raw vector size). **IVF** instead clusters vectors around centroids up front (`nlist` of them, often ~√n as a rule of thumb); a query only searches the `nprobe` nearest clusters — cheaper on memory but needing retraining as data shifts, with slightly lower recall. For disk-scale corpora, DiskANN keeps most of the graph on SSD and only a sliver in RAM, trading a few milliseconds of latency for a 90%+ cut in memory footprint.
 
 ## A concrete example
 
-Vector databases are purpose-built systems for storing, indexing, and searching high-dimensional embeddings. The market has split into Managed Serverless and Specialized High-Performance engines. We no longer ask "Does it support vector search?" (Postgres, Redis, and Mongo all do). We ask "Does it scale to 100M+ vectors with sub-100ms P99 and full metadata filtering?"
+Say you're indexing 20 million support-ticket chunks at 1,024 dimensions.
+
+- **Raw vector storage:** 20M × 1,024 dims × 4 bytes (float32) ≈ 82 GB.
+- **HNSW graph overhead:** roughly 1.5–2x raw size, so the index needs around 120–165 GB of RAM to serve comfortably — past what a single mid-size instance offers cheaply.
+- **Query latency, well-tuned:** single-digit to low-double-digit milliseconds at 95–99% recall, versus far higher latency for 100%-recall brute force at this scale.
+- **Filtered query for one of 500 tenants:** each tenant holds about 40,000 chunks — a needle-in-haystack filter that returns unusable counts under naive post-filtering, but works fine under filter-aware traversal or a per-tenant namespace.
+- **pgvector reality check:** brute-force pgvector is comfortable up to roughly a million vectors as a rule of thumb — 20 million rows and a 500-way tenant filter is well past what a Postgres extension without a serious ANN index was built for.
+
+Compare a smaller shop: 300,000 chunks, single tenant, already on Postgres — squarely inside pgvector's comfortable range, no new operational surface.
 
 ## The tradeoffs that matter
 
-| Choice | Upside | Cost |
-|--------|--------|------|
-| Simpler design | Faster to ship | Less resilient |
-| Heavier retrieval | Better grounding | More latency |
-| Bigger model | Higher quality | Higher $/query |
+| Approach | Query speed at scale | Memory / cost | Operational surface | Best fit |
+|---|---|---|---|---|
+| Flat / brute force | Slow past ~100K–1M vectors | Lowest (no index structure) | None — no index to tune | Small corpora, exact recall required |
+| HNSW | Very fast, excellent recall | High (graph lives in RAM) | Moderate — tune `M`, `ef_search` | Most production RAG at moderate-to-large scale |
+| IVF / IVF-PQ | Fast | Lower (clusters + quantization) | Higher — retraining as data drifts | Very large corpora, memory-constrained |
+| DiskANN | Fast, few ms latency penalty | Very low RAM (SSD-backed) | Specialized ops | Billion-scale, non-real-time acceptable |
+| pgvector in existing Postgres | Fine to ~1M rows | Compute-only, no new system | Lowest — one database to run | Small-to-mid scale, team already on Postgres |
+| Dedicated vector DB (Pinecone/Qdrant/Weaviate/Milvus) | Fast at any scale, native filtering | Managed pricing or self-host ops | New system, new on-call surface | Scale, heavy metadata filtering, multi-tenancy |
+
+The honest framing: an ANN index always trades a slice of recall (typically 95–99%, not 100%) for speed — a deliberate, tunable choice, not a bug. And pgvector-versus-dedicated-database really asks whether you have enough vectors, filtering complexity, and tenants that a purpose-built engine earns its operational cost. Below roughly a million vectors and modest filtering, the answer is usually no.
 
 ## Where people go wrong
 
-- Skipping evaluation and hoping demos generalize
-- Ignoring latency/cost until production traffic arrives
-- Treating retrieval quality as a generation problem
+1. **Post-filtering instead of pre-filtering.** Fetching top-k and discarding rows that fail a tenant check can silently return too few results, or none, on a narrow filter. Confirm the database filters *during* traversal.
+2. **Assuming ANN recall is 100%.** HNSW and IVF are approximate by design — usually 95–99%. For genuinely exact needs (audits, legal holds), a flat index on a small subset beats a "better" ANN configuration.
+3. **Reaching for a dedicated vector database by default.** At a few hundred thousand vectors, pgvector on infrastructure you already run is simpler and cheaper than a new stateful service.
+4. **Sizing memory only for vectors, forgetting index overhead.** HNSW's graph adds roughly 1.5–2x on top of raw vector storage; a plan accounting only for `dimensions × 4 bytes × count` runs out of RAM in production.
+5. **Sharing one index across tenants with no isolation strategy.** Metadata filtering works, but a bug can leak another tenant's data. High-security cases call for a namespace or collection per tenant, not a shared index with hope.
 
 ## The interview lens
 
-### Q: How would you choose between Pinecone and a self-hosted solution?
+Interviewers use this topic to check whether you understand *why* the category exists, not whether you've memorized a vendor chart.
 
-**Strong answer:**
-Decision depends on several factors:
+A strong sound bite: *"A vector database's job is turning an O(n) exact search into a sub-linear approximate one — I listen for whether a candidate understands the recall they're trading away, and whether metadata filtering happens during that search or bolted on after it."*
 
-**Choose Pinecone when:**
-- Team lacks ops capacity for stateful infrastructure
-- Need to move quickly (days not weeks)
-- Scale is moderate (under 100M vectors)
-- Budget allows managed service premium
-- Compliance allows cloud-vendor dependency
+Likely follow-ups:
 
-**Choose self-hosted (Qdrant, Milvus) when:**
-- Have Kubernetes and ops expertise
-- Cost sensitivity at scale
-- Need full control over data
-- Specific compliance requirements
-- Want to avoid vendor lock-in
-
-For most startups, I would start with Pinecone or Qdrant Cloud for velocity, then evaluate migration if costs become prohibitive at scale. The switching cost is moderate since vector DBs have similar APIs.
-
-### Q: Explain how HNSW works and when you would not use it.
-
-**Strong answer:**
-HNSW builds a hierarchical graph of vectors:
-
-**How it works:**
-1. Insert vectors as nodes in a multi-layer graph
-2. Higher layers have fewer nodes, larger jumps
-3. Search: start at top layer, greedily navigate to nearest neighbor
-4. Descend layers until bottom (all vectors)
-
-**Why it is good:**
-- O(log n) query complexity
-- No training required
-- Supports real-time updates
-- Excellent recall/latency tradeoff
-
-**When not to use:**
-- Very small datasets (&lt;10K): brute force is fine
-- Extremely memory constrained: HNSW uses 1.5-2x vector size for graph
-- Need exact search: HNSW is approximate
-- Heavy update workload with tight latency: updates can cause temporary degradation
-
-Alternatives:
-- IVF-PQ for memory constraints
-- DiskANN for billion-scale with cost efficiency
-- Flat index for exact search
-- LSH for very high-dimensional sparse vectors
-
-### Q: When would you use a Disk-based index (like DiskANN) over a RAM-based index (HNSW)?
-
-**Strong answer:**
-I would use a Disk-based index when the memory cost of the index exceeds the budget or the capacity of a single high-memory node. For example, a 100-million-vector index with 1536 dimensions would require nearly 1TB of RAM for HNSW. Using DiskANN, I can store the majority of that 1TB on NVMe SSDs, reducing the RAM requirement by 90-95% while maintaining sub-10ms query times. This represents a massive TCO (Total Cost of Ownership) reduction for non-real-time search applications.
-
-### Q: Why is metadata filtering often the bottleneck in vector databases?
-
-**Strong answer:**
-In naive vector search, we find the "Top K" nearest neighbors and THEN filter them by metadata (e.g., "only documents from 2024"). If the filter is very restrictive, we might find 0 results after filtering. Specialized databases now use **Pre-Filtering with HNSW**, traversing the graph but only considering nodes that satisfy the boolean metadata constraint. This is computationally expensive because it breaks the "short-circuit" logic of HNSW, requiring specialized bitmasks or hardware acceleration (SIMD) to keep latencies low.
-
-### Q: How do you handle multi-tenancy in a vector database?
-
-**Strong answer:**
-Three main approaches:
-
-**1. Metadata filtering (most common):**
-```python
-results = db.search(
-    vector=query,
-    filter={"tenant_id": current_tenant}
-)
-```
-- Pros: Simple, single index
-- Cons: All tenants share resources, potential for bugs exposing data
-
-**2. Collection per tenant:**
-```python
-results = db.collection(f"tenant_{tenant_id}").search(vector=query)
-```
-- Pros: Strong isolation, per-tenant scaling
-- Cons: Many collections, operational overhead
-
-**3. Namespace per tenant (Pinecone):**
-```python
-results = index.query(vector=query, namespace=tenant_id)
-```
-- Pros: Isolation within single index
-- Cons: Vendor-specific
-
-**I would choose:**
-- Metadata filtering for most cases (simple, cost-effective)
-- Separate collections for high-security requirements
-- Never post-filter (retrieve all, filter after) due to leakage risk
+- Walk me through what happens inside an HNSW search, layer by layer.
+- How would you support 10,000 tenants in one vector index without leaking data between them?
+- At what point would you migrate from pgvector to a dedicated vector database, and how would you do it with zero downtime?
 
 ## Go deeper
 
-- [Upstream chapter (Vector Databases)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/06-retrieval-systems/04-vector-databases.md)
-- Related questions in the [question bank](/questions)
-- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)
+- [Embedding Models](./embedding-models.mdx) — what actually goes into the vectors this chapter searches over.
+- [Hybrid Search](./hybrid-search.mdx) — combining this vector search with keyword search for exact-match queries.
+- [Production RAG at Scale](./production-rag-at-scale.mdx) — capacity planning and operations for indexes at this size.
+- Upstream reference: [Vector Databases — AI System Design Guide](https://github.com/ombharatiya/ai-system-design-guide/blob/main/06-retrieval-systems/04-vector-databases.md) (MIT; see [CREDITS](../../../CREDITS.md)).

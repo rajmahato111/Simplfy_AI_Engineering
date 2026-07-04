@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="576" viewBox="0 0 1200 576" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN (8px grid)
+Canvas 1200x576 (content ends y=464; QC headroom included in H).
+Title center (600,44).
+
+Container "Query path, cache-first, with fallback branches": x=24 y=88 w=1152 h=376 (24..1176, 88..464)
+  caption (40,110)
+  Row Top (cache hit)   y=120 h=64 (120..184) c_y=152
+    Cached answer (orange) x=232 w=152 (232..384) c=(308,152), directly above Cache check
+  Row Main (pipeline)   y=248 h=64 (248..312) c_y=280
+    Query (orange)            x=48  w=120 (48..168)   c=(108,280)
+    Cache check (yellow)      x=232 w=152 (232..384)  c=(308,280)
+    Hybrid retrieval (indigo) x=448 w=184 (448..632)  c=(540,280)
+    Rerank (violet)           x=696 w=112 (696..808)  c=(752,280)
+    Generate (violet)         x=872 w=112 (872..984)  c=(928,280)
+    Answer (orange)           x=1048 w=112 (1048..1160) c=(1104,280)
+  Row Bottom (empty-retrieval fallback) y=376 h=64 (376..440) c_y=408
+    Honest "not found" (red)  x=448 w=184 (448..632)  c=(540,408), directly below Hybrid retrieval
+
+Arrows (#475569, end 2px before target edge, one L-bend max):
+  A1 Query->CacheCheck        (168,280)->(230,280)
+  A2 CacheCheck->HybridRet    (384,280)->(446,280)
+  A3 HybridRet->Rerank        (632,280)->(694,280)
+  A4 Rerank->Generate         (808,280)->(870,280)
+  A5 Generate->Answer         (984,280)->(1046,280)
+  B1 CacheCheck->CachedAnswer (308,248)->(308,186) , upward, cache hit short-circuit
+  B2 HybridRet->NotFound      (540,312)->(540,374) , downward, empty-results honest fallback
+
+Labels (12px #475569, white backing rect):
+  "cache hit"      rect(263,200,90,18) text(308,213), beside B1
+  "empty results"  rect(485,332,110,18) text(540,345), beside B2
+-->
+  <rect width="1200" height="576" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="600" y="44" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">Production RAG: cache-first path with an honest-failure branch</text>
+
+  <!-- group container -->
+  <rect x="24" y="88" width="1152" height="376" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="40" y="110" font-size="12" fill="#64748B">Query path (online)</text>
+
+  <!-- main row arrows -->
+  <line x1="168" y1="280" x2="230" y2="280" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="384" y1="280" x2="446" y2="280" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="632" y1="280" x2="694" y2="280" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="808" y1="280" x2="870" y2="280" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="984" y1="280" x2="1046" y2="280" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- branch arrows -->
+  <line x1="308" y1="248" x2="308" y2="186" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="540" y1="312" x2="540" y2="374" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- branch labels -->
+  <rect x="263" y="200" width="90" height="18" fill="#ffffff"/>
+  <text x="308" y="213" font-size="12" fill="#475569" text-anchor="middle">cache hit</text>
+  <rect x="485" y="332" width="110" height="18" fill="#ffffff"/>
+  <text x="540" y="345" font-size="12" fill="#475569" text-anchor="middle">empty results</text>
+
+  <!-- Row Top node -->
+  <rect x="232" y="120" width="152" height="64" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="308" y="149" font-size="14" fill="#7C2D12" text-anchor="middle">Cached<tspan x="308" dy="17">answer</tspan></text>
+
+  <!-- Row Main nodes -->
+  <rect x="48" y="248" width="120" height="64" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="108" y="285" font-size="14" fill="#7C2D12" text-anchor="middle">Query</text>
+
+  <rect x="232" y="248" width="152" height="64" rx="10" fill="#FEFCE8" stroke="#CA8A04" stroke-width="1.5"/>
+  <text x="308" y="277" font-size="13" fill="#713F12" text-anchor="middle">Cache check<tspan x="308" dy="17">(~5-50ms)</tspan></text>
+
+  <rect x="448" y="248" width="184" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="540" y="277" font-size="13" fill="#1E1B4B" text-anchor="middle">Hybrid retrieval<tspan x="540" dy="17">(~150ms)</tspan></text>
+
+  <rect x="696" y="248" width="112" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="752" y="277" font-size="13" fill="#2E1065" text-anchor="middle">Rerank<tspan x="752" dy="17">(~150ms)</tspan></text>
+
+  <rect x="872" y="248" width="112" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="928" y="277" font-size="13" fill="#2E1065" text-anchor="middle">Generate<tspan x="928" dy="17">(~1.5-2.5s)</tspan></text>
+
+  <rect x="1048" y="248" width="112" height="64" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="1104" y="285" font-size="14" fill="#7C2D12" text-anchor="middle">Answer</text>
+
+  <!-- Row Bottom node -->
+  <rect x="448" y="376" width="184" height="64" rx="10" fill="#FEF2F2" stroke="#DC2626" stroke-width="1.5"/>
+  <text x="540" y="405" font-size="14" fill="#7F1D1D" text-anchor="middle">Honest<tspan x="540" dy="17">"not found"</tspan></text>
+</svg>

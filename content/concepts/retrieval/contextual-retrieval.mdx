@@ -1,80 +1,98 @@
 ---
-title: Contextual Retrieval
+title: "Contextual Retrieval: Give Every Chunk Its Address"
 slug: contextual-retrieval
 type: concept
 area: retrieval
 difficulty: intermediate
-tags:
-  - retrieval
-  - contextual
+tags: [contextual-retrieval, chunking, embeddings, bm25, prompt-caching, rag]
 diagrams:
-  - diagrams/contextual-retrieval--overview.svg
-est_minutes: 5
-source_attribution: >-
-  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
-  edition with interview lens. See CREDITS.md.
-last_reviewed: '2026-07-04'
-status: draft
+  - diagrams/contextual-retrieval--ingestion-pipeline.svg
+est_minutes: 11
+source_attribution: "Factual basis: AI System Design Guide (MIT) by Om Bharatiya; rewritten and expanded. See CREDITS.md."
+last_reviewed: 2026-07-04
+status: reviewed
 ---
+
 ## The 30-second version
 
-Contextual Retrieval is an ingestion-time technique that solves the #1 cause of RAG failure: chunks that lose meaning when separated from their source document. Pioneered by Anthropic in late 2024, it is now a production standard for high-precision retrieval. Anthropic's own measurements show a 49% reduction in retrieval failures with hybrid search alone, and 67% reduction when combined with reranking.
+Contextual retrieval is an ingestion-time fix for the single most common cause of RAG (Retrieval-Augmented Generation) failure: a chunk that made perfect sense inside its document loses that sense the moment it's cut out. "Approval requires two weeks' notice" is meaningless in isolation — notice for *what*? Contextual retrieval has an LLM (large language model) read the chunk alongside its full source document and write a short situating sentence ("this chunk is from Meridian Logistics' employee handbook, Section 6 on time-off requests, describing the manager approval workflow"), which gets prepended before the chunk is embedded and indexed for keyword search. Anthropic's published measurements: contextual embeddings alone cut retrieval failures 35%; adding contextual keyword search reaches 49%; adding a reranker on top reaches 67%. The technique costs money at ingestion — prompt caching brings that down by roughly 90% — and pays it back once, on every query, forever after.
 
 ## The analogy
 
-Think of **Contextual Retrieval** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+Think about a box of old family photographs with nothing written on the back.
+
+A single print showing a cake and some balloons tells you almost nothing on its own — whose birthday, which year, which house. Now imagine someone had gone through the box once and, on the back of each photo, written one line in pencil: "Grandma's 70th, our old kitchen, 1998." Suddenly a photo that was a mystery becomes searchable — you can find "the one from Grandma's 70th" by flipping through captions instead of squinting at every print. Writing those captions took an afternoon, once, for the whole box. Every time anyone searches afterward — this year, next year, for any reason — that one afternoon keeps paying for itself.
+
+That's the whole technique: the captioning pass happens once, at index time, and every query benefits forever. There's a cheap version too — if the photos already came in a labeled album with "1998 — Family" printed on each page, you can copy that printed label onto the back without anyone needing to look and think — a free, structural caption instead of a hand-written, judgment-based one.
+
+| Photo-box habit | Contextual retrieval element |
+|---|---|
+| An uncaptioned print, meaningless alone | A raw chunk, stripped of its document |
+| Writing one pencil caption per photo | LLM-generated context string per chunk |
+| The captioning afternoon, done once | Ingestion-time cost (paid once) |
+| Every future search benefiting from the captions | Every future query benefiting from the embedding |
+| Reading the caption to find "Grandma's 70th" | Contextual embedding match |
+| Also being able to search by handwriting on the caption itself | Contextual BM25 (keyword) match |
+| Copying a printed album label instead of writing a new caption | Contextual chunk headers (deterministic, no LLM) |
+| Photographing the whole box once instead of captioning | Prompt caching the full document across chunk calls |
 
 ## How it actually works
 
+The diagram follows one document through the ingestion pipeline and shows where the context string gets attached before the two indexes are built.
 
-![Contextual Retrieval overview](diagrams/contextual-retrieval--overview.svg)
+![Contextual retrieval ingestion pipeline: a document and its chunks both feed an LLM contextualizer, which prepends a situating string to each chunk before it is written to both a vector index and a BM25 index](diagrams/contextual-retrieval--ingestion-pipeline.svg)
 
-Contextual Retrieval is an ingestion-time technique that solves the #1 cause of RAG failure: **chunks that lose meaning when separated from their source document**. Pioneered by Anthropic in late 2024, it is now a production standard for high-precision retrieval. Anthropic's own measurements show a 49% reduction in retrieval failures with hybrid search alone, and 67% reduction when combined with reranking.
+**The problem it targets.** Chunk an employee handbook and a naive splitter might produce a chunk that just says "Approval requires two weeks' notice" — no "Meridian," no "time-off," no "manager." A user searching "how far in advance do I need to request vacation at Meridian" embeds a query full of exactly those missing words, and the embedding of "Approval requires two weeks' notice" sits nowhere near it in vector space. The chunk is correct. It's just unfindable.
+
+**The fix.** At ingestion, for every chunk, send the *full document* plus that one chunk to an LLM with a short instruction: write a succinct sentence situating this chunk within the document. The model returns something like "This chunk is from Meridian Logistics' Employee Handbook, Section 6 on Time-Off Requests, describing the manager approval workflow." That sentence gets prepended to the chunk's text — the version shown to the LLM at answer time is still the original, but the version that gets embedded and keyword-indexed now carries "Meridian," "time-off," and "manager approval" that the raw chunk never had.
+
+**Two indexes, same fix.** The context string helps both channels: **contextual embeddings** put the enriched chunk into a better neighborhood in vector space, and **contextual BM25** gives the keyword index the exact proper nouns and jargon a raw chunk would never match on. Both indexes build from the same contextualized text, then get queried together and combined with reciprocal rank fusion, same as any [hybrid search](./hybrid-search.mdx) setup — contextual retrieval is a preprocessing step underneath hybrid search, not a replacement for it.
+
+**The cost lever.** Sending the full document with every single chunk means paying for the document's tokens once per chunk. Prompt caching fixes this: cache the full document as a stable prefix, so only the small per-chunk instruction varies between calls, and the document's tokens get billed once instead of once per chunk — the difference between a one-time chore and a recurring bill.
 
 ## A concrete example
 
-Contextual Retrieval is an ingestion-time technique that solves the #1 cause of RAG failure: chunks that lose meaning when separated from their source document. Pioneered by Anthropic in late 2024, it is now a production standard for high-precision retrieval. Anthropic's own measurements show a 49% reduction in retrieval failures with hybrid search alone, and 67% reduction when combined with reranking.
+An 8,000-token internal wiki page gets split into 24 chunks (roughly 330 tokens each). Contextualizing every chunk needs one LLM call per chunk, each carrying the full 8,000-token document as input.
+
+Without caching: 24 calls × 8,000 input tokens ≈ 192,000 input tokens billed, plus 24 short outputs. Using a fast, cheap model once caching handles the shared document prefix, a 12,000-document knowledge base (the scale where this matters) costs on the order of $4 total to contextualize — versus roughly $25 with a mid-tier model and no caching discipline, or well over $120 with a frontier model on every chunk. The lever that matters is model choice plus caching, in that order: the context string is short and factual, so it doesn't need a frontier model's judgment, and caching removes the redundant document tokens that would otherwise dominate the bill — Anthropic's own benchmark reports roughly 90% cost reduction from caching alone.
+
+On quality: at knowledge-base scale, the same benchmark reports top-20 retrieval failure dropping from a 5.7% baseline to 3.7% with contextual embeddings alone (a 35% relative reduction), to 2.9% adding contextual BM25 (49% total), to 1.9% adding a reranker on top (67% total) — meaning roughly 1 in 18 queries failing to surface the right chunk becomes roughly 1 in 53.
 
 ## The tradeoffs that matter
 
-| Choice | Upside | Cost |
-|--------|--------|------|
-| Simpler design | Faster to ship | Less resilient |
-| Heavier retrieval | Better grounding | More latency |
-| Bigger model | Higher quality | Higher $/query |
+| Approach | Retrieval improvement | Cost | When to reach for it |
+|---|---|---|---|
+| Raw chunking (baseline) | — | None | Self-contained chunks (FAQ pairs, product cards) |
+| Contextual chunk headers (deterministic) | ~10–20% | None — no LLM call | Well-structured docs with real headings (Markdown, HTML) |
+| Contextual embeddings (LLM-generated) | ~35% | $ per chunk, one-time | Unstructured prose, ambiguous section boundaries |
+| + Contextual BM25 | ~49% cumulative | Marginal — same LLM call | Corpora with jargon, IDs, proper nouns dense-only search misses |
+| + Reranker | ~67% cumulative | Adds reranking latency per query | Retrieval failure rate still above your target after the above |
+
+The load-bearing distinction is *when* you pay. Contextual retrieval spends money at ingestion, once per chunk, ever. Query-time patterns like HyDE (see [advanced retrieval patterns](./advanced-retrieval-patterns.mdx)) spend money on every query. At 10,000 queries a day against a 50,000-chunk corpus, the ingestion cost amortizes into irrelevance; a per-query LLM call does not. That asymmetry is why the strongest systems do both — enrich documents once, and reserve query-time tricks for whatever still needs help after enrichment.
 
 ## Where people go wrong
 
-- Skipping evaluation and hoping demos generalize
-- Ignoring latency/cost until production traffic arrives
-- Treating retrieval quality as a generation problem
+1. **Reaching for a frontier model to write context strings.** The output is a short, factual, situating sentence — a fast, cheap model does this job as well as an expensive one. Save the frontier model's budget for something that needs judgment.
+2. **Sending the full document on every call without caching.** This is the single biggest avoidable cost in the whole technique — cache the document prefix once, don't re-bill it per chunk.
+3. **Applying it to chunks that were never ambiguous.** FAQ pairs and product cards are already self-contained; contextualizing them adds ingestion cost for a failure mode they don't have.
+4. **Treating it as a replacement for hybrid search or reranking.** Contextual retrieval makes both index channels better; it doesn't remove the need for fusion or reranking on top — the 67% figure only shows up with all three layered together.
+5. **Skipping the deterministic option when structure already exists.** If a document already has clean headings, prepending "Document: X / Section: Y" costs nothing and captures much of the same signal an LLM would generate — save the LLM call for genuinely unstructured text.
 
 ## The interview lens
 
-### Q: Explain Anthropic's Contextual Retrieval. When would you use it and when would you skip it?
+Interviewers use this topic to check whether you understand *why* a chunk fails to retrieve — not just that "adding context helps." The strong answer names context dilution specifically and can place the cost correctly against alternatives.
 
-**Strong answer:**
-Contextual Retrieval solves the "context dilution" problem in RAG. When documents are chunked, individual chunks lose the surrounding context that gives them meaning -- a chunk saying "It costs $200" is useless without knowing *what* costs $200. The technique uses an LLM at ingestion time to generate a short context string (50-100 tokens) per chunk, explaining what that chunk is about within the document. This context is prepended to the chunk before embedding and BM25 indexing.
+A strong sound bite: *"A chunk can be perfectly correct and still be unfindable, because it lost the words a query would actually use to look for it — so I write a short situating sentence per chunk at ingestion time, prepend it before embedding and before BM25 indexing, and pay for it once with prompt caching instead of paying a retrieval tax on every query forever."*
 
-The key results: Contextual Embeddings alone reduce retrieval failures by 35%. Adding Contextual BM25 achieves 49% reduction. Adding a reranker reaches 67% reduction.
+Likely follow-ups:
 
-I would use it when chunks regularly lose meaning in isolation -- legal contracts, financial reports, technical manuals. I would skip it when chunks are already self-contained (FAQs, product cards) or when the corpus is small enough for long-context RAG.
-
-### Q: A knowledge base of 50,000 documents needs Contextual Retrieval. How do you manage the ingestion cost?
-
-**Strong answer:**
-Three strategies:
-1. **Model selection**: Use a small, fast model (Claude Haiku-class) for contextualization. The output is short factual text, not creative writing -- a frontier model adds cost without quality gain.
-2. **Prompt caching**: Cache the full document text across all chunk contextualization calls. For a 10,000-token document with 30 chunks, this reduces input token costs by approximately 90%.
-3. **Tiered approach**: Not every document needs LLM contextualization. For well-structured documents (Markdown, HTML with headers), use deterministic Contextual Chunk Headers (prepending doc title + section hierarchy) which is free. Reserve LLM contextualization for unstructured or ambiguous documents.
-
-### Q: How does Contextual Retrieval compare to HyDE for improving retrieval quality?
-
-**Strong answer:**
-They solve different sides of the same problem. Contextual Retrieval enriches **documents** at ingestion time (pay once), while HyDE enriches **queries** at search time (pay per query). For a system handling 10,000 queries/day against a 50,000-chunk corpus, Contextual Retrieval is dramatically cheaper because the ingestion cost is amortized. HyDE also has a hallucination risk -- the hypothetical document might pull in wrong data. In practice, the strongest systems use both: Contextual Retrieval for ingestion enrichment and HyDE (or multi-query expansion) for complex queries that need query-side help.
+- Why does this help BM25 as much as embeddings? (BM25 needs the literal proper nouns and product names a raw chunk may not contain; the context string supplies them.)
+- How do you keep ingestion cost bounded at 50,000+ documents? (Cheap model for context generation, prompt-cache the document prefix, and skip LLM contextualization entirely for well-structured docs in favor of deterministic headers.)
+- How does this compare to HyDE? (Opposite side of the same problem — this enriches documents once at ingestion; HyDE enriches the query, and pays a cost on every request.)
 
 ## Go deeper
 
-- [Upstream chapter (Contextual Retrieval)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/06-retrieval-systems/10-contextual-retrieval.md)
-- Related questions in the [question bank](/questions)
-- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)
+- [Chunking Strategies](./chunking-strategies.mdx) — the splitting decision this technique sits downstream of.
+- [Hybrid Search](./hybrid-search.mdx) — the dense-plus-BM25 fusion this pipeline feeds.
+- [Advanced Retrieval Patterns](./advanced-retrieval-patterns.mdx) — the query-time counterparts (HyDE, multi-query) and how their cost profile differs.
+- Upstream reference: [Contextual Retrieval — AI System Design Guide](https://github.com/ombharatiya/ai-system-design-guide/blob/main/06-retrieval-systems/10-contextual-retrieval.md) (MIT; see [CREDITS](../../../CREDITS.md)).

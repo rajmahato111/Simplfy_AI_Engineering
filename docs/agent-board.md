@@ -8,7 +8,7 @@
 
 | ID | Tool | Branch | Status | Paths (locks) |
 |----|------|--------|--------|---------------|
-| _(none — pick up from content-review-plan.md)_ | | | | |
+| _(none — continue section rewrites per content-review-plan.md)_ | | | | |
 
 ---
 
@@ -16,23 +16,14 @@
 
 | PR | Task | Merged |
 |----|------|--------|
+| **#27** | Claude T-020–022: RAG cluster (13 hand-written chapters) | pending merge |
 | **#26** | Content review program, metadata fixes, 3 retrieval rewrites | 2026-07-04 |
 | **#25** | Content gaps: questions, MDX corpus, meta pages, whiteboard | 2026-07-04 |
 | #22 | Meta pages, Stripe/Pro, flashcards, study plan | 2026-07-04 |
+| #15 | T-001 Claude: Pilot content batch (retrieval) | 2026-07-04 |
 | #20 | P3: AI mock interviewer shell (SPIDER + scorecard) | 2026-07-04 |
 | #19 | Tier 5: Grounded tutor, SPIDER feedback, frameworks, T-003 brief | 2026-07-04 |
 | #18 | T-040–043: Glossary, patterns, 121-question bank ingest | 2026-07-04 |
-| #15 | T-001 Claude: Pilot content batch (retrieval) | 2026-07-04 |
-| #7 | P1 Vercel deploy readiness | 2026-07-04 |
-| #8 | P2 Reader polish (prev/next, SEO, sitemap) | 2026-07-04 |
-| #9 | P3 Auth skeleton | 2026-07-04 |
-| #10 | P4 Search | 2026-07-04 |
-| #11 | P5 Question bank shell | 2026-07-04 |
-| #12 | Tier 1: Postgres progress, question detail, landing polish | 2026-07-04 |
-| #13 | Tier 2: Ingest validate, Postgres FTS search, glossary/patterns | 2026-07-04 |
-| #14 | Tier 3: SPIDER practice, tutor chat shell, Stripe checkout stub | 2026-07-04 |
-| #16 | CI fix: db:reindex hang + progress E2E | 2026-07-04 |
-| #17 | CI fix: progress E2E server-action race | 2026-07-04 |
 
 ---
 
@@ -40,5 +31,5 @@
 
 | ID | Tool | Task |
 |----|------|------|
-| T-020–T-022 | Claude Code | RAG cluster expansion (blocked: token-out) |
 | T-030–T-032 | Claude Code | Agents content batch |
+| T-052+ | Cursor | Remaining MDX rewrites (non-retrieval sections) |

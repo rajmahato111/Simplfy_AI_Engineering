@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="992" height="664" viewBox="0 0 992 664" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN (8px grid)
+Canvas 992x664. Title center (496,44).
+Build container: x=32 y=80 w=440 h=136 (32..472, 80..216), caption (48,102)
+Query container: x=32 y=392 w=928 h=248 (32..960, 392..640), caption (48,414)
+
+Nodes (h=64):
+  Source documents (green)   x=48  w=152 y=120 -> 48..200,  c=(124,152)
+  Entity extractor (violet)  x=264 w=192 y=120 -> 264..456, c=(360,152)
+  Graph database (green)     x=264 w=192 y=280 -> 264..456, c=(360,312)
+  Community summaries (green)x=560 w=192 y=280 -> 560..752, c=(656,312)
+  Multi-hop question (orange)x=48  w=128 y=424 -> 48..176,  c=(112,456)
+  Local search (indigo)      x=264 w=192 y=424 -> 264..456, c=(360,456)
+  Generator A (violet)       x=512 w=128 y=424 -> 512..640, c=(576,456)
+  Whole-corpus q. (orange)   x=48  w=128 y=552 -> 48..176,  c=(112,584)
+  Global search (indigo)     x=560 w=192 y=552 -> 560..752, c=(656,584)
+  Generator B (violet)       x=816 w=128 y=552 -> 816..944, c=(880,584)
+
+Arrows (#475569, stop 2px short of target edge):
+  A1 docs->extractor      (200,152)->(262,152)
+  A2 extractor->graphdb   (360,184)->(360,278)   label "entities + edges"
+  A3 graphdb->summaries   (456,312)->(558,312)   label "communities" offset above line (was on-line, occluding it)
+  A4 qA->local            (176,456)->(262,456)
+  A5 local->genA          (456,456)->(510,456)
+  A6 local->graphdb READ  (360,424)->(360,346)   label "traverse 1-2 hops"
+  A7 qB->global           (176,584)->(558,584)
+  A8 global->genB         (752,584)->(814,584)
+  A9 global->summaries    (656,552)->(656,346)   label "read summaries"
+Cross-check: vertical x=656 spans y=346..552; row A nodes end at x=640; no crossings.
+-->
+  <rect width="992" height="664" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="496" y="44" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">GraphRAG: build once, search two ways</text>
+
+  <!-- containers -->
+  <rect x="32" y="80" width="440" height="136" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="48" y="102" font-size="12" fill="#64748B">Index time (offline)</text>
+  <rect x="32" y="392" width="928" height="248" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="48" y="414" font-size="12" fill="#64748B">Query time — two search modes</text>
+
+  <!-- arrows -->
+  <line x1="200" y1="152" x2="262" y2="152" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="360" y1="184" x2="360" y2="278" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="456" y1="312" x2="558" y2="312" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="176" y1="456" x2="262" y2="456" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="456" y1="456" x2="510" y2="456" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="360" y1="424" x2="360" y2="346" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="176" y1="584" x2="558" y2="584" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="752" y1="584" x2="814" y2="584" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="656" y1="552" x2="656" y2="346" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- arrow labels (white backing) -->
+  <rect x="368" y="222" width="110" height="18" fill="#ffffff"/>
+  <text x="372" y="235" font-size="12" fill="#475569">entities + edges</text>
+  <rect x="459" y="290" width="96" height="18" fill="#ffffff"/>
+  <text x="507" y="303" font-size="12" fill="#475569" text-anchor="middle">communities</text>
+  <rect x="368" y="370" width="122" height="18" fill="#ffffff"/>
+  <text x="372" y="383" font-size="12" fill="#475569">traverse 1–2 hops</text>
+  <rect x="664" y="431" width="104" height="18" fill="#ffffff"/>
+  <text x="668" y="444" font-size="12" fill="#475569">read summaries</text>
+
+  <!-- build nodes -->
+  <rect x="48" y="120" width="152" height="64" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="124" y="149" font-size="14" fill="#064E3B" text-anchor="middle">Source<tspan x="124" dy="17">documents</tspan></text>
+
+  <rect x="264" y="120" width="192" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="360" y="149" font-size="14" fill="#2E1065" text-anchor="middle">Entity + relation<tspan x="360" dy="17">extractor (LLM)</tspan></text>
+
+  <!-- stores -->
+  <rect x="264" y="280" width="192" height="64" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="360" y="309" font-size="14" fill="#064E3B" text-anchor="middle">Graph database<tspan x="360" dy="17">(nodes + edges)</tspan></text>
+
+  <rect x="560" y="280" width="192" height="64" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="656" y="309" font-size="14" fill="#064E3B" text-anchor="middle">Community<tspan x="656" dy="17">summaries</tspan></text>
+
+  <!-- query row A: local -->
+  <rect x="48" y="424" width="128" height="64" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="112" y="453" font-size="14" fill="#7C2D12" text-anchor="middle">Multi-hop<tspan x="112" dy="17">question</tspan></text>
+
+  <rect x="264" y="424" width="192" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="360" y="453" font-size="14" fill="#1E1B4B" text-anchor="middle">Local search<tspan x="360" dy="17">(entity + hops)</tspan></text>
+
+  <rect x="512" y="424" width="128" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="576" y="453" font-size="14" fill="#2E1065" text-anchor="middle">Generator<tspan x="576" dy="17">(LLM)</tspan></text>
+
+  <!-- query row B: global -->
+  <rect x="48" y="552" width="128" height="64" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="112" y="581" font-size="14" fill="#7C2D12" text-anchor="middle">Whole-corpus<tspan x="112" dy="17">question</tspan></text>
+
+  <rect x="560" y="552" width="192" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="656" y="581" font-size="14" fill="#1E1B4B" text-anchor="middle">Global search<tspan x="656" dy="17">(summaries)</tspan></text>
+
+  <rect x="816" y="552" width="128" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="880" y="581" font-size="14" fill="#2E1065" text-anchor="middle">Generator<tspan x="880" dy="17">(LLM)</tspan></text>
+</svg>
