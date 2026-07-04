@@ -9,7 +9,7 @@ const LINKS = [
   { href: "/learn", label: "Learn" },
   { href: "/questions", label: "Questions" },
   { href: "/practice", label: "Practice" },
-  { href: "/mock", label: "Mock interview" },
+  { href: "/mock", label: "Mock" },
   { href: "/tutor", label: "Tutor" },
   { href: "/search", label: "Search" },
   { href: "/dashboard", label: "Dashboard" },
