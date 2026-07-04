@@ -14,7 +14,8 @@ export function ChapterProgress({
   bookmarked: boolean;
   signedIn: boolean;
 }) {
-  const [pending, start] = useTransition();
+  const [bookmarkPending, startBookmark] = useTransition();
+  const [completePending, startComplete] = useTransition();
 
   if (!signedIn) {
     return (
@@ -31,8 +32,8 @@ export function ChapterProgress({
     <div className="flex flex-wrap items-center gap-3">
       <button
         type="button"
-        disabled={pending}
-        onClick={() => start(() => void toggleBookmark(slug, !bookmarked))}
+        disabled={bookmarkPending}
+        onClick={() => startBookmark(() => void toggleBookmark(slug, !bookmarked))}
         className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition ${
           bookmarked
             ? "border-brand bg-brand-muted text-brand"
@@ -43,8 +44,8 @@ export function ChapterProgress({
       </button>
       <button
         type="button"
-        disabled={pending}
-        onClick={() => start(() => void toggleComplete(slug, !completed))}
+        disabled={completePending}
+        onClick={() => startComplete(() => void toggleComplete(slug, !completed))}
         className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition ${
           completed
             ? "border-emerald-600 bg-emerald-50 text-emerald-800"

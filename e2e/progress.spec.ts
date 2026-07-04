@@ -8,15 +8,21 @@ test.describe("progress", () => {
     await page.getByRole("button", { name: /Continue as demo user/i }).click();
     await expect(page).toHaveURL(/\/dashboard/);
 
-    await page.goto("/learn/concepts/retrieval/rag-fundamentals");
+    const chapter = "/learn/concepts/retrieval/rag-fundamentals";
+
+    await page.goto(chapter);
     await page.getByRole("button", { name: "Bookmark" }).click();
-    await page.getByRole("button", { name: "Mark complete" }).click();
+    await page.goto(chapter);
     await expect(page.getByRole("button", { name: "Bookmarked" })).toBeVisible();
+    await page.getByRole("button", { name: "Mark complete" }).click();
+    await page.goto(chapter);
     await expect(page.getByRole("button", { name: "Completed ✓" })).toBeVisible();
 
     await page.goto("/dashboard");
-    await expect(page.getByText("RAG Fundamentals")).toBeVisible();
-    await expect(page.getByText("Bookmarked")).toBeVisible();
-    await expect(page.getByText("Done")).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: /RAG Fundamentals: Give Your LLM an Open Book/i }),
+    ).toBeVisible();
+    await expect(page.getByText("Bookmarked", { exact: true })).toBeVisible();
+    await expect(page.getByText("Done", { exact: true })).toBeVisible();
   });
 });
