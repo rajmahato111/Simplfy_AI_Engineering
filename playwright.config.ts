@@ -24,5 +24,9 @@ export default defineConfig({
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
+    env: {
+      AUTH_SECRET: process.env.AUTH_SECRET ?? "local-dev-secret",
+      NEXT_PUBLIC_SITE_URL: baseURL,
+    },
   },
 });
