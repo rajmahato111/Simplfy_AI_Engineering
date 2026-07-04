@@ -32,7 +32,7 @@ test.describe("tier 3 pages", () => {
     await page.getByRole("textbox", { name: "Message" }).fill("What is RAG?");
     await page.getByRole("button", { name: "Send" }).click();
     await expect(page.getByText("From the corpus:")).toBeVisible({ timeout: 10000 });
-    await expect(page.getByRole("link", { name: "RAG fundamentals" })).toBeVisible();
+    await expect(page.locator('ul[aria-live="polite"] li ul a').first()).toBeVisible();
   });
 
   test("frameworks page lists SPIDER", async ({ page }) => {

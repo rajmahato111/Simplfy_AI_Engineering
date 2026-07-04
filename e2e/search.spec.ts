@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 test.describe("search", () => {
   test("search page finds RAG content", async ({ page }) => {
     await page.goto("/search?q=RAG");
-    await expect(page.getByRole("heading", { name: "Search" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Search", exact: true })).toBeVisible();
     await expect(page.getByRole("main").getByRole("link").filter({ hasText: /RAG/i }).first()).toBeVisible();
   });
 

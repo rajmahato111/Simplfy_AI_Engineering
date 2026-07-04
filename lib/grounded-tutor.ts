@@ -13,15 +13,27 @@ export type TutorResponse = {
   citations: TutorCitation[];
 };
 
+function normalizeQuery(query: string) {
+  return query
+    .replace(/^(what is|what are|explain|tell me about|how does|how do)\s+/i, "")
+    .replace(/\?+$/, "")
+    .trim();
+}
+
 function mergeResults(query: string, limit: number) {
   const seen = new Set<string>();
   const merged: TutorCitation[] = [];
 
-  for (const r of [...searchContent(query, limit)]) {
+  for (const r of searchContent(query, limit + 5)) {
     if (seen.has(r.href)) continue;
     seen.add(r.href);
     merged.push({ title: r.title, href: r.href, excerpt: r.excerpt, type: r.type });
   }
+
+  merged.sort((a, b) => {
+    const rank = (t: string) => (t === "concept" || t === "walkthrough" ? 0 : t === "glossary" ? 1 : 2);
+    return rank(a.type) - rank(b.type);
+  });
 
   return merged.slice(0, limit);
 }
@@ -33,15 +45,30 @@ export async function answerTutorQuery(query: string): Promise<TutorResponse> {
     return { answer: "Ask a question about RAG, agents, evals, or system design.", citations: [] };
   }
 
-  const hybrid = await searchContentHybrid(q, 5);
-  const citations: TutorCitation[] = hybrid.length
-    ? hybrid.map((r) => ({
+  const normalized = normalizeQuery(q);
+  const searchTerms = [q, normalized].filter((term, i, arr) => term && arr.indexOf(term) === i);
+
+  let citations: TutorCitation[] = [];
+  for (const term of searchTerms) {
+    const hybrid = await searchContentHybrid(term, 5);
+    if (hybrid.length) {
+      citations = hybrid.map((r) => ({
         title: r.title,
         href: r.href,
         excerpt: r.excerpt,
         type: r.type,
-      }))
-    : mergeResults(q, 5);
+      }));
+      break;
+    }
+  }
+
+  if (!citations.length) citations = mergeResults(normalized || q, 5);
+  else {
+    citations.sort((a, b) => {
+      const rank = (t: string) => (t === "concept" || t === "walkthrough" ? 0 : t === "glossary" ? 1 : 2);
+      return rank(a.type) - rank(b.type);
+    });
+  }
 
   if (!citations.length) {
     return {
