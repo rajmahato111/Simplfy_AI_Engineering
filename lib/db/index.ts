@@ -15,3 +15,11 @@ export function getDb() {
 export function isDbConfigured() {
   return Boolean(process.env.DATABASE_URL);
 }
+
+/** Close the Postgres pool — required for CLI scripts to exit cleanly. */
+export async function closeDb() {
+  if (queryClient) {
+    await queryClient.end({ timeout: 5 });
+    queryClient = null;
+  }
+}
