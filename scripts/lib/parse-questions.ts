@@ -44,13 +44,47 @@ const SECTIONS: Array<{ re: RegExp; ctx: TopicContext }> = [
   },
 ];
 
+const STRONG_LABELS = [
+  "Strong answer covers",
+  "Strong answer structure",
+  "Strong answer framework",
+  "Strong answer",
+];
+
+const SAMPLE_LABELS = ["Sample Answer"];
+const FOLLOW_LABELS = ["Follow-up to expect", "Follow-ups", "Follow-up"];
+
+const RUBRIC_HEADERS =
+  "Sample Answer|Follow-up to expect|Follow-ups|Follow-up|Key insight to mention|Key insight|Requirements|What interviewers look for|Strong answer covers|Strong answer structure|Strong answer framework|Strong answer(?!\\s+framework)";
+
+function extractMultiline(afterHeader: string) {
+  const stopRe = new RegExp(`(?=\\n\\*\\*(?:${RUBRIC_HEADERS})|\\n---|\\n###)`);
+  const idx = afterHeader.search(stopRe);
+  return (idx < 0 ? afterHeader : afterHeader.slice(0, idx)).trim();
+}
+
 function extractBlock(body: string, label: string) {
-  const re = new RegExp(
-    `\\*\\*${label}(?:\\s+to\\s+expect)?(?:\\s+to\\s+mention)?:?\\*\\*\\s*\\n([\\s\\S]*?)(?=\\n\\*\\*|$)`,
+  const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const headerRe = new RegExp(
+    `\\*\\*${escaped}(?:\\s+to\\s+expect)?(?:\\s+to\\s+mention)?:?\\*\\*`,
     "i",
   );
-  const m = body.match(re);
-  return m ? m[1].trim() : "";
+  const m = body.match(headerRe);
+  if (!m || m.index === undefined) return "";
+  const after = body.slice(m.index + m[0].length);
+  if (/^\s*\n/.test(after)) {
+    return extractMultiline(after.replace(/^\s*\n+/, ""));
+  }
+  const inline = after.trimStart().split("\n")[0].trim();
+  return inline;
+}
+
+function extractFirstBlock(body: string, labels: string[]) {
+  for (const label of labels) {
+    const block = extractBlock(body, label);
+    if (block) return block;
+  }
+  return "";
 }
 
 function parseBullets(text: string) {
@@ -75,9 +109,75 @@ function parseNumbered(text: string) {
   return items.filter(Boolean);
 }
 
+function parseTableFirstColumn(text: string) {
+  const items: string[] = [];
+  let pastHeader = false;
+  for (const line of text.split("\n")) {
+    const trimmed = line.trim();
+    if (!/^\|.+\|$/.test(trimmed)) continue;
+    if (/^\|[\s-:|]+\|$/.test(trimmed)) {
+      pastHeader = true;
+      continue;
+    }
+    if (!pastHeader) continue;
+    const cells = trimmed
+      .split("|")
+      .map((c) => c.trim())
+      .filter(Boolean);
+    const first = cells[0]?.replace(/\*\*/g, "").trim();
+    if (first && !/^(factor|strategy|pattern|feature|metric)$/i.test(first)) items.push(first);
+  }
+  return items;
+}
+
+function parseBoldSections(text: string) {
+  const skip = /^(strong answer|sample|follow-up|key insight|requirements|what|when|critical principle)$/i;
+  const items: string[] = [];
+  for (const m of text.matchAll(/\*\*([^*\n]+?):\*\*/g)) {
+    const title = m[1].trim();
+    if (title.length < 4 || skip.test(title)) continue;
+    items.push(title);
+  }
+  return items;
+}
+
+function parseStrongAnswer(text: string) {
+  if (!text) return [];
+
+  const numbered = parseNumbered(text);
+  const bullets = parseBullets(text);
+  const tableRows = parseTableFirstColumn(text);
+  const boldSections = parseBoldSections(text);
+
+  if (numbered.length >= 2) {
+    return [...new Set([...numbered, ...bullets])];
+  }
+  if (bullets.length >= 2) return bullets;
+  if (tableRows.length >= 2) return tableRows;
+  if (boldSections.length >= 2) return [...new Set([...boldSections, ...bullets])];
+
+  const mixed = [...numbered, ...bullets, ...tableRows, ...boldSections];
+  return [...new Set(mixed)].filter(Boolean);
+}
+
+function parseFollowUps(raw: string) {
+  if (!raw) return [];
+  const bullets = parseBullets(raw);
+  if (bullets.length) return bullets;
+  const cleaned = raw.replace(/\*\*/g, "").trim();
+  const questions = cleaned.split(/(?<=\?)\s+/).map((s) => s.trim()).filter(Boolean);
+  if (questions.length > 1) return questions;
+  return [cleaned];
+}
+
 function excerpt(text: string, max = 480) {
   const flat = text.replace(/\*\*/g, "").replace(/\n+/g, " ").trim();
   return flat.length > max ? `${flat.slice(0, max)}…` : flat;
+}
+
+function capSample(text: string, max = 10_000) {
+  const trimmed = text.trim();
+  return trimmed.length > max ? `${trimmed.slice(0, max)}…` : trimmed;
 }
 
 function inferDifficulty(topic: string, upstreamId: string): Question["difficulty"] {
@@ -96,15 +196,6 @@ export function parseQuestionBank(md: string): Question[] {
   const slugUsed = new Set<string>();
   let topic: TopicContext = { slug: "general", label: "General" };
 
-  for (const line of md.split("\n")) {
-    const section = line.match(/^## (.+)/);
-    if (section) {
-      const hit = SECTIONS.find((s) => s.re.test(section[1]));
-      if (hit) topic = hit.ctx;
-    }
-  }
-
-  // Re-walk with section tracking inline
   topic = { slug: "general", label: "General" };
   const parts = md.split(/^### /m).slice(1);
 
@@ -118,7 +209,6 @@ export function parseQuestionBank(md: string): Question[] {
     const title = (qMatch ? qMatch[3] : sMatch![2]).trim();
     const body = part.slice(firstLine.length);
 
-    // Update topic from nearest preceding ## in full md — use part index
     const partStart = md.indexOf(`### ${firstLine}`);
     const before = md.slice(0, partStart);
     for (const line of before.split("\n")) {
@@ -130,16 +220,14 @@ export function parseQuestionBank(md: string): Question[] {
     }
 
     const looksFor = parseBullets(extractBlock(body, "What interviewers look for"));
-    let strong = parseNumbered(
-      extractBlock(body, "Strong answer covers") ||
-        extractBlock(body, "Strong answer structure") ||
-        extractBlock(body, "Strong answer framework"),
-    );
-    if (!strong.length) strong = parseBullets(extractBlock(body, "Strong answer covers"));
-
-    const sample = extractBlock(body, "Sample Answer") || extractBlock(body, "Strong answer");
+    const strongBlock = extractFirstBlock(body, STRONG_LABELS);
+    const strong = parseStrongAnswer(strongBlock);
+    let sample = extractFirstBlock(body, SAMPLE_LABELS);
+    if (!sample && strongBlock.length > 150) {
+      sample = strongBlock;
+    }
     const requirements = extractBlock(body, "Requirements");
-    const followRaw = extractBlock(body, "Follow-up to expect") || extractBlock(body, "Follow-ups");
+    const followRaw = extractFirstBlock(body, FOLLOW_LABELS);
     const keyInsight =
       extractBlock(body, "Key insight to mention") || extractBlock(body, "Key insight");
 
@@ -163,9 +251,10 @@ export function parseQuestionBank(md: string): Question[] {
       body_md: requirements || title,
       interviewer_looks_for: looksFor,
       strong_answer_covers: strong,
-      follow_ups: followRaw ? [followRaw.replace(/\*\*/g, "").trim()] : undefined,
+      follow_ups: followRaw ? parseFollowUps(followRaw) : undefined,
       key_insight: keyInsight ? excerpt(keyInsight, 320) : undefined,
       sample_answer_excerpt: sample ? excerpt(sample) : undefined,
+      sample_answer_md: sample ? capSample(sample) : undefined,
       status: "draft",
       source: "upstream",
     });

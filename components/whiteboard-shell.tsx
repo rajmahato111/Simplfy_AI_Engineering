@@ -1,11 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-export function WhiteboardShell() {
+type Props = {
+  prompt?: string;
+};
+
+export function WhiteboardShell({ prompt }: Props) {
   const [notes, setNotes] = useState("");
   const [critique, setCritique] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+
+  useEffect(() => {
+    if (prompt && !notes) setNotes(prompt);
+  }, [prompt, notes]);
 
   async function critiqueDiagram() {
     setPending(true);
@@ -24,12 +32,9 @@ export function WhiteboardShell() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl">
-      <p className="text-sm text-zinc-600">
-        Text whiteboard shell — describe your architecture in prose or ASCII. Excalidraw canvas ships next.
-      </p>
+    <div>
       <textarea
-        className="mt-4 w-full rounded-lg border border-zinc-300 p-4 font-mono text-sm"
+        className="w-full rounded-lg border border-zinc-300 p-4 font-mono text-sm"
         rows={12}
         placeholder="Client → API GW → RAG pipeline → LLM …"
         value={notes}
