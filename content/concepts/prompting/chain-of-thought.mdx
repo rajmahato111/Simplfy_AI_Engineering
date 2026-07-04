@@ -1,0 +1,72 @@
+---
+title: Chain-of-Thought (CoT)
+slug: chain-of-thought
+type: concept
+area: prompting
+difficulty: intermediate
+tags:
+  - prompting
+  - chain
+  - thought
+diagrams:
+  - diagrams/chain-of-thought--overview.svg
+est_minutes: 5
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The 30-second version
+
+Chain-of-Thought (CoT) is the technique of encouraging an LLM to generate intermediate reasoning steps before providing a final answer. It has evolved from a simple prompt phrase into the core architectural feature of reasoning models (o1, DeepSeek-R2, Claude Opus 4.7 with extended thinking, GPT-5.5 with extended thinking).
+
+## The analogy
+
+Think of **Chain-of-Thought (CoT)** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Chain-of-Thought (CoT) overview](diagrams/chain-of-thought--overview.svg)
+
+Chain-of-Thought (CoT) is the technique of encouraging an LLM to generate intermediate reasoning steps before providing a final answer. It has evolved from a simple prompt phrase into the core architectural feature of reasoning models (o1, DeepSeek-R2, Claude Opus 4.7 with extended thinking, GPT-5.5 with extended thinking).
+
+## A concrete example
+
+Chain-of-Thought (CoT) is the technique of encouraging an LLM to generate intermediate reasoning steps before providing a final answer. It has evolved from a simple prompt phrase into the core architectural feature of reasoning models (o1, DeepSeek-R2, Claude Opus 4.7 with extended thinking, GPT-5.5 with extended thinking).
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: Why does CoT improve performance on mathematical word problems?
+
+**Strong answer:**
+CoT improves performance by aligning the model's computational complexity with the task's logical complexity. In a standard single-pass generation, the model must predict the final answer token based on limited local information. With CoT, the model "breaks" the problem into smaller, auto-regressive steps. Each step uses the previous step's output as context, allowing the model's attention mechanism to focus on one sub-problem at a time (e.g., first adding the apples, then subtracting the oranges), reducing the "cognitive load" of the single-pass prediction.
+
+### Q: How do you handle CoT in a production environment where latency is critical?
+
+**Strong answer:**
+We use a **Hybrid Reasoning Architecture**:
+1. **Tier 1 (Fast)**: A classifier identifies if the query needs deep reasoning.
+2. **Tier 2 (Condensed CoT)**: We prompt the model with "Be concise in your reasoning," or use "Knowledge Distillation" where we train a smaller model to produce *only* the final answer while benefitting from a teacher's CoT-style pretraining. 
+3. **Tier 3 (Streaming)**: We stream the CoT to the user (if transparent) or a background process so the system can begin "pre-processing" the final result as it appears.
+
+## Go deeper
+
+- [Upstream chapter (Chain-of-Thought (CoT))](https://github.com/ombharatiya/ai-system-design-guide/blob/main/05-prompting-and-context/03-chain-of-thought.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

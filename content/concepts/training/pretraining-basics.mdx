@@ -1,0 +1,72 @@
+---
+title: Pretraining Basics
+slug: pretraining-basics
+type: concept
+area: training
+difficulty: beginner
+tags:
+  - training
+  - pretraining
+  - basics
+diagrams:
+  - diagrams/pretraining-basics--overview.svg
+est_minutes: 5
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The 30-second version
+
+Pretraining is the most computationally expensive phase of building an LLM, where a model learns general knowledge and language patterns from massive datasets.
+
+## The analogy
+
+Think of **Pretraining Basics** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Pretraining Basics overview](diagrams/pretraining-basics--overview.svg)
+
+Pretraining is the most computationally expensive phase of building an LLM, where a model learns general knowledge and language patterns from massive datasets.
+
+## A concrete example
+
+Pretraining is the most computationally expensive phase of building an LLM, where a model learns general knowledge and language patterns from massive datasets.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: Why train an 8B model on 15T tokens if Chinchilla says 160B tokens is optimal?
+
+**Strong answer:**
+Chinchilla optimality focuses on the best use of a fixed **training** compute budget. However, in production, we care about the **Total Cost of Ownership (TCO)**, which is dominated by inference. By overtraining a small model, we "bake in" more intelligence into fewer parameters. This results in a model that is significantly more efficient to serve (higher TPS, lower VRAM) while maintaining frontier-level quality.
+
+### Q: What is the "curriculum" in LLM pretraining?
+
+**Strong answer:**
+Curriculum refers to the order and mixture of data. A common modern pattern is:
+1. **General Knowledge Phase:** 80% of tokens (Web, Books).
+2. **Reasoning Focus Phase:** 15% tokens (Code, Math, Logic).
+3. **High-Quality "Cooling" Phase:** The last 1-5% of tokens are extremely high-quality, human-curated, or textbook data. This "cooling" phase helps the model jitter less and follow instructions better before any fine-tuning starts.
+
+## Go deeper
+
+- [Upstream chapter (Pretraining Basics)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/03-training-and-adaptation/01-pretraining-basics.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

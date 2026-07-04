@@ -67,7 +67,7 @@ export default async function LearnDocPage({ params }: Props) {
     },
   });
 
-  const { title, type, area, difficulty, est_minutes, source_attribution } =
+  const { title, type, area, difficulty, est_minutes, source_attribution, status } =
     doc.frontmatter;
   const { prev, next } = getAdjacentSlugs(slug);
 
@@ -106,10 +106,20 @@ export default async function LearnDocPage({ params }: Props) {
                 {title}
               </h1>
               <div className="mt-4 flex flex-wrap gap-2">
+                {status === "draft" && (
+                  <Badge className="border-amber-200 bg-amber-50 text-amber-900">Draft</Badge>
+                )}
                 {difficulty && <Badge className="capitalize">{difficulty}</Badge>}
                 {est_minutes && <Badge>{est_minutes} min read</Badge>}
                 <BadgeBrand>Free</BadgeBrand>
               </div>
+              {status === "draft" && (
+                <p className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+                  This chapter is a scaffold awaiting a full style-guide rewrite (analogy,
+                  numbers, interview lens, and a hand-authored diagram). See the retrieval
+                  pilots for the quality bar.
+                </p>
+              )}
               {source_attribution && (
                 <p className="mt-4 text-sm leading-relaxed text-zinc-500">
                   {source_attribution}

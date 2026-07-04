@@ -1,0 +1,80 @@
+---
+title: Computer-Use Agents
+slug: computer-use-agents
+type: concept
+area: tool-use
+difficulty: intermediate
+tags:
+  - tool-use
+  - computer
+  - use
+  - agents
+diagrams:
+  - diagrams/computer-use-agents--overview.svg
+est_minutes: 5
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The 30-second version
+
+Computer-use agents let an LLM see a screen, reason about it, and act through mouse clicks and keystrokes -- the same way a human operates a computer. Instead of calling structured APIs, the model works with raw pixels. This chapter covers how they work, when they beat traditional automation, and how to design production systems around them.
+
+## The analogy
+
+Think of **Computer-Use Agents** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Computer-Use Agents overview](diagrams/computer-use-agents--overview.svg)
+
+Computer-use agents let an LLM see a screen, reason about it, and act through mouse clicks and keystrokes -- the same way a human operates a computer. Instead of calling structured APIs, the model works with raw pixels. This chapter covers how they work, when they beat traditional automation, and how to design production systems around them.
+
+## A concrete example
+
+Computer-use agents let an LLM see a screen, reason about it, and act through mouse clicks and keystrokes -- the same way a human operates a computer. Instead of calling structured APIs, the model works with raw pixels. This chapter covers how they work, when they beat traditional automation, and how to design production systems around them.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: A client has 500 insurance claim PDFs per day that must be entered into a legacy web portal with no API. Design a system using computer-use agents.
+
+**Strong answer:**
+I would build a pipeline with three stages. First, a document processing stage using an LLM to extract structured data from the PDFs (claim number, claimant name, amounts, dates). Second, a computer-use agent stage where each claim is processed by a Claude Computer Use agent running in an isolated Docker container with a virtual display. The agent navigates the web portal, fills in the form fields using the extracted data, and captures a confirmation screenshot after submission. Third, a verification stage that uses a separate LLM call to compare the confirmation screenshot against the expected data to catch any entry errors.
+
+For scale, I would run 10-20 containers in parallel, each processing claims sequentially. At roughly 2 minutes per claim with the agent, 20 containers handle 600 claims per 8-hour day. I would add a dead-letter queue for claims that fail after 3 retries, with human review.
+
+Cost at $0.50 per claim (roughly 20 actions at $0.025 each) means $250/day for 500 claims -- likely cheaper than the manual data entry team it replaces.
+
+### Q: Compare computer-use agents with Selenium for web automation. When would you choose each?
+
+**Strong answer:**
+Selenium interacts with the DOM directly -- it is fast, deterministic, and cheap. But it breaks when selectors change, gets blocked by anti-bot systems, and cannot handle tasks requiring visual judgment.
+
+Computer-use agents are 100x slower and 10x more expensive per action, but they adapt to UI changes because they work with pixels rather than selectors. They handle anti-bot detection better because they generate human-like interaction patterns. And they can reason about visual layouts -- verifying a chart rendered correctly or reading content from a canvas element that Selenium cannot inspect.
+
+I would choose Selenium for high-volume, stable workflows where the target site is under my control. I would choose computer-use agents for one-off tasks, third-party sites that change frequently, cross-application desktop workflows, and any task where the human cost of maintaining selectors exceeds the LLM inference cost.
+
+The best production systems use both: Playwright handles the predictable steps (authentication, navigation), and the computer-use agent handles the dynamic steps (interpreting results, making judgment calls).
+
+## Go deeper
+
+- [Upstream chapter (Computer-Use Agents)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/17-tool-use-and-computer-agents/04-computer-use-agents.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

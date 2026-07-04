@@ -1,0 +1,73 @@
+---
+title: FinOps and Token Economics
+slug: finops-and-token-economics
+type: concept
+area: mlops
+difficulty: intermediate
+tags:
+  - mlops
+  - finops
+  - and
+  - token
+  - economics
+diagrams:
+  - diagrams/finops-and-token-economics--overview.svg
+est_minutes: 5
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The 30-second version
+
+This chapter is about the economics and discipline of running LLMs at scale: how to model, attribute, budget, and structurally reduce AI spend. It is not a rehash of inference internals; for the tactical levers (quantization, batching, speculative decoding, KV cache) see [Cost Optimization Playbook](../04-inference-optimization/07-cost-optimization-playbook.md) and the [inference chapters](../04-inference-optimization/01-inference-fundamentals.md).
+
+## The analogy
+
+Think of **FinOps and Token Economics** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![FinOps and Token Economics overview](diagrams/finops-and-token-economics--overview.svg)
+
+This chapter is about the **economics and discipline** of running LLMs at scale: how to model, attribute, budget, and structurally reduce AI spend. It is not a rehash of inference internals; for the tactical levers (quantization, batching, speculative decoding, KV cache) see [Cost Optimization Playbook](../04-inference-optimization/07-cost-optimization-playbook.md) and the [inference chapters](../04-inference-optimization/01-inference-fundamentals.md).
+
+The anchor finding that frames the whole chapter, from Datadog's 2026 State of AI Engineering: **system prompts are about 69% of input tokens, yet only about 28% of calls use prompt caching.** The single largest, lowest-effort cost lever in most production stacks is sitting unused. AI products also run as a cost-of-goods business, not zero-marginal-cost SaaS, so margin thinking is now an engineering concern.
+
+## A concrete example
+
+This chapter is about the economics and discipline of running LLMs at scale: how to model, attribute, budget, and structurally reduce AI spend. It is not a rehash of inference internals; for the tactical levers (quantization, batching, speculative decoding, KV cache) see [Cost Optimization Playbook](../04-inference-optimization/07-cost-optimization-playbook.md) and the [inference chapters](../04-inference-optimization/01-inference-fundamentals.md).
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: Your LLM bill doubled month over month with flat traffic. How do you find and fix it?
+
+**Strong answer:**
+First, attribution: if every call is not tagged by feature, team, model, and route through a gateway or proxy, that is the first fix, because you cannot debug what you cannot see. With attribution I would break spend into the token-spend layers and look for the usual culprits: a prompt change that broke cache-hit rate (the system prompt is ~69% of input tokens, so a cache regression is huge), extended thinking switched on for simple tasks (billed at the output rate and invisible in the response), an agent loop whose step count crept up, unbounded output or conversation history, or a retry storm. The highest-ROI fix is almost always restoring prompt caching, then right-sizing the model and capping output. I would also move any offline work (evals, backfills) to the batch API for roughly half off, and set per-feature budgets with spike alerts so the next doubling pages someone on day one.
+
+### Q: Why do AI products have worse gross margins than SaaS, and what do engineers do about it?
+
+**Strong answer:**
+Because every request carries a variable token cost, so an AI product behaves like a cost-of-goods business rather than zero-marginal-cost software; reported margins run roughly 25-30 points below typical SaaS. Engineers attack it on two fronts. Structurally: cache the static prompt prefix, right-size and cascade models, prefer RAG to long-context stuffing, distill high-volume narrow tasks onto a small model, and batch the offline tier. Operationally: instrument unit economics (cost per conversation, per resolved outcome) so pricing can move toward outcome-based models, which only works if you know your cost per resolution. The cost levers are an engineering responsibility, not just a finance one.
+
+## Go deeper
+
+- [Upstream chapter (FinOps and Token Economics)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/11-infrastructure-and-mlops/04-finops-and-token-economics.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

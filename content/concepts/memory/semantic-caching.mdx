@@ -1,0 +1,69 @@
+---
+title: Semantic Caching
+slug: semantic-caching
+type: concept
+area: memory
+difficulty: intermediate
+tags:
+  - memory
+  - semantic
+  - caching
+diagrams:
+  - diagrams/semantic-caching--overview.svg
+est_minutes: 5
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The 30-second version
+
+Caching has evolved from exact string matching to Semantic Matching. Semantic caching reduces costs by 30-70% and cuts latency from seconds to milliseconds by reusing completions for "equivalent" queries.
+
+## The analogy
+
+Think of **Semantic Caching** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Semantic Caching overview](diagrams/semantic-caching--overview.svg)
+
+Caching has evolved from exact string matching to **Semantic Matching**. Semantic caching reduces costs by **30-70%** and cuts latency from seconds to milliseconds by reusing completions for "equivalent" queries.
+
+## A concrete example
+
+Caching has evolved from exact string matching to Semantic Matching. Semantic caching reduces costs by 30-70% and cuts latency from seconds to milliseconds by reusing completions for "equivalent" queries.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: What is "Semantic Drift" in caching, and how do you prevent it?
+
+**Strong answer:**
+Semantic Drift occurs when the similarity threshold is too loose (e.g., 0.8 instead of 0.95). A query like *"How do I fix my car?"* might match a cached response for *"How do I wash my car?"*. To prevent this, we use **Multi-Stage Validation**: 1) Vector similarity check, 2) **Entity-Match check** (ensures both queries involve "Car" and the same "Verb"), and 3) **Threshold Tightening**: for technical or medical queries, we require $>0.98$ similarity to return a cached result.
+
+### Q: Why is a Semantic Cache sometimes *more* expensive than a raw LLM call at low volume?
+
+**Strong answer:**
+Because a semantic cache requires its own **Embedding API call** and **Vector Search query**. If the embedding model costs $0.02 and the search takes 100ms, and your primary LLM call is only $0.05 and takes 500ms, the relative savings are small. Semantic caching only becomes a significant win at **High Scale** (millions of requests) where the cache hit rate is high enough to offset the "Embedding Tax" and drastically reduce aggregate latency.
+
+## Go deeper
+
+- [Upstream chapter (Semantic Caching)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/08-memory-and-state/05-semantic-caching.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

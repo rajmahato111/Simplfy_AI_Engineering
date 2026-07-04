@@ -1,0 +1,128 @@
+---
+title: Tokenization Deep Dive
+slug: tokenization-deep-dive
+type: concept
+area: foundations
+difficulty: beginner
+tags:
+  - foundations
+  - tokenization
+  - deep
+  - dive
+diagrams:
+  - diagrams/tokenization-deep-dive--overview.svg
+est_minutes: 5
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The 30-second version
+
+Tokenization is the process of converting text into discrete units (tokens) that models can process. It directly impacts model capabilities, costs, and performance.
+
+## The analogy
+
+Think of **Tokenization Deep Dive** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Tokenization Deep Dive overview](diagrams/tokenization-deep-dive--overview.svg)
+
+Tokenization is the process of converting text into discrete units (tokens) that models can process. It directly impacts model capabilities, costs, and performance.
+
+## A concrete example
+
+Tokenization is the process of converting text into discrete units (tokens) that models can process. It directly impacts model capabilities, costs, and performance.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: Why does GPT-4 struggle with simple character counting?
+
+**Strong answer:**
+Tokenization converts text to subword units, not characters. When asked "How many 'r's in strawberry?", the model sees tokens like ["str", "aw", "berry"] rather than individual letters.
+
+The model has to reason about the internal structure of tokens it does not directly observe. This requires memorizing or computing character compositions of tokens, which is an emergent capability that is not always reliable.
+
+The solution is to prompt the model to spell out the word character by character first, then count. This forces the creation of character-level tokens.
+
+### Q: How would you estimate token count for cost planning?
+
+**Strong answer:**
+For rough estimation: multiply word count by 1.3 for English text.
+
+For accurate counting: Use the model-specific tokenizer.
+- OpenAI: tiktoken library
+- Others: transformers AutoTokenizer
+
+Important considerations:
+- Non-English text uses 1.5-3x more tokens
+- Code and structured data tokenize inefficiently
+- Always budget extra for output tokens (typically priced higher)
+- Include system prompts and formatting tokens
+
+For production cost estimation, I sample real requests and measure actual token usage, then apply safety margins.
+
+### Q: What happens when switching tokenizers between models?
+
+**Strong answer:**
+Every model family has its own tokenizer. You cannot reuse tokens across models because:
+
+1. **Vocabulary differs:** Token IDs mean different strings
+2. **Merge rules differ:** Same text splits differently
+3. **Special tokens differ:** Chat formatting varies
+
+Practical implications:
+- Always use the correct tokenizer for token counting
+- Cached embeddings are model-specific
+- Prompt templates need per-model adjustment
+- Fine-tuned models inherit their base tokenizer
+
+### Q: How do you handle tokenization for RAG chunking?
+
+**Strong answer:**
+Key considerations:
+
+1. **Chunk at token boundaries:** Splitting mid-token corrupts text when decoded
+2. **Account for template tokens:** System prompt, formatting consume tokens
+3. **Leave headroom:** Retrieved chunks plus question must fit context
+
+Implementation approach:
+```python
+# Determine available tokens for chunks
+available = max_context - system_prompt_tokens - question_tokens - output_reserve
+
+# Chunk with overlap at token boundaries
+chunks = chunk_at_token_boundaries(document, chunk_size=500, overlap=50)
+
+# Select chunks until budget exhausted
+selected = []
+tokens_used = 0
+for chunk in ranked_chunks:
+    chunk_tokens = count_tokens(chunk)
+    if tokens_used + chunk_tokens <= available:
+        selected.append(chunk)
+        tokens_used += chunk_tokens
+```
+
+## Go deeper
+
+- [Upstream chapter (Tokenization Deep Dive)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/01-foundations/02-tokenization-deep-dive.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

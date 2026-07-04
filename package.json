@@ -2,7 +2,7 @@
   "name": "simplify-ai-engineering",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev --turbopack --hostname 0.0.0.0 --port 3000",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
@@ -14,7 +14,22 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:reindex": "tsx scripts/rebuild-search-index.ts",
-    "ingest:validate": "tsx scripts/ingest-validate.ts"
+    "ingest:validate": "tsx scripts/ingest-validate.ts",
+    "ingest:glossary": "tsx scripts/ingest-glossary.ts",
+    "ingest:patterns": "tsx scripts/ingest-patterns.ts",
+    "ingest:questions": "tsx scripts/ingest-questions.ts",
+    "ingest:frameworks": "tsx scripts/ingest-frameworks.ts",
+    "ingest:meta-pages": "tsx scripts/ingest-meta-pages.ts",
+    "ingest:whiteboard": "tsx scripts/ingest-whiteboard-exercises.ts",
+    "scaffold:mdx": "tsx scripts/scaffold-mdx.ts",
+    "scaffold:mdx:catalog": "tsx scripts/generate-mdx-catalog.ts",
+    "sanitize:mdx": "tsx scripts/sanitize-mdx.ts",
+    "enhance:mdx": "tsx scripts/enhance-mdx-drafts.ts",
+    "demote:auto-enhanced": "tsx scripts/demote-auto-enhanced-mdx.ts",
+    "audit:content": "tsx scripts/audit-content-quality.ts",
+    "sync:mdx-metadata": "tsx scripts/sync-mdx-metadata.ts",
+    "ingest:all": "npm run ingest:glossary && npm run ingest:patterns && npm run ingest:questions && npm run ingest:frameworks && npm run ingest:meta-pages && npm run ingest:whiteboard",
+    "setup:env": "bash scripts/setup-env.sh"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.2",

@@ -1,0 +1,107 @@
+---
+title: "Reranking Strategies: From 'Maybe Relevant' to 'Actually in the Prompt'"
+slug: reranking-strategies
+type: concept
+area: retrieval
+difficulty: intermediate
+tags: [reranking, cross-encoder, retrieval, rag, bi-encoder]
+diagrams:
+  - diagrams/reranking-strategies--two-stage.svg
+est_minutes: 12
+source_attribution: "Factual basis: AI System Design Guide (MIT) by Om Bharatiya; rewritten and expanded. See CREDITS.md."
+last_reviewed: 2026-07-04
+status: reviewed
+---
+
+## The 30-second version
+
+Reranking is the **second stage** of retrieval: a fast bi-encoder (embedding search) pulls a wide candidate set — typically 50–100 chunks — and a slower **cross-encoder** reads each `[query, chunk]` pair together and assigns a relevance score. The top 5–10 survivors go into the LLM (large language model) prompt. Bi-encoders embed query and document **independently**, so they miss fine-grained token interactions; cross-encoders see both at once and fix ranking mistakes that cosine similarity cannot. Production stacks almost always use this two-stage funnel: recall first, precision second.
+
+## The analogy
+
+You're hiring one engineer from a stack of 200 résumés.
+
+**Stage 1 (bi-encoder)** is an ATS keyword filter run by a busy recruiter. It scans every résumé in milliseconds using precomputed tags — "CUDA," "distributed systems," "Python" — and forwards the 100 that look plausibly related. Fast, cheap, but it might rank "configured CUDA for a college project" above "led GPU cluster scheduling at scale" because both mention CUDA.
+
+**Stage 2 (cross-encoder)** is a senior engineer who actually **reads** each of the 100 résumés alongside the job description, line by line, and re-orders them. Slow — 100 careful reads — but the person who truly matches "CUDA memory management in production training" rises to the top.
+
+You would never ask the senior engineer to read 200,000 résumés. You would also never ship the ATS shortlist without the senior pass. Reranking is that senior read, applied to chunks.
+
+| Hiring pipeline | Retrieval pipeline |
+|---|---|
+| 200k résumés in database | Millions of chunks in vector index |
+| ATS tag match | Bi-encoder ANN search |
+| Top 100 forwarded | Top 50–100 candidates |
+| Hiring manager reads with JD in hand | Cross-encoder scores [query, chunk] |
+| Top 5 interviewed | Top 5–10 chunks in LLM context |
+
+## How it actually works
+
+![Two-stage retrieval: bi-encoder recall over the full index, cross-encoder precision on ~100 candidates](diagrams/reranking-strategies--two-stage.svg)
+
+Follow the diagram left to right.
+
+**Stage 1** embeds the query and runs approximate nearest-neighbor search over the full corpus. Embeddings were computed offline — cost per query is one small forward pass plus index traversal (~30–50 ms). This stage optimizes **recall**: get the right chunk somewhere in the top 100, even if it is ranked too low.
+
+**Stage 2** feeds each candidate to a **cross-encoder** — a transformer that jointly attends across query and document tokens and outputs a single relevance score. You cannot precompute document-side representations (the query changes every time), so this stage costs **O(candidates)** forward passes. Batch them on GPU; 100 pairs in one batch often lands in 40–120 ms depending on model size.
+
+The cross-encoder reorders. A classic failure mode: query `"How to configure CUDA memory"` — bi-encoder ranks a generic "memory management in CUDA apps" doc above the page that literally says `CUDA_VISIBLE_DEVICES`. The cross-encoder sees token-level alignment and promotes the env-var doc.
+
+Common production models: **Cohere Rerank**, **Voyage rerank-2**, **BGE-Reranker-v2-m3** (self-hostable). Pick by language coverage, latency tail, and whether you need on-prem weights.
+
+**Multi-stage** stacks extend the funnel: BM25 → top 1,000 → dense → top 100 → cross-encoder → top 10. Each stage is cheaper than the next.
+
+## A concrete example
+
+Support RAG: 120k chunks, hybrid retrieval returns 80 fused candidates (see [Hybrid Search](./hybrid-search.mdx)).
+
+| Stage | Work | Latency | Output |
+|---|---|---|---|
+| Hybrid retrieve | Dense top-40 + sparse top-40 + RRF | ~75 ms | 80 unique chunk IDs |
+| Cross-encoder rerank | 80 × (query + 512-token chunk), batched | ~90 ms | Scores 0.0–1.0 |
+| Take top 8 | Sort, dedupe by parent doc | &lt;1 ms | ~4,000 tokens of context |
+
+Without reranking, the correct chunk sits at bi-encoder rank 14 — outside a top-10 prompt. After reranking it is rank 2. Same index, same embedding model, same LLM — only the second stage changed the answer.
+
+Cost: Cohere Rerank charges per search unit; 80 candidates ≈ fractions of a cent. Self-hosted BGE on a small GPU is flat infra cost — attractive above ~100k queries/day.
+
+## The tradeoffs that matter
+
+| Choice | Precision | Latency added | Cost | When |
+|---|---|---|---|---|
+| No rerank (top-k cosine only) | Baseline | 0 | Lowest | Prototypes, tiny corpora |
+| Cross-encoder on top 50 | Large gain | +50–150 ms | API or GPU | Production RAG default |
+| Cross-encoder on top 200 | Marginal over 100 | +2× latency | Higher | Only if recall@100 is still low |
+| LLM-as-reranker | High but noisy | +seconds | $$$ | Offline eval, not hot path |
+| Distilled small reranker | ~90% of CE quality | Lower | Self-host sweet spot | High QPS after offline distillation |
+
+**When to skip reranking:** corpus under ~5k chunks where you can afford top-20 in prompt; extreme latency budgets (&lt;100 ms total); or retrieval eval shows recall@5 already above your bar without it.
+
+**When reranking is mandatory:** technical docs with similar titles, legal/clinical text where wrong chunk = wrong answer, any system where users cite sources.
+
+## Where people go wrong
+
+1. **Tuning the LLM prompt when rank 14 was the problem.** If the right chunk never makes top-k, reranking (or better hybrid recall) comes first.
+2. **Reranking 500 candidates on every query.** Latency scales linearly; retrieve wider in stage 1, rerank narrower in stage 2.
+3. **Using a cross-encoder as the first-stage index.** Cannot precompute — you would run a transformer forward pass per document per query. That is O(corpus), not O(log n).
+4. **Ignoring batching.** 100 sequential rerank calls destroy p95; one batched GPU call is the production pattern.
+5. **Same model for embed and rerank.** They are different jobs — bi-encoder for speed, cross-encoder for judgment. Do not assume one model does both well.
+
+## The interview lens
+
+This topic tests whether you understand the **recall vs precision split** in retrieval architecture.
+
+A strong sound bite: *"Bi-encoder for recall over the whole index, cross-encoder for precision on the top hundred — you cannot precompute cross-encoder scores, so you only afford that attention budget on a small shortlist."*
+
+Likely follow-ups:
+
+- Why can't we just use a cross-encoder for everything? (No precomputed doc representation; linear in corpus size per query.)
+- Bi-encoder ranked the wrong doc first — what happened? (Independent embeddings missed token interaction; CE sees query tokens attend to doc tokens.)
+- How many candidates do you rerank? (Start 50–100; measure precision@k gain vs latency; rarely need 200+.)
+
+## Go deeper
+
+- [Hybrid Search](./hybrid-search.mdx) — widening stage-1 recall before rerank.
+- [RAG Fundamentals](./rag-fundamentals.mdx) — full query path including reranker box.
+- [Late Interaction & ColBERT](./late-interaction-colbert.mdx) — when token-level scoring moves into stage 1.
+- Upstream reference: [Reranking Strategies — AI System Design Guide](https://github.com/ombharatiya/ai-system-design-guide/blob/main/06-retrieval-systems/06-reranking-strategies.md) (MIT; see [CREDITS](../../../CREDITS.md)).

@@ -11,7 +11,11 @@ import matter from "gray-matter";
 type IngestManifest = {
   mdx?: string[];
   questions?: string;
+  glossary?: string;
+  patterns?: string;
 };
+
+const MIN = { glossary: 80, patterns: 40, questions: 115 };
 
 const manifestPath = process.argv[2] ?? "data/ingest-manifest.example.json";
 
@@ -44,16 +48,29 @@ for (const rel of manifest.mdx ?? []) {
   }
 }
 
-if (manifest.questions) {
-  const qPath = path.join(process.cwd(), manifest.questions);
-  if (!fs.existsSync(qPath)) {
-    console.log(`✗ ${manifest.questions} — missing`);
+function checkJson(key: keyof IngestManifest, min?: number) {
+  const rel = manifest[key];
+  if (!rel || typeof rel !== "string") return;
+  const filePath = path.join(process.cwd(), rel);
+  if (!fs.existsSync(filePath)) {
+    console.log(`✗ ${rel} — missing`);
+    errors++;
+    return;
+  }
+  const rows = JSON.parse(fs.readFileSync(filePath, "utf8"));
+  const count = Array.isArray(rows) ? rows.length : 0;
+  const floor = min ?? 1;
+  if (count < floor) {
+    console.log(`✗ ${rel} — expected ≥${floor}, got ${count}`);
     errors++;
   } else {
-    const qs = JSON.parse(fs.readFileSync(qPath, "utf8"));
-    console.log(`✓ ${manifest.questions} — ${Array.isArray(qs) ? qs.length : 0} question(s)`);
+    console.log(`✓ ${rel} — ${count} record(s)`);
   }
 }
+
+checkJson("questions", MIN.questions);
+checkJson("glossary", MIN.glossary);
+checkJson("patterns", MIN.patterns);
 
 if (errors) {
   console.log(`\nFAIL — ${errors} error(s)`);

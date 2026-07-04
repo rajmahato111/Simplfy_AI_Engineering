@@ -1,0 +1,71 @@
+---
+title: 'Reasoning Loops: ReAct and Beyond'
+slug: reasoning-loops-react-and-beyond
+type: concept
+area: agents
+difficulty: intermediate
+tags:
+  - agents
+  - reasoning
+  - loops
+  - react
+  - and
+diagrams:
+  - diagrams/reasoning-loops-react-and-beyond--overview.svg
+est_minutes: 5
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The 30-second version
+
+Reasoning Loops define the control flow of an agent. While ReAct was the 2023 baseline, current systems use more sophisticated patterns like Plan-and-Solve, Self-Reflexion, and Inference-Time Scaling running on top of reasoning-native models.
+
+## The analogy
+
+Think of **Reasoning Loops: ReAct and Beyond** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Reasoning Loops: ReAct and Beyond overview](diagrams/reasoning-loops-react-and-beyond--overview.svg)
+
+Reasoning Loops define the control flow of an agent. While **ReAct** was the 2023 baseline, current systems use more sophisticated patterns like **Plan-and-Solve**, **Self-Reflexion**, and **Inference-Time Scaling** running on top of reasoning-native models.
+
+## A concrete example
+
+Reasoning Loops define the control flow of an agent. While ReAct was the 2023 baseline, current systems use more sophisticated patterns like Plan-and-Solve, Self-Reflexion, and Inference-Time Scaling running on top of reasoning-native models.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: When would you use a "Reasoning Loop" (ReAct) vs. a "Plan-and-Solve" architecture?
+
+**Strong answer:**
+I choose **ReAct** for **Exploratory** tasks where the environment is unpredictable (e.g., browsing a new website where you don't know the URL structure yet). The agent needs to react to every observation. I choose **Plan-and-Solve** for **Predictable** but complex workflows (e.g., generating a financial report from 5 known APIs). Planning prevents the model from "meandering" and allows for better parallelization of steps that don't depend on each other.
+
+### Q: What is "Inference-Time Scaling" and how does it relate to Agentic Loops?
+
+**Strong answer:**
+Inference-Time Scaling (often associated with OpenAI's o1) refers to spending more compute *during the response generation* rather than just during training. In an agentic context, this means the model doesn't just output the first valid-looking action. It uses a **Search Tree** (like Monte Carlo Tree Search) to simulate different action paths internally before committing to the one most likely to succeed. This reduces the number of "Real World" tool calls needed, saving external API costs and reducing failure rates.
+
+## Go deeper
+
+- [Upstream chapter (Reasoning Loops: ReAct and Beyond)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/07-agentic-systems/02-reasoning-loops-react-and-beyond.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

@@ -1,0 +1,125 @@
+[
+  {
+    "id": "spider",
+    "name": "System Design Framework",
+    "acronym": "SPIDER",
+    "use_for": "Use this framework for any system design question involving AI components. The full motion with rough time budget per phase:",
+    "summary": "Use this framework for any system design question involving AI components. The full motion with rough time budget per phase:",
+    "phases": [
+      {
+        "letter": "S",
+        "name": "Scope and Clarify",
+        "purpose": "Narrow the problem space and show you think before you build."
+      },
+      {
+        "letter": "P",
+        "name": "Prioritize Requirements",
+        "purpose": "Identify what matters most and design toward it."
+      },
+      {
+        "letter": "I",
+        "name": "Initial Architecture",
+        "purpose": "Draw the high-level system before diving into details."
+      },
+      {
+        "letter": "D",
+        "name": "Deep Dive into Critical Paths",
+        "purpose": "Show depth on the most important parts."
+      },
+      {
+        "letter": "E",
+        "name": "Evaluation and Observability",
+        "purpose": "Show you think about production operations."
+      },
+      {
+        "letter": "R",
+        "name": "Reliability and Scale",
+        "purpose": "Address failure modes and growth."
+      }
+    ],
+    "anti_patterns": [
+      "Jumping straight into architecture without understanding requirements."
+    ],
+    "source": "upstream"
+  },
+  {
+    "id": "eta",
+    "name": "Concept Explanation Framework",
+    "acronym": "ETA",
+    "use_for": "Use this for conceptual questions like \"Explain RAG\" or \"What is speculative decoding?\"",
+    "summary": "Use this for conceptual questions like \"Explain RAG\" or \"What is speculative decoding?\"",
+    "phases": [
+      {
+        "letter": "E",
+        "name": "Explain Simply",
+        "purpose": ""
+      },
+      {
+        "letter": "T",
+        "name": "Technical Details",
+        "purpose": ""
+      },
+      {
+        "letter": "A",
+        "name": "Applications and Tradeoffs",
+        "purpose": ""
+      }
+    ],
+    "anti_patterns": [],
+    "source": "upstream"
+  },
+  {
+    "id": "tradeoff",
+    "name": "Tradeoff Analysis Framework",
+    "use_for": "When asked to compare options or justify a decision, use this structure.",
+    "summary": "When asked to compare options or justify a decision, use this structure.",
+    "phases": [],
+    "anti_patterns": [],
+    "source": "upstream"
+  },
+  {
+    "id": "debugging",
+    "name": "Debugging and Troubleshooting Framework",
+    "use_for": "When asked \"How would you debug X?\" or \"The system is doing Y, how do you fix it?\" The 4-step diagnostic motion:",
+    "summary": "When asked \"How would you debug X?\" or \"The system is doing Y, how do you fix it?\" The 4-step diagnostic motion:",
+    "phases": [],
+    "anti_patterns": [],
+    "source": "upstream"
+  },
+  {
+    "id": "star-l",
+    "name": "Behavioral Questions Framework",
+    "acronym": "STAR-L",
+    "use_for": "For behavioral questions in AI roles, use STAR-L (STAR + Learnings).",
+    "summary": "For behavioral questions in AI roles, use STAR-L (STAR + Learnings).",
+    "phases": [
+      {
+        "letter": "S",
+        "name": "Situation",
+        "purpose": ""
+      },
+      {
+        "letter": "T",
+        "name": "Task",
+        "purpose": ""
+      },
+      {
+        "letter": "A",
+        "name": "Action",
+        "purpose": ""
+      },
+      {
+        "letter": "R",
+        "name": "Result",
+        "purpose": ""
+      },
+      {
+        "letter": "L",
+        "name": "Learnings",
+        "purpose": ""
+      }
+    ],
+    "anti_patterns": [],
+    "source": "upstream"
+  }
+]

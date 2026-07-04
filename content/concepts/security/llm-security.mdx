@@ -1,0 +1,110 @@
+---
+title: LLM Security
+slug: llm-security
+type: concept
+area: security
+difficulty: advanced
+tags:
+  - security
+  - llm
+diagrams:
+  - diagrams/llm-security--overview.svg
+est_minutes: 5
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The 30-second version
+
+Security in LLM systems is fundamentally different from traditional application security. This chapter covers prompt injection, data leakage, and other LLM-specific security concerns.
+
+## The analogy
+
+Think of **LLM Security** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![LLM Security overview](diagrams/llm-security--overview.svg)
+
+Security in LLM systems is fundamentally different from traditional application security. This chapter covers prompt injection, data leakage, and other LLM-specific security concerns.
+
+## A concrete example
+
+Security in LLM systems is fundamentally different from traditional application security. This chapter covers prompt injection, data leakage, and other LLM-specific security concerns.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: How do you defend against prompt injection?
+
+**Strong answer:**
+Defense in depth with multiple layers:
+
+**1. Input layer:**
+- Sanitize known injection patterns
+- Clear separation between instructions and user input
+- Use delimiters and explicit markers
+
+**2. System prompt layer:**
+- Strong instruction hierarchy
+- Explicit security rules that cannot be overridden
+- Repeat critical instructions
+
+**3. Output layer:**
+- Filter for system prompt leakage
+- Check for dangerous content
+- Validate before execution
+
+**4. Operational:**
+- Log and monitor for attack patterns
+- Rate limiting
+- Human review for flagged requests
+
+No single defense is sufficient. Attackers will find bypasses.
+
+### Q: How do you handle multi-tenant data security in RAG?
+
+**Strong answer:**
+Tenant isolation at every layer:
+
+**1. Data storage:**
+- Tenant ID on every document
+- Separate vector namespaces or collections
+- Encryption at rest per tenant
+
+**2. Retrieval:**
+- Always filter by tenant_id
+- Never post-filter (retrieve all, then filter)
+- Verify permissions on retrieved docs
+
+**3. Generation:**
+- Tenant-specific system prompts
+- No cross-tenant context mixing
+- Output validation for data leakage
+
+**4. Audit:**
+- Log all access with tenant context
+- Monitor for cross-tenant access attempts
+- Regular security reviews
+
+## Go deeper
+
+- [Upstream chapter (LLM Security)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/12-security-and-access/01-llm-security.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

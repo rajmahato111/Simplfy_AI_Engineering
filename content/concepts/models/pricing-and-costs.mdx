@@ -1,0 +1,117 @@
+---
+title: Pricing and Costs
+slug: pricing-and-costs
+type: concept
+area: models
+difficulty: intermediate
+tags:
+  - models
+  - pricing
+  - and
+  - costs
+diagrams:
+  - diagrams/pricing-and-costs--overview.svg
+est_minutes: 5
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The 30-second version
+
+Understanding the cost structure of LLM systems is essential for production planning. This chapter covers pricing models, cost optimization strategies, and total cost of ownership analysis.
+
+## The analogy
+
+Think of **Pricing and Costs** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Pricing and Costs overview](diagrams/pricing-and-costs--overview.svg)
+
+Understanding the cost structure of LLM systems is essential for production planning. This chapter covers pricing models, cost optimization strategies, and total cost of ownership analysis.
+
+## A concrete example
+
+Understanding the cost structure of LLM systems is essential for production planning. This chapter covers pricing models, cost optimization strategies, and total cost of ownership analysis.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: How would you optimize costs for a high-volume RAG application?
+
+**Strong answer:**
+I would approach cost optimization in layers:
+
+**1. Architecture optimization:**
+- Model routing: Use cheap model for simple queries
+- Caching: 30-40% of queries may be cacheable
+- Prompt compression: Minimize system prompt tokens
+
+**2. Model selection:**
+```
+Simple queries (60%): GPT-5.4-mini at $0.003/request
+Complex queries (40%): GPT-5.4 at $0.011/request
+Weighted avg: $0.0062/request (vs $0.011 all GPT-5.4)
+Savings: 44%
+```
+
+**3. Infrastructure:**
+- Batch embedding updates (50% cheaper)
+- Right-size vector DB
+- Use spot instances where possible
+
+**4. Monitoring:**
+- Track cost per query type
+- Alert on anomalies
+- Regular cost reviews
+
+### Q: When would you recommend self-hosting vs using APIs?
+
+**Strong answer:**
+Decision depends on multiple factors:
+
+**Volume threshold:**
+- Below 100K/month: Almost always API
+- 100K-500K: Evaluate case by case
+- Above 500K: Often self-hosting wins
+
+**Team capabilities:**
+- No ML ops: API regardless of scale
+- Strong infra team: Consider self-hosting earlier
+
+**Quality requirements:**
+- Need absolute best: APIs (frontier models)
+- Good enough works: Self-hosted open models
+
+**Other factors:**
+- Data privacy: May force self-hosting
+- Latency control: Self-hosting gives more control
+- Fine-tuning needs: Self-hosting enables more customization
+
+**My recommendation process:**
+1. Start with APIs for fastest iteration
+2. Build abstraction layer for model switching
+3. Evaluate self-hosting when spend exceeds $10K/month
+4. Pilot with shadow deployment before committing
+
+## Go deeper
+
+- [Upstream chapter (Pricing and Costs)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/02-model-landscape/03-pricing-and-costs.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

@@ -1,0 +1,115 @@
+---
+title: LLM Internals
+slug: llm-internals
+type: concept
+area: foundations
+difficulty: beginner
+tags:
+  - foundations
+  - llm
+  - internals
+diagrams:
+  - diagrams/llm-internals--overview.svg
+est_minutes: 5
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The 30-second version
+
+The architectural core of modern LLMs: transformers, MoE, attention math, RoPE, GQA, KV cache, and the inference-optimal scaling shift driving 2026 model design.
+
+## The analogy
+
+Think of **LLM Internals** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![LLM Internals overview](diagrams/llm-internals--overview.svg)
+
+The architectural core of modern LLMs: transformers, MoE, attention math, RoPE, GQA, KV cache, and the inference-optimal scaling shift driving 2026 model design.
+
+This chapter covers the core concepts behind large language models. Understanding these internals is essential for making informed architectural decisions about AI systems. For practical implications of these architectural choices, see [Inference Optimization](../04-inference-optimization/) (KV cache, PagedAttention), [Model Taxonomy](../02-model-landscape/01-model-taxonomy.md) (MoE models in production), and [Glossary](../GLOSSARY.md) for definitions of MoE, RoPE, ALiBi, GQA, MLA.
+
+## A concrete example
+
+The architectural core of modern LLMs: transformers, MoE, attention math, RoPE, GQA, KV cache, and the inference-optimal scaling shift driving 2026 model design.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: Explain why transformer attention is O(n²) and what alternatives exist.
+
+**Strong answer:**
+Attention computes pairwise similarities between all tokens. For sequence length n:
+- QK^T is [n, d] × [d, n] = n² multiplications per head
+- Storage for attention weights: n² floats
+
+Alternatives:
+- Sparse attention (Longformer): O(n) with local + global patterns
+- Linear attention (Performer): O(n) using random feature approximation
+- Flash Attention: Still O(n²) compute but O(n) memory via kernel fusion
+- State-space models (Mamba): O(n) fully linear
+
+The tradeoff: n² is necessary for full long-range dependencies, but most tasks do not need all pairwise interactions.
+
+### Q: What is the KV cache and why does it matter for serving?
+
+**Strong answer:**
+During autoregressive generation, we generate one token at a time. Without caching, we would recompute K and V for all previous tokens on each step.
+
+The KV cache stores K and V from previous positions. On each new token:
+1. Compute Q, K, V only for the new position
+2. Concatenate new K, V to cached K, V
+3. Compute attention with full K, V
+
+This reduces per-token complexity from O(n) to O(1) for K and V computation.
+
+**The cost:** Memory scales linearly with sequence length. For Llama 70B at 8K context, KV cache is ~21 GB per request. This limits batch size and requires techniques like PagedAttention.
+
+### Q: Why do modern LLMs use Pre-LN instead of Post-LN?
+
+**Strong answer:**
+Pre-LN places normalization before each sublayer rather than after. This creates a more direct path for gradients through residual connections.
+
+With Post-LN, gradients must pass through the normalization, which can cause instability at the start of training. Post-LN requires learning rate warmup and careful initialization.
+
+Pre-LN enables training very deep models (100+ layers) without special initialization. The tradeoff is slightly lower final performance, but in practice, the training stability is worth it.
+
+### Q: What is the difference between MHA, MQA, and GQA?
+
+**Strong answer:**
+All three are multi-head attention variants that differ in how K and V heads are shared:
+
+- **MHA (Multi-Head Attention)**: Each query head has its own K and V heads. N:N ratio.
+- **MQA (Multi-Query Attention)**: All query heads share a single K and V head. N:1 ratio.
+- **GQA (Grouped-Query Attention)**: Groups of query heads share K and V heads. N:G ratio (typical G=8).
+
+Memory impact for KV cache:
+- MHA: Full size
+- MQA: 1/N size (but quality degrades)
+- GQA: 1/G size (best tradeoff)
+
+Llama 2 70B uses GQA with 8 KV heads for 64 query heads, reducing KV cache by 8x with minimal quality loss.
+
+## Go deeper
+
+- [Upstream chapter (LLM Internals)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/01-foundations/01-llm-internals.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

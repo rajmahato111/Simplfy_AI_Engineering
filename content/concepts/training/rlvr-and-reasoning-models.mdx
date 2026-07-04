@@ -1,0 +1,71 @@
+---
+title: 'Training Reasoning Models: RLVR and GRPO'
+slug: rlvr-and-reasoning-models
+type: concept
+area: training
+difficulty: intermediate
+tags:
+  - training
+  - rlvr
+  - and
+  - reasoning
+  - models
+diagrams:
+  - diagrams/rlvr-and-reasoning-models--overview.svg
+est_minutes: 5
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The 30-second version
+
+The frontier reasoning models (OpenAI's o-series, DeepSeek-R1, Qwen's thinking models) are trained with a recipe distinct from the RLHF and DPO covered in [RLHF and DPO](04-rlhf-and-dpo.md): reinforcement learning with verifiable rewards (RLVR). Take a capable base model, have it generate long chains of thought on problems with *checkable* answers (math, code, logic), and reward correctness directly with a programmatic verifier instead of a learned reward model. This chapter covers RLVR, the GRPO algorithm DeepSeek made popular, the reward-design failure modes, the live debate over what RL actually adds, and the cheaper distillation path most teams should take first.
+
+## The analogy
+
+Think of **Training Reasoning Models: RLVR and GRPO** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Training Reasoning Models: RLVR and GRPO overview](diagrams/rlvr-and-reasoning-models--overview.svg)
+
+The frontier reasoning models (OpenAI's o-series, DeepSeek-R1, Qwen's thinking models) are trained with a recipe distinct from the RLHF and DPO covered in [RLHF and DPO](04-rlhf-and-dpo.md): **reinforcement learning with verifiable rewards (RLVR)**. Take a capable base model, have it generate long chains of thought on problems with *checkable* answers (math, code, logic), and reward correctness directly with a programmatic verifier instead of a learned reward model. This chapter covers RLVR, the GRPO algorithm DeepSeek made popular, the reward-design failure modes, the live debate over what RL actually adds, and the cheaper distillation path most teams should take first.
+
+## A concrete example
+
+The frontier reasoning models (OpenAI's o-series, DeepSeek-R1, Qwen's thinking models) are trained with a recipe distinct from the RLHF and DPO covered in [RLHF and DPO](04-rlhf-and-dpo.md): reinforcement learning with verifiable rewards (RLVR). Take a capable base model, have it generate long chains of thought on problems with *checkable* answers (math, code, logic), and reward correctness directly with a programmatic verifier instead of a learned reward model. This chapter covers RLVR, the GRPO algorithm DeepSeek made popular, the reward-design failure modes, the live debate over what RL actually adds, and the cheaper distillation path most teams should take first.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: What is RLVR, and why does it scale more stably than RLHF for reasoning?
+
+**Strong answer:**
+RLVR is reinforcement learning with verifiable rewards: instead of a learned reward model, you reward the policy with a deterministic verifier, did the math answer match, did the code pass its tests. It scales more stably than RLHF because the reward is grounded in an external oracle rather than a neural net the policy can over-optimize. RLHF's classic failure is reward-model hacking, where the policy finds inputs the reward model scores highly but humans would not; a unit-test pass has no comparable soft surface to exploit. The tradeoff is that RLVR only applies where you can mechanically check correctness, which is why it took off first in math, code, and logic. It does not eliminate gaming, models can still reach right answers through unfaithful steps or game the checker, so you still watch faithfulness and length.
+
+### Q: Explain GRPO and one of its known failure modes.
+
+**Strong answer:**
+GRPO drops PPO's value/critic network, which for an LLM roughly doubles memory, and replaces the learned baseline with a group-relative one: sample several completions for the same prompt, score each with the verifier, and use the within-group z-score as the advantage, broadcast to every token. That makes it cheap and well-suited to single terminal verifiable rewards, which is why DeepSeek used it. A key failure mode is zero-variance collapse: when every completion in a group gets the same reward, all correct on an easy prompt or all wrong on a hard one, the standard deviation is zero, the advantages are zero, and the group produces no gradient. As the model improves, more prompts become all-correct, so the effective batch shrinks. DAPO's dynamic sampling fixes this by filtering out all-correct and all-wrong groups and only training on groups that actually produce a gradient. There is also a length bias from broadcasting one advantage over all tokens, which Dr.GRPO addresses by removing the length normalization.
+
+## Go deeper
+
+- [Upstream chapter (Training Reasoning Models: RLVR and GRPO)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/03-training-and-adaptation/08-rlvr-and-reasoning-models.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

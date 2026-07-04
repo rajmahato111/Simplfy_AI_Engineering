@@ -1,0 +1,108 @@
+---
+title: LLM Observability
+slug: observability
+type: concept
+area: evals
+difficulty: intermediate
+tags:
+  - evals
+  - observability
+diagrams:
+  - diagrams/observability--overview.svg
+est_minutes: 5
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The 30-second version
+
+Observability for LLM systems requires adapting the three pillars of logs, metrics, and traces for the unique characteristics of AI applications.
+
+## The analogy
+
+Think of **LLM Observability** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![LLM Observability overview](diagrams/observability--overview.svg)
+
+Observability for LLM systems requires adapting the three pillars of logs, metrics, and traces for the unique characteristics of AI applications.
+
+## A concrete example
+
+Observability for LLM systems requires adapting the three pillars of logs, metrics, and traces for the unique characteristics of AI applications.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: What metrics would you track for a production LLM system?
+
+**Strong answer:**
+
+"I organize metrics into three categories:
+
+**Operational metrics:** These are table stakes for any service.
+- Request rate and error rate
+- Latency percentiles: p50, p95, p99
+- Time to first token (TTFT) for streaming
+- Availability
+
+**Quality metrics:** This is what makes LLM observability unique.
+- Sampled quality scores using LLM-as-judge (1-5% sample rate)
+- For RAG: faithfulness and relevance scores
+- User feedback: thumbs up/down, explicit ratings
+- Task completion rate where measurable
+
+**Cost metrics:**
+- Cost per request by model
+- Daily/weekly cost trends
+- Cost per successful user action
+- Token efficiency
+
+I set alerts for operational issues (error rate > 5%, P95 > SLA) and quality drift (average score drops 10% from baseline). Cost alerts for spikes help catch runaway usage.
+
+The key insight is that a fast, available LLM system producing bad outputs is still failing. Quality must be a first-class metric."
+
+### Q: How do you detect quality degradation in production?
+
+**Strong answer:**
+
+"I use several approaches:
+
+**Continuous sampling:** I evaluate 1-5% of requests using LLM-as-judge. This gives me a quality signal without evaluating everything.
+
+**Drift detection:** I maintain a baseline quality distribution and use statistical tests to detect when current scores drift significantly. A 10% degradation triggers a warning.
+
+**User feedback:** Thumbs up/down, explicit ratings if available. This is ground truth for user satisfaction.
+
+**Implicit signals:** Task completion, retry rate, escalation rate, session length. If users are struggling more, quality may have dropped.
+
+**What to do when I detect degradation:**
+1. Check for recent deployments or prompt changes
+2. Sample specific responses to diagnose the issue
+3. Check if it is model-specific (provider issue) or universal
+4. Roll back if necessary, then investigate
+
+I also maintain a golden test set of queries with expected behaviors that I run on every deployment to catch regressions before production."
+
+## Go deeper
+
+- [Upstream chapter (LLM Observability)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/14-evaluation-and-observability/02-observability.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

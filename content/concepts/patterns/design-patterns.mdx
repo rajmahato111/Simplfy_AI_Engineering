@@ -1,0 +1,92 @@
+---
+title: AI Design Patterns
+slug: design-patterns
+type: concept
+area: patterns
+difficulty: intermediate
+tags:
+  - patterns
+  - design
+diagrams:
+  - diagrams/design-patterns--overview.svg
+est_minutes: 5
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The 30-second version
+
+This chapter catalogs common patterns for building AI systems, similar to design patterns in software engineering. Each pattern includes when to use it, implementation guidance, and tradeoffs.
+
+## The analogy
+
+Think of **AI Design Patterns** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![AI Design Patterns overview](diagrams/design-patterns--overview.svg)
+
+This chapter catalogs common patterns for building AI systems, similar to design patterns in software engineering. Each pattern includes when to use it, implementation guidance, and tradeoffs.
+
+## A concrete example
+
+This chapter catalogs common patterns for building AI systems, similar to design patterns in software engineering. Each pattern includes when to use it, implementation guidance, and tradeoffs.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: Describe three RAG patterns and when to use each.
+
+**Strong answer:**
+
+"I will describe Naive RAG, Advanced RAG, and Parent-Child Retrieval.
+
+**Naive RAG** is the simplest: embed query, search vectors, stuff top K into prompt, generate. I use this for MVPs and when retrieval quality is already good. It is fast to implement but has no reranking or query enhancement.
+
+**Advanced RAG** adds multiple stages: query rewriting, hybrid search (semantic + keyword), reranking, and filtering. I use this in production when accuracy matters. The additional latency (100-200ms for reranking) is worth it for the 10-15% precision improvement.
+
+**Parent-Child Retrieval** embeds small chunks for precise matching but returns larger parent chunks for context. I use this when documents have structure and I need both precision in retrieval and sufficient context for generation.
+
+The pattern I choose depends on the accuracy requirements, latency budget, and document characteristics. I often start with Naive RAG to establish a baseline, then iterate to Advanced RAG."
+
+### Q: What reliability patterns would you use for a production LLM system?
+
+**Strong answer:**
+
+"I implement multiple layers of reliability:
+
+**Retry with exponential backoff** for transient failures. Rate limits and temporary errors are common with LLM APIs.
+
+**Multi-provider fallback** so if OpenAI is having issues, I automatically route to Anthropic or Google. This requires abstracting the LLM interface.
+
+**Circuit breaker** to stop hammering a failing service. After N failures, I open the circuit and route to fallback immediately, giving the primary time to recover.
+
+**Graceful degradation** when all providers fail. Return cached responses, show fallback messages, or queue for later processing rather than erroring.
+
+**Bulkhead isolation** to prevent one component's failures from cascading. Agent workloads get separate thread pools from RAG workloads.
+
+**Timeouts** at every level. LLM calls can hang; I set aggressive timeouts and handle them gracefully.
+
+The key is assuming failures will happen and designing for them rather than hoping they will not."
+
+## Go deeper
+
+- [Upstream chapter (AI Design Patterns)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/15-ai-design-patterns/01-design-patterns.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

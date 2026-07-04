@@ -87,12 +87,12 @@ A strong sound bite: *"Production RAG fails in retrieval and infrastructure long
 Likely follow-ups:
 
 - How does this design change for a multi-tenant SaaS product instead of one enterprise deployment? (Isolation model choice — silo, pool, or bridge — driven by tenant size distribution and compliance requirements.)
-- How do you detect retrieval quality degrading in production before users complain? (Empty-retrieval rate, similarity-score drift, faithfulness sampling on live traffic — see [RAG evaluation](./rag-evaluation.mdx).)
+- How do you detect retrieval quality degrading in production before users complain? (Empty-retrieval rate, similarity-score drift, faithfulness sampling on live traffic — see [RAG evaluation](./rag-evaluation-patterns.mdx).)
 - Costs tripled with no traffic increase — where do you look first? (Cache hit rate, model-routing distribution, retry/thrash loops in any agentic retrieval path, and whether re-embedding is happening more often than it should.)
 
 ## Go deeper
 
-- [RAG evaluation](./rag-evaluation.mdx) — the monitoring signals that catch production drift before users do.
+- [RAG evaluation](./rag-evaluation-patterns.mdx) — the monitoring signals that catch production drift before users do.
 - [Hybrid search](./hybrid-search.mdx) — the parallel vector-plus-keyword retrieval this chapter's request path assumes.
 - [Design a production RAG system](../../walkthroughs/design-a-production-rag-system.mdx) — this chapter's concerns worked through as a full interview answer.
 - Upstream reference: [Production RAG at Scale — AI System Design Guide](https://github.com/ombharatiya/ai-system-design-guide/blob/main/06-retrieval-systems/14-production-rag-at-scale.md) (MIT; see [CREDITS](../../../CREDITS.md)).

@@ -1,0 +1,306 @@
+[
+  {
+    "id": "wb-01",
+    "number": 1,
+    "slug": "exercise-1-enterprise-rag-system",
+    "title": "Enterprise RAG System",
+    "summary": "Design a RAG-based knowledge assistant for a large enterprise with the following requirements: - 10 million documents from multiple sources (SharePoint, Confluence, Google Drive, internal wikis) - 50,000 employees with role-based access - Documents update continuously - Must resp…",
+    "problem_statement": "Design a RAG-based knowledge assistant for a large enterprise with the following requirements:\n\n- 10 million documents from multiple sources (SharePoint, Confluence, Google Drive, internal wikis)\n- 50,000 employees with role-based access\n- Documents update continuously\n- Must respect document permissions at query time\n- Sub-3 second response time for 95% of queries\n- Support for multiple languages (English, Spanish, Mandarin)",
+    "time_allocation_md": "| Phase | Time | Focus |\n|-------|------|-------|\n| Clarification | 3 min | Scope, priorities, constraints |\n| High-level architecture | 7 min | Components and data flow |\n| Data pipeline | 8 min | Ingestion, chunking, indexing |\n| Query pipeline | 8 min | Retrieval, generation, permissions |\n| Reliability and scale | 5 min | Failure handling, scaling |\n| Evaluation | 4 min | Metrics and monitoring |",
+    "sections": [
+      {
+        "id": "problem-statement",
+        "title": "Problem Statement",
+        "body_md": "Design a RAG-based knowledge assistant for a large enterprise with the following requirements:\n\n- 10 million documents from multiple sources (SharePoint, Confluence, Google Drive, internal wikis)\n- 50,000 employees with role-based access\n- Documents update continuously\n- Must respect document permissions at query time\n- Sub-3 second response time for 95% of queries\n- Support for multiple languages (English, Spanish, Mandarin)",
+        "level": 3
+      },
+      {
+        "id": "time-allocation-35-minutes",
+        "title": "Time Allocation (35 minutes)",
+        "body_md": "| Phase | Time | Focus |\n|-------|------|-------|\n| Clarification | 3 min | Scope, priorities, constraints |\n| High-level architecture | 7 min | Components and data flow |\n| Data pipeline | 8 min | Ingestion, chunking, indexing |\n| Query pipeline | 8 min | Retrieval, generation, permissions |\n| Reliability and scale | 5 min | Failure handling, scaling |\n| Evaluation | 4 min | Metrics and monitoring |",
+        "level": 3
+      },
+      {
+        "id": "clarification-questions",
+        "title": "Clarification Questions",
+        "body_md": "```\n1. What is the document size distribution? (PDFs, wikis, code?)\n2. How often do permissions change? (Impacts caching strategy)\n3. Is conversation history required or single-turn Q&A?\n4. What is the accuracy bar? (Can we say \"I don't know\"?)\n5. Are there compliance requirements? (Audit, data residency)\n```",
+        "level": 4
+      },
+      {
+        "id": "high-level-architecture",
+        "title": "High-Level Architecture",
+        "body_md": "```\n┌─────────────────────────────────────────────────────────────────────────┐\n│                          DATA PLANE                                      │\n│  ┌──────────────┐    ┌──────────────┐    ┌──────────────────────────────┐│\n│  │   Connectors │───▶│   Processor  │───▶│       Vector Database        ││\n│  │ (SP,GD,Conf) │    │ (chunk,embed)│    │  (Pinecone/Qdrant/Weaviate)  ││\n│  └──────────────┘    └──────────────┘    └──────────────────────────────┘│\n│                                                      ▲                   │\n│                                                      │ sync              │\n│  ┌──────────────────────────────────────────────────┼───────────────────┐│\n│  │                    Permission Service            │                   ││\n│  └──────────────────────────────────────────────────┼───────────────────┘│\n└─────────────────────────────────────────────────────┼───────────────────┘\n                                                      │\n┌─────────────────────────────────────────────────────┼───────────────────┐\n│                          QUERY PLANE                │                   │\n│  ┌──────────────┐    ┌──────────────┐    ┌─────────┴──────┐             │\n│  │    User      │───▶│  Query API   │───▶│   Retriever    │             │\n│  │  Interface   │    │              │    │ (+ perm filter)│             │\n│  └──────────────┘    └──────────────┘    └────────┬───────┘             │\n│                             │                      │                     │\n│                             ▼                      ▼                     │\n│                      ┌──────────────┐    ┌──────────────┐               │\n│                      │   Reranker   │◀───│   Chunks     │               │\n│                      └──────┬───────┘    └──────────────┘               │\n│                             │                                            │\n│                             ▼                                            │\n│                      ┌──────────────┐    ┌──────────────┐               │\n│                      │  Generator   │───▶│   Response   │               │\n│                      │    (LLM)     │    │  + Citations │               │\n│                      └──────────────┘    └──────────────┘               │\n└─────────────────────────────────────────────────────────────────────────┘\n```",
+        "level": 4
+      },
+      {
+        "id": "data-pipeline-deep-dive",
+        "title": "Data Pipeline Deep Dive",
+        "body_md": "**1. Connectors:**\n```\nEach source has a dedicated connector:\n- SharePoint: Graph API with delta sync\n- Confluence: REST API with webhooks\n- Google Drive: Drive API with push notifications\n\nConnector responsibilities:\n- Fetch document content and metadata\n- Track change events (create, update, delete)\n- Extract permissions from source system\n- Normalize to common document schema\n```\n\n**2. Document Schema:**\n```json\n{\n  \"doc_id\": \"uuid\",\n  \"source\": \"sharepoint|confluence|gdrive\",\n  \"source_id\": \"original_id_in_source\",\n  \"title\": \"string\",\n  \"content\": \"string\",\n  \"content_type\": \"pdf|html|docx|md\",\n  \"language\": \"en|es|zh\",\n  \"permissions\": {\n    \"users\": [\"user_id_1\", \"user_id_2\"],\n    \"groups\": [\"group_id_1\"],\n    \"visibility\": \"private|internal|public\"\n  },\n  \"metadata\": {\n    \"author\": \"string\",\n    \"created_at\": \"timestamp\",\n    \"updated_at\": \"timestamp\",\n    \"path\": \"folder/path\"\n  }\n}\n```\n\n**3. Chunking Strategy:**\n```\nGiven mixed document types, use adaptive chunking:\n\n- Markdown/HTML: Semantic chunking by headers\n- PDFs: Layout-aware chunking using document AI\n- Wiki pages: Section-based chunking\n\nChunk parameters:\n- Target size: 512 tokens\n- Overlap: 50 tokens\n- Preserve: headers, tables, code blocks\n\nEach chunk inherits parent document permissions.\n```\n\n**4. Embedding:**\n```\nMultilingual requirement suggests:\n- Model: Cohere embed-v3 (multilingual, good quality)\n- Alternative: OpenAI text-embedding-3-large\n\nBatch embedding:\n- Process in batches of 100 chunks\n- Rate limit handling with exponential backoff\n- Store embedding with chunk in vector DB\n```\n\n**5. Vector Database Choice:**\n```\nPinecone or Qdrant for this scale.\n\nSelection criteria:\n- Metadata filtering: Critical for permissions\n- Scale: 10M docs × 5 chunks = 50M vectors\n- Hybrid search: Needed for keyword queries\n\nSchema:\n- Vector: embedding\n- Metadata: doc_id, chunk_id, language, permissions, source\n```",
+        "level": 4
+      },
+      {
+        "id": "query-pipeline-deep-dive",
+        "title": "Query Pipeline Deep Dive",
+        "body_md": "**1. Permission Resolution:**\n```python\ndef get_user_permissions(user_id: str) -> PermissionSet:\n    \"\"\"\n    Resolve all documents user can access.\n    Returns set of:\n    - Direct user grants\n    - Group memberships expanded\n    - Public document access\n    \n    CACHED with 5-minute TTL since permissions change infrequently.\n    \"\"\"\n    cache_key = f\"permissions:{user_id}\"\n    if cached := cache.get(cache_key):\n        return cached\n    \n    perms = permission_service.resolve(user_id)\n    cache.set(cache_key, perms, ttl=300)\n    return perms\n```\n\n**2. Retrieval with Filtering:**\n```python\ndef retrieve(query: str, user_id: str, top_k: int = 20) -> List[Chunk]:\n    perms = get_user_permissions(user_id)\n    \n    # Detect language for query\n    lang = detect_language(query)\n    \n    # Build permission filter\n    # User can see: public docs, their own, or groups they belong to\n    filter = {\n        \"$or\": [\n            {\"visibility\": \"public\"},\n            {\"users\": {\"$in\": [user_id]}},\n            {\"groups\": {\"$in\": perms.groups}}\n        ]\n    }\n    \n    # Optional: boost same-language content\n    if lang != \"en\":\n        filter[\"language\"] = lang\n    \n    results = vector_db.search(\n        query_embedding=embed(query),\n        top_k=top_k,\n        filter=filter\n    )\n    return results\n```\n\n**3. Reranking:**\n```\nRerank top-20 to get top-5 with cross-encoder.\nModel: bge-reranker-v2-m3 (multilingual)\nLatency budget: ~100ms\n```\n\n**4. Generation:**\n```python\ndef generate(query: str, chunks: List[Chunk], user_id: str) -> Response:\n    context = format_chunks_with_citations(chunks)\n    \n    prompt = f\"\"\"You are a knowledge assistant for [Company].\nAnswer the question using ONLY the provided context.\nIf the context does not contain the answer, say \"I could not find information about that in our knowledge base.\"\nAlways cite sources using [1], [2] format.\n\nCONTEXT:\n{context}\n\nQUESTION: {query}\n\"\"\"\n    \n    response = llm.generate(\n        prompt=prompt,\n        model=\"gpt-4o\",\n        temperature=0.1\n    )\n    \n    return format_with_source_links(response, chunks)\n```",
+        "level": 4
+      },
+      {
+        "id": "scaling-and-reliability",
+        "title": "Scaling and Reliability",
+        "body_md": "**Latency Budget (p95 < 3s):**\n```\nPermission resolution:   50ms  (cached)\nEmbedding:              100ms\nVector search:          100ms\nReranking:              150ms\nLLM generation:        1500ms\nNetwork/overhead:       100ms\n─────────────────────────────\nTotal:                 2000ms (buffer for P95)\n```\n\n**Scaling Considerations:**\n```\n- Vector DB: Sharded by source or hash\n- Embedding service: Horizontal scale, stateless\n- LLM calls: Multiple providers for redundancy\n- Cache: Redis cluster for permissions and responses\n```\n\n**Failure Handling:**\n```\n- Vector DB down: Return cached results + degraded warning\n- LLM down: Fallback to secondary provider\n- Rate limiting: Queue with backpressure\n- Embedding service: Batch retries with circuit breaker\n```",
+        "level": 4
+      },
+      {
+        "id": "evaluation-approach",
+        "title": "Evaluation Approach",
+        "body_md": "**Offline Metrics:**\n```\n- Retrieval: Precision@5, Recall@5, MRR\n- Generation: RAGAS (faithfulness, relevance)\n- End-to-end: Answer correctness on test set\n```\n\n**Online Metrics:**\n```\n- User feedback: Thumbs up/down\n- Query reformulation rate: User rephrasing indicates failure\n- Citation click-through: Are sources useful?\n```\n\n**Monitoring:**\n```\n- Latency dashboards by percentile\n- Permission filter hit rate\n- Empty result rate by source\n- Cost per query\n```\n\n---",
+        "level": 4
+      }
+    ],
+    "source": "upstream"
+  },
+  {
+    "id": "wb-02",
+    "number": 2,
+    "slug": "exercise-2-customer-support-chatbot",
+    "title": "Customer Support Chatbot",
+    "summary": "Design an AI-powered customer support system for an e-commerce company: - Handle 10,000 conversations per day - Access to product catalog (1M products), order history, FAQs - Goal: Resolve 70% of tickets without human handoff - Support order lookup, returns, product questions - M…",
+    "problem_statement": "Design an AI-powered customer support system for an e-commerce company:\n\n- Handle 10,000 conversations per day\n- Access to product catalog (1M products), order history, FAQs\n- Goal: Resolve 70% of tickets without human handoff\n- Support order lookup, returns, product questions\n- Multilingual support (3 languages)\n- Integration with existing Zendesk ticketing",
+    "sections": [
+      {
+        "id": "problem-statement",
+        "title": "Problem Statement",
+        "body_md": "Design an AI-powered customer support system for an e-commerce company:\n\n- Handle 10,000 conversations per day\n- Access to product catalog (1M products), order history, FAQs\n- Goal: Resolve 70% of tickets without human handoff\n- Support order lookup, returns, product questions\n- Multilingual support (3 languages)\n- Integration with existing Zendesk ticketing",
+        "level": 3
+      },
+      {
+        "id": "solution-highlights",
+        "title": "Solution Highlights",
+        "body_md": "**Key Architectural Decisions:**\n\n1. **Agent Architecture with Flow Control:**\n```\n┌─────────────────────────────────────────────────────────┐\n│                                                         │\n│   ┌─────────┐     ┌─────────────┐     ┌─────────────┐   │\n│   │ Intake  │────▶│  Classify   │────▶│   Router    │   │\n│   └─────────┘     └─────────────┘     └──────┬──────┘   │\n│                                              │           │\n│         ┌────────────────┬──────────────────┼───────┐   │\n│         ▼                ▼                  ▼       ▼   │\n│   ┌───────────┐   ┌───────────┐   ┌───────────┐ ┌─────┐ │\n│   │Order Flow │   │Product Q&A│   │ Returns   │ │Human│ │\n│   └─────┬─────┘   └─────┬─────┘   └─────┬─────┘ └─────┘ │\n│         │               │               │               │\n│         └───────────────┴───────────────┘               │\n│                         │                               │\n│                   ┌─────▼─────┐                         │\n│                   │  Response │                         │\n│                   │ Generator │                         │\n│                   └───────────┘                         │\n└─────────────────────────────────────────────────────────┘\n```\n\n2. **Tool Design:**\n```python\ntools = [\n    {\n        \"name\": \"lookup_order\",\n        \"description\": \"Look up order details by order ID or customer email\",\n        \"parameters\": {\n            \"order_id\": \"optional string\",\n            \"email\": \"optional string\"\n        }\n    },\n    {\n        \"name\": \"search_products\",\n        \"description\": \"Search product catalog\",\n        \"parameters\": {\n            \"query\": \"string\",\n            \"category\": \"optional string\",\n            \"price_range\": \"optional tuple\"\n        }\n    },\n    {\n        \"name\": \"create_return\",\n        \"description\": \"Initiate a return for an order\",\n        \"parameters\": {\n            \"order_id\": \"string\",\n            \"reason\": \"string\",\n            \"items\": \"list of item IDs\"\n        }\n    },\n    {\n        \"name\": \"escalate_to_human\",\n        \"description\": \"Transfer to human agent\",\n        \"parameters\": {\n            \"reason\": \"string\",\n            \"priority\": \"low|medium|high\"\n        }\n    }\n]\n```\n\n3. **Escalation Criteria:**\n```\nEscalate to human when:\n- Customer explicitly requests human\n- Sentiment is highly negative (detected by classifier)\n- Issue involves payment disputes\n- Agent confidence is low after 2 attempts\n- Complex multi-order issues\n- Refund above threshold amount\n```\n\n4. **Integration Pattern:**\n```\nZendesk integration:\n- Webhook receives new tickets\n- AI handles via API\n- Resolution → close ticket\n- Escalation → assign to queue with context summary\n- All interactions logged to ticket timeline\n```\n\n---",
+        "level": 3
+      }
+    ],
+    "source": "upstream"
+  },
+  {
+    "id": "wb-03",
+    "number": 3,
+    "slug": "exercise-3-code-review-assistant",
+    "title": "Code Review Assistant",
+    "summary": "Design a code review assistant for a development platform: - Reviews pull requests automatically - Provides specific, actionable feedback - Respects repository style guides and conventions - Can suggest code fixes - Integration with GitHub/GitLab - Handles 50,000 PRs per day",
+    "problem_statement": "Design a code review assistant for a development platform:\n\n- Reviews pull requests automatically\n- Provides specific, actionable feedback\n- Respects repository style guides and conventions\n- Can suggest code fixes\n- Integration with GitHub/GitLab\n- Handles 50,000 PRs per day",
+    "sections": [
+      {
+        "id": "problem-statement",
+        "title": "Problem Statement",
+        "body_md": "Design a code review assistant for a development platform:\n\n- Reviews pull requests automatically\n- Provides specific, actionable feedback\n- Respects repository style guides and conventions\n- Can suggest code fixes\n- Integration with GitHub/GitLab\n- Handles 50,000 PRs per day",
+        "level": 3
+      },
+      {
+        "id": "solution-highlights",
+        "title": "Solution Highlights",
+        "body_md": "**Key Technical Choices:**\n\n1. **Context Assembly:**\n```\nFor each changed file, assemble context:\n- The diff (changed lines)\n- Full file content (for understanding)\n- Related files (imports, tests, types)\n- Repository conventions (.eslintrc, .editorconfig)\n- Previous review comments (learn from feedback)\n```\n\n2. **Review Categories:**\n```python\nreview_types = [\n    \"bug_risk\",           # Potential bugs\n    \"security\",           # Security issues\n    \"performance\",        # Performance concerns\n    \"maintainability\",    # Code quality\n    \"style\",              # Style guide violations\n    \"test_coverage\"       # Missing tests\n]\n```\n\n3. **Model Selection:**\n```\nPrimary: Claude Sonnet 4.6 (best price-to-quality for code understanding; Opus 4.8 for the hardest reviews)\nFallback: GPT-5.5\n\nSpecialized models:\n- Security scanning: CodeQL + LLM review\n- Style: Linters + LLM explanation\n```\n\n4. **Output Format:**\n```markdown\n## Review Summary",
+        "level": 3
+      },
+      {
+        "id": "critical-issues-must-fix",
+        "title": "Critical Issues (must fix)",
+        "body_md": "- **Line 45**: SQL injection vulnerability in user query\n  ```python\n  # Instead of:\n  query = f\"SELECT * FROM users WHERE id = {user_id}\"\n  # Use:\n  query = \"SELECT * FROM users WHERE id = ?\"\n  cursor.execute(query, (user_id,))\n  ```",
+        "level": 3
+      },
+      {
+        "id": "suggestions-consider-fixing",
+        "title": "Suggestions (consider fixing)",
+        "body_md": "- **Line 78-82**: This loop could be simplified using list comprehension\n...\n```\n\n5. **Latency Strategy:**\n```\nTarget: Review ready within 2 minutes of PR creation\n\nStrategy:\n- Queue PR for processing\n- Parallel processing of files\n- Stream results as available\n- Cache repository conventions\n```\n\n---",
+        "level": 3
+      }
+    ],
+    "source": "upstream"
+  },
+  {
+    "id": "wb-04",
+    "number": 4,
+    "slug": "exercise-4-document-processing-pipeline",
+    "title": "Document Processing Pipeline",
+    "summary": "Design a document processing pipeline for financial services: - Process 100,000 documents per day (invoices, contracts, forms) - Extract structured data with 99% accuracy - Handle PDFs, scanned documents, handwritten notes - HIPAA/SOC2 compliance - Human review for low-confidence…",
+    "problem_statement": "Design a document processing pipeline for financial services:\n\n- Process 100,000 documents per day (invoices, contracts, forms)\n- Extract structured data with 99% accuracy\n- Handle PDFs, scanned documents, handwritten notes\n- HIPAA/SOC2 compliance\n- Human review for low-confidence extractions",
+    "sections": [
+      {
+        "id": "problem-statement",
+        "title": "Problem Statement",
+        "body_md": "Design a document processing pipeline for financial services:\n\n- Process 100,000 documents per day (invoices, contracts, forms)\n- Extract structured data with 99% accuracy\n- Handle PDFs, scanned documents, handwritten notes\n- HIPAA/SOC2 compliance\n- Human review for low-confidence extractions",
+        "level": 3
+      },
+      {
+        "id": "solution-highlights",
+        "title": "Solution Highlights",
+        "body_md": "**Pipeline Architecture:**\n\n```\n┌────────┐   ┌───────────┐   ┌────────────┐   ┌────────────┐\n│ Ingest │──▶│ Classify  │──▶│  Extract   │──▶│  Validate  │\n└────────┘   └───────────┘   └────────────┘   └────────────┘\n                                                     │\n                                     ┌───────────────┼───────────────┐\n                                     ▼               ▼               ▼\n                              ┌──────────┐   ┌──────────┐   ┌──────────┐\n                              │ Auto-pass│   │  Review  │   │  Reject  │\n                              └──────────┘   └──────────┘   └──────────┘\n```\n\n**Key Components:**\n\n1. **Document Classification:**\n```\nFine-tuned classifier on document types:\n- Invoice, Contract, Receipt, Form, ID, Other\n\nModel: LayoutLMv3 or fine-tuned ViT\nConfidence threshold: 0.95 for auto-routing\n```\n\n2. **Extraction Strategy:**\n```\nTiered extraction based on document type:\n\nTier 1: Document AI (Textract/Azure)\n- Good for structured forms\n- Fast and cheap\n- Returns confidence scores\n\nTier 2: Vision LLM (Claude Opus 4.8, GPT-5.5, Gemini 3.1 Pro)\n- Fallback for complex layouts\n- Better for unstructured text\n- More expensive\n\nCombine outputs and cross-validate.\n```\n\n3. **Validation Rules:**\n```python\nvalidation_rules = {\n    \"invoice\": [\n        (\"total\", lambda x: x > 0, \"Total must be positive\"),\n        (\"date\", lambda x: parse_date(x), \"Invalid date format\"),\n        (\"vendor_id\", lambda x: regex_match(x, TAX_ID_PATTERN), \"Invalid tax ID\"),\n        (\"line_items\", lambda x: sum(i.amount for i in x) == total, \"Line items must sum to total\")\n    ],\n    \"contract\": [\n        (\"parties\", lambda x: len(x) >= 2, \"Contract must have at least 2 parties\"),\n        (\"effective_date\", lambda x: parse_date(x), \"Invalid date\"),\n        (\"signature_present\", lambda x: x == True, \"Signature required\")\n    ]\n}\n```\n\n4. **Human Review Interface:**\n```\nReviewer sees:\n- Original document image\n- Extracted fields with confidence scores\n- Validation errors highlighted\n- Suggested corrections from LLM\n- One-click approval or field-level corrections\n```\n\n5. **Compliance Measures:**\n```\nHIPAA/SOC2 requirements:\n- All documents encrypted at rest (AES-256)\n- TLS 1.3 in transit\n- Audit log for all access and changes\n- PHI detection and masking\n- Retention policies enforced\n- Access controls with MFA\n```\n\n---",
+        "level": 3
+      }
+    ],
+    "source": "upstream"
+  },
+  {
+    "id": "wb-05",
+    "number": 5,
+    "slug": "exercise-5-real-time-content-moderation",
+    "title": "Real-Time Content Moderation",
+    "summary": "Design a content moderation system for a social platform: - 1 million posts per day (text, images, video) - Latency requirement: under 500ms for posts to be visible - Detect: hate speech, violence, adult content, spam - Appeal workflow for false positives - Support 10 languages",
+    "problem_statement": "Design a content moderation system for a social platform:\n\n- 1 million posts per day (text, images, video)\n- Latency requirement: under 500ms for posts to be visible\n- Detect: hate speech, violence, adult content, spam\n- Appeal workflow for false positives\n- Support 10 languages",
+    "sections": [
+      {
+        "id": "problem-statement",
+        "title": "Problem Statement",
+        "body_md": "Design a content moderation system for a social platform:\n\n- 1 million posts per day (text, images, video)\n- Latency requirement: under 500ms for posts to be visible\n- Detect: hate speech, violence, adult content, spam\n- Appeal workflow for false positives\n- Support 10 languages",
+        "level": 3
+      },
+      {
+        "id": "solution-highlights",
+        "title": "Solution Highlights",
+        "body_md": "**Architecture Pattern: Multi-Stage Cascade**\n\n```\n         ┌───────────────────────────────────────────┐\n         │              Fast Filters                 │\n         │   (regex, blocklist, hash matching)       │\n         └─────────────────┬─────────────────────────┘\n                           │ Pass 95%\n                           ▼\n         ┌───────────────────────────────────────────┐\n         │            ML Classifiers                 │\n         │   (text: BERT, image: CLIP, video: X3D)   │\n         └─────────────────┬─────────────────────────┘\n                           │ Uncertain 5%\n                           ▼\n         ┌───────────────────────────────────────────┐\n         │            LLM Analysis                   │\n         │   (context-aware, nuanced decisions)      │\n         └─────────────────┬─────────────────────────┘\n                           │ Still uncertain 0.5%\n                           ▼\n         ┌───────────────────────────────────────────┐\n         │            Human Review                   │\n         └───────────────────────────────────────────┘\n```\n\n**Key Design Decisions:**\n\n1. **Latency Optimization:**\n```\nTarget: 500ms total\n\nStage 1 (Fast): 20ms\n- Regex patterns\n- Known hash matching (PhotoDNA)\n- Blocklist lookup\n\nStage 2 (ML): 80ms\n- Batched inference on GPU\n- Small specialized models\n- Parallel text/image processing\n\nStage 3 (LLM): 400ms (async for borderline)\n- Only 5% of content reaches here\n- Used for nuanced decisions\n```\n\n2. **Threshold Strategy:**\n```python\nclass ModerationDecision:\n    BLOCK = \"block\"          # High confidence violation\n    ALLOW = \"allow\"          # High confidence safe\n    LIMIT = \"limit\"          # Reduce distribution\n    REVIEW = \"human_review\"  # Queue for human\n\nthresholds = {\n    \"hate_speech\": {\n        \"block\": 0.95,\n        \"limit\": 0.80,\n        \"review\": 0.60\n    },\n    \"adult_content\": {\n        \"block\": 0.98,  # Higher threshold, legal implications\n        \"limit\": 0.90,\n        \"review\": 0.70\n    }\n}\n```\n\n3. **Appeal Workflow:**\n```\n1. User submits appeal\n2. Content queued for human review\n3. Different reviewer than original (blind review)\n4. Decision logged with reasoning\n5. If overturned:\n   - Content restored\n   - Original decision added to training data as negative\n   - Model retrained periodically\n```\n\n---",
+        "level": 3
+      }
+    ],
+    "source": "upstream"
+  },
+  {
+    "id": "wb-06",
+    "number": 6,
+    "slug": "exercise-6-multi-tenant-ai-platform",
+    "title": "Multi-Tenant AI Platform",
+    "summary": "Design a multi-tenant AI platform (AI-as-a-Service): - Serve 500+ enterprise customers - Each customer has their own documents and models - Complete data isolation between tenants - Per-tenant usage tracking and billing - Different pricing tiers with different capabilities - SOC2…",
+    "problem_statement": "Design a multi-tenant AI platform (AI-as-a-Service):\n\n- Serve 500+ enterprise customers\n- Each customer has their own documents and models\n- Complete data isolation between tenants\n- Per-tenant usage tracking and billing\n- Different pricing tiers with different capabilities\n- SOC2 compliance required",
+    "sections": [
+      {
+        "id": "problem-statement",
+        "title": "Problem Statement",
+        "body_md": "Design a multi-tenant AI platform (AI-as-a-Service):\n\n- Serve 500+ enterprise customers\n- Each customer has their own documents and models\n- Complete data isolation between tenants\n- Per-tenant usage tracking and billing\n- Different pricing tiers with different capabilities\n- SOC2 compliance required",
+        "level": 3
+      },
+      {
+        "id": "solution-highlights",
+        "title": "Solution Highlights",
+        "body_md": "**Tenant Isolation Architecture:**\n\n```\n┌─────────────────────────────────────────────────────────────────┐\n│                         API Gateway                              │\n│  ┌──────────────────────────────────────────────────────────┐   │\n│  │   Auth → Tenant Context → Rate Limit → Route             │   │\n│  └──────────────────────────────────────────────────────────┘   │\n└─────────────────────────────────────────────────────────────────┘\n                               │\n                               ▼\n┌─────────────────────────────────────────────────────────────────┐\n│                    Tenant-Aware Service Layer                    │\n│                                                                  │\n│  All operations scoped to tenant_id from context                │\n│  - Retrieval filters by tenant                                  │\n│  - Cache keys prefixed by tenant                                │\n│  - Audit logs include tenant                                    │\n└─────────────────────────────────────────────────────────────────┘\n                               │\n           ┌───────────────────┼───────────────────┐\n           ▼                   ▼                   ▼\n┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐\n│  Shared Vector  │ │  Shared LLM     │ │  Shared Object  │\n│  DB (filtered)  │ │  (no tenant     │ │  Storage        │\n│                 │ │   data in prompt│ │  (tenant paths) │\n│  tenant_id in   │ │   history)      │ │                 │\n│  all metadata   │ │                 │ │  s3://bucket/   │\n└─────────────────┘ └─────────────────┘ │  {tenant_id}/   │\n                                        └─────────────────┘\n```\n\n**Critical Isolation Points:**\n\n```python\nclass TenantContext:\n    tenant_id: str\n    user_id: str\n    tier: str  # \"starter\" | \"pro\" | \"enterprise\"\n    \n    def __enter__(self):\n        # Set tenant context for all downstream calls\n        _tenant_context.set(self)\n        \n    def __exit__(self, *args):\n        _tenant_context.set(None)\n\n# Middleware ensures tenant context on every request\n@middleware\ndef enforce_tenant_context(request, call_next):\n    tenant_id = extract_tenant_from_token(request.headers[\"Authorization\"])\n    with TenantContext(tenant_id=tenant_id, ...):\n        verify_tenant_access(tenant_id, request.path)\n        response = call_next(request)\n        add_tenant_to_audit_log(tenant_id, request, response)\n    return response\n```\n\n**Billing and Usage Tracking:**\n\n```python\nusage_schema = {\n    \"tenant_id\": \"string\",\n    \"timestamp\": \"datetime\",\n    \"operation\": \"embed|retrieve|generate\",\n    \"model\": \"string\",\n    \"tokens_in\": \"int\",\n    \"tokens_out\": \"int\",\n    \"latency_ms\": \"int\",\n    \"cost_cents\": \"decimal\"\n}\n\n# Real-time usage aggregation\nasync def track_usage(tenant_id: str, operation: Usage):\n    # Append to time-series DB\n    await timeseries.write(\"usage\", {\n        \"tenant_id\": tenant_id,\n        **operation.dict()\n    })\n    \n    # Update real-time counter for rate limiting\n    await redis.incr(f\"usage:{tenant_id}:{today()}\", operation.tokens)\n```\n\n---",
+        "level": 3
+      }
+    ],
+    "source": "upstream"
+  },
+  {
+    "id": "wb-07",
+    "number": 7,
+    "slug": "exercise-7-semantic-search-at-scale",
+    "title": "Semantic Search at Scale",
+    "summary": "Design a semantic search system for an e-commerce site: - 50 million products - 100 million queries per day - P99 latency under 100ms - Support filters (price, category, brand, ratings) - Personalization based on user history - Real-time inventory updates",
+    "problem_statement": "Design a semantic search system for an e-commerce site:\n\n- 50 million products\n- 100 million queries per day\n- P99 latency under 100ms\n- Support filters (price, category, brand, ratings)\n- Personalization based on user history\n- Real-time inventory updates",
+    "sections": [
+      {
+        "id": "problem-statement",
+        "title": "Problem Statement",
+        "body_md": "Design a semantic search system for an e-commerce site:\n\n- 50 million products\n- 100 million queries per day\n- P99 latency under 100ms\n- Support filters (price, category, brand, ratings)\n- Personalization based on user history\n- Real-time inventory updates",
+        "level": 3
+      },
+      {
+        "id": "solution-highlights",
+        "title": "Solution Highlights",
+        "body_md": "**Key Challenge: 100ms at 100M queries/day**\n\n```\n100M queries/day = 1,157 QPS average\nPeak: 5,000-10,000 QPS\n\nAt 100ms latency, need:\n- Edge caching\n- Pre-computed embeddings\n- Optimized retrieval\n- Minimal LLM involvement\n```\n\n**Architecture:**\n\n```\n┌────────────────────────────────────────────────────────────┐\n│                         CDN/Edge                            │\n│              (Cache popular queries: ~30% hit)              │\n└─────────────────────────────┬──────────────────────────────┘\n                              │\n┌─────────────────────────────▼──────────────────────────────┐\n│                      Query Service                          │\n│  1. Embed query (cached embeddings for common queries)      │\n│  2. Retrieve candidates (ANN search)                        │\n│  3. Apply filters (post-filter or hybrid)                   │\n│  4. Personalize ranking                                     │\n│  5. Return results                                          │\n└─────────────────────────────┬──────────────────────────────┘\n                              │\n┌─────────────────────────────▼──────────────────────────────┐\n│                    Vector Database Cluster                  │\n│  - Sharded by category (reduce search space)                │\n│  - HNSW index with ef_search tuned for speed                │\n│  - Metadata filtering with roaring bitmaps                  │\n└────────────────────────────────────────────────────────────┘\n```\n\n**Latency Budget:**\n\n```\nEdge cache check:    5ms\nEmbedding lookup:   10ms (cached) or 30ms (compute)\nVector search:      30ms\nFiltering:          10ms\nPersonalization:    10ms\nSerialization:      10ms\nNetwork overhead:   25ms\n─────────────────────\nTotal:              100ms target (with cache hit)\n```\n\n**Hybrid Search Strategy:**\n\n```python\ndef search(query: str, filters: dict, user_id: str) -> List[Product]:\n    # Determine search strategy based on query\n    if is_keyword_heavy(query):\n        # \"nike air max 90 size 10\"\n        sparse_weight = 0.7\n        dense_weight = 0.3\n    else:\n        # \"comfortable running shoes for flat feet\"\n        sparse_weight = 0.3\n        dense_weight = 0.7\n    \n    # Parallel retrieval\n    dense_results = vector_db.search(embed(query), top_k=100, filter=filters)\n    sparse_results = elastic.search(query, top_k=100, filter=filters)\n    \n    # Reciprocal rank fusion\n    combined = rrf_merge(\n        [dense_results, sparse_results],\n        weights=[dense_weight, sparse_weight]\n    )\n    \n    # Personalization boost\n    personalized = apply_user_preferences(combined, user_id)\n    \n    return personalized[:20]\n```\n\n**Real-Time Updates:**\n\n```\nProduct updates (price, inventory) flow:\n1. Change event published to Kafka\n2. Consumer updates vector DB metadata\n3. Search reflects change within seconds\n\nReindexing (description changes):\n1. Full re-embed required\n2. Run as async job\n3. Swap index when complete\n```\n\n---",
+        "level": 3
+      }
+    ],
+    "source": "upstream"
+  },
+  {
+    "id": "wb-08",
+    "number": 8,
+    "slug": "exercise-8-evaluation-pipeline-for-a-production-llm-product",
+    "title": "Evaluation Pipeline for a Production LLM Product",
+    "summary": "\"Your company ships an AI assistant used by 50,000 daily users. Leadership wants to ship model and prompt changes weekly without quality regressions. Design the evaluation pipeline: offline evals, CI gating, judge calibration, and production monitoring. Budget: the eval system it…",
+    "problem_statement": "\"Your company ships an AI assistant used by 50,000 daily users. Leadership wants to ship model and prompt changes weekly without quality regressions. Design the evaluation pipeline: offline evals, CI gating, judge calibration, and production monitoring. Budget: the eval system itself should cost under 2% of inference spend.\"",
+    "sections": [
+      {
+        "id": "problem-statement",
+        "title": "Problem Statement",
+        "body_md": "\"Your company ships an AI assistant used by 50,000 daily users. Leadership wants to ship model and prompt changes weekly without quality regressions. Design the evaluation pipeline: offline evals, CI gating, judge calibration, and production monitoring. Budget: the eval system itself should cost under 2% of inference spend.\"",
+        "level": 3
+      },
+      {
+        "id": "clarifying-questions-to-ask",
+        "title": "Clarifying Questions to Ask",
+        "body_md": "- What does \"quality\" mean for this product? (Task success, faithfulness, tone, safety?)\n- Do we have any labeled data today, or are we starting from zero?\n- What is the change velocity? (Prompts daily, models monthly?)\n- What is the cost of a shipped regression? (Support tickets, churn, regulatory exposure?)\n- Who consumes eval results? (Engineers gating PRs, PMs tracking quality, execs tracking trend lines?)",
+        "level": 3
+      },
+      {
+        "id": "what-distinguishes-strong-candidates",
+        "title": "What Distinguishes Strong Candidates",
+        "body_md": "- They design the dataset before the scorer; a great judge on a stale dataset measures nothing.\n- They treat the judge as a system component with its own eval (calibration vs humans), not as ground truth.\n- They name eval gaming risks unprompted: dev-set overfitting, judge sycophancy, metric narrowing, silent exclusion of hard cases.\n- They link offline scores to production outcomes instead of celebrating green dashboards.\n- They quantify the eval budget and place the expensive human grading where it has the most leverage.\n\n---",
+        "level": 3
+      },
+      {
+        "id": "content",
+        "title": "Overview",
+        "body_md": "**High-level architecture:**\n\n```\n                    ┌────────────────────────────────────────────┐\n                    │              EVAL PIPELINE                  │\n                    │                                             │\n  Prompt/model PR ──► CI runner ── dev set (visible, ~200 cases) │\n                    │     │                                       │\n                    │     ├── held-out set (CI-only, ~300 cases,  │\n                    │     │    rotated quarterly)                  │\n                    │     │                                       │\n                    │     └── gate: pass/fail vs baseline ──► merge│\n                    │                                             │\n  Production ──────► sampler (1-5% of traffic)                   │\n                    │     │                                       │\n                    │     ├── LLM-judge scoring (async, cheap)    │\n                    │     ├── human-graded slice (weekly, ~100)   │\n                    │     └── outcome metrics (thumbs, escalation)│\n                    │                                             │\n                    └──── dashboards + regression alerts ─────────┘\n```\n\n**1. Dataset strategy (the part most candidates skip):**\n\n```\nGolden dataset composition:\n- 40% sampled from real production traces (stratified by intent cluster)\n- 30% known-hard cases from past incidents and complaints\n- 20% adversarial cases (injection attempts, edge formats)\n- 10% canary cases that must never change behavior\n\nSplit: dev (iterate freely) / held-out (CI-only, never inspected)\nRefresh: quarterly, sampled from recent traffic; archive old sets\n```\n\n**2. Scoring design:**\n\n- Binary pass/fail per dimension (faithfulness, completeness, tone, safety), not 1-5 scales. Binary decisions are reproducible; Likert drifts.\n- LLM-as-judge for scale: a cheap model (Claude Haiku 4.5, GPT-5.5-mini) with a rubric and few-shot anchors per dimension.\n- Judge calibration: monthly agreement check against the human-graded slice. Judge-human agreement is itself a dashboard metric; below 85% agreement, the judge prompt gets fixed before any product conclusions are drawn.\n\n**3. CI gating:**\n\n```python\ndef eval_gate(pr_results, baseline_results):\n    # Hard gates: any safety regression blocks merge\n    if pr_results.safety_pass_rate < baseline_results.safety_pass_rate:\n        return Block(reason=\"safety regression\")\n    # Soft gates: quality within noise band\n    delta = pr_results.task_success - baseline_results.task_success\n    if delta < -0.02:                  # 2pt regression threshold\n        return Block(reason=f\"quality drop {delta:.1%}\")\n    if pr_results.held_out_success < pr_results.dev_success - 0.05:\n        return Warn(reason=\"possible dev-set overfitting\")\n    return Pass()\n```\n\n**4. Production monitoring:**\n\n- Sampled judge scoring on live traffic (1-5%), trended daily.\n- Outcome linkage: complaint rate, thumbs-down rate, and escalation rate plotted against eval scores on the same dashboard. Divergence between eval trend and outcome trend triggers an eval review.\n- Drift alarms: input distribution shift (intent cluster mix), score drop by segment, and judge agreement decay.\n\n**5. Cost control:**\n\n```\n50K DAU, ~3 requests each = 150K requests/day\nSample 2% = 3K judged requests/day\nJudge cost: ~1K tokens per judgment on a $1/1M model = ~$3/day\nWeekly human slice: 100 cases x 3 min reviewer time\nCI runs: 500 cases x ~2K tokens per PR = under $2 per PR\nTotal: well under the 2% budget; the human slice is the\ndominant cost and it is what keeps the judge honest.\n```",
+        "level": 4
+      }
+    ],
+    "source": "upstream"
+  },
+  {
+    "id": "wb-09",
+    "number": 9,
+    "slug": "exercise-9-memory-and-state-for-a-long-running-agent",
+    "title": "Memory and State for a Long-Running Agent",
+    "summary": "\"Design the memory system for a personal AI assistant that works with a user over months: it should remember preferences and facts, learn from past sessions, recall relevant history at the right moments, and forget what it should not keep. Sessions can run for hours. Support 1M u…",
+    "problem_statement": "\"Design the memory system for a personal AI assistant that works with a user over months: it should remember preferences and facts, learn from past sessions, recall relevant history at the right moments, and forget what it should not keep. Sessions can run for hours. Support 1M users.\"",
+    "sections": [
+      {
+        "id": "problem-statement",
+        "title": "Problem Statement",
+        "body_md": "\"Design the memory system for a personal AI assistant that works with a user over months: it should remember preferences and facts, learn from past sessions, recall relevant history at the right moments, and forget what it should not keep. Sessions can run for hours. Support 1M users.\"",
+        "level": 3
+      },
+      {
+        "id": "clarifying-questions-to-ask",
+        "title": "Clarifying Questions to Ask",
+        "body_md": "- What memory failures hurt most: forgetting something important, or recalling something wrong or stale?\n- Privacy constraints? (GDPR deletion, per-user isolation, regulated data?)\n- Is memory per-user only, or shared organizational knowledge too?\n- Latency budget for recall on each turn?\n- How long do individual sessions run? (Determines in-session vs cross-session design.)",
+        "level": 3
+      },
+      {
+        "id": "what-distinguishes-strong-candidates",
+        "title": "What Distinguishes Strong Candidates",
+        "body_md": "- They separate in-session context management from cross-session memory instead of conflating them.\n- They spend time on the write path (extraction, dedup, conflict supersession) rather than only on retrieval.\n- They treat wrong recall as worse than no recall and design the relevance gate accordingly.\n- They name memory poisoning as a security surface: untrusted content written today and trusted tomorrow needs provenance tags and review gates.\n- They mention production frameworks (Mem0, Zep, Letta) as build-vs-buy options while still being able to design from primitives.\n\n---\n\n## Tips for Whiteboard Exercises",
+        "level": 3
+      },
+      {
+        "id": "drawing-tips",
+        "title": "Drawing Tips",
+        "body_md": "1. **Start with boxes and labels** before connecting with arrows\n2. **Use consistent notation**: rectangles for services, cylinders for databases, arrows for data flow\n3. **Label data on arrows**: what flows between components\n4. **Leave space** for additions as you discuss",
+        "level": 3
+      },
+      {
+        "id": "common-patterns-to-know",
+        "title": "Common Patterns to Know",
+        "body_md": "| Pattern | When to Use | Draw As |\n|---------|-------------|---------|\n| Load balancer + service fleet | Any scaled service | LB → multiple boxes |\n| Queue + workers | Async processing | Queue → worker pool |\n| Cache layer | Read-heavy, latency-sensitive | Diamond before service |\n| CDC/streaming | Real-time updates | Kafka/stream icon |\n| Sidecar | Cross-cutting concerns | Small box attached to service |",
+        "level": 3
+      },
+      {
+        "id": "phrases-that-signal-strong-candidates",
+        "title": "Phrases That Signal Strong Candidates",
+        "body_md": "- \"Before I design this, let me understand the scale...\"\n- \"The tradeoff here is...\"\n- \"In production, we would also need...\"\n- \"One failure mode to consider is...\"\n- \"Let me walk you through the latency budget...\"\n- \"For evaluation, I would measure...\"",
+        "level": 3
+      },
+      {
+        "id": "time-management",
+        "title": "Time Management",
+        "body_md": "- Do not spend more than 5 minutes on clarification\n- Draw the complete high-level picture before deep diving\n- Leave time for reliability and evaluation\n- Check in with the interviewer on focus areas\n\n---\n\n*See also: [Question Bank](01-question-bank.md) | [Answer Frameworks](02-answer-frameworks.md) | [Common Pitfalls](03-common-pitfalls.md)*",
+        "level": 3
+      },
+      {
+        "id": "content",
+        "title": "Overview",
+        "body_md": "**The memory hierarchy:**\n\n```\n┌──────────────────────────────────────────────────────────┐\n│ L1 Working memory: the context window                     │\n│   Current session, tool results, scratchpad               │\n│   Managed by compaction + just-in-time loading            │\n├──────────────────────────────────────────────────────────┤\n│ L2 Episodic memory: what happened                         │\n│   Past session summaries, trajectories, outcomes          │\n│   Store: vector DB, retrieved by similarity + recency     │\n├──────────────────────────────────────────────────────────┤\n│ L3 Semantic memory: what is true                          │\n│   Extracted facts and preferences with provenance         │\n│   Store: structured records or knowledge graph            │\n├──────────────────────────────────────────────────────────┤\n│ L4 Procedural memory: how to do things                    │\n│   Learned workflows, per-user playbooks (skills)          │\n│   Store: versioned files, loaded on demand                │\n└──────────────────────────────────────────────────────────┘\n```\n\n**1. In-session (L1): context engineering, not storage.**\nCompaction at a window threshold (summarize history, keep recent artifacts), just-in-time loading of large content by reference, and a structured scratch note the agent re-reads after compaction. A session that runs hours never holds its whole transcript in context.\n\n**2. Write path (the hard part):**\n\n```\nSession ends (or hits checkpoint)\n    │\n    ├── Summarize episode → L2 (embedding + metadata:\n    │     timestamp, topics, outcome, sentiment)\n    │\n    └── Fact extraction pass → candidate facts\n          │\n          ├── Deduplicate against existing L3\n          ├── Conflict check: contradicts a stored fact?\n          │     ├── Newer + higher confidence → supersede (keep old\n          │     │     version with valid_to timestamp)\n          │     └── Ambiguous → store as candidate, confirm with\n          │           user at next natural opportunity\n          └── Importance filter: discard chit-chat, keep\n                preferences, commitments, corrections\n```\n\nThe conflict path matters most: \"user moved from Madrid to Lisbon\" must supersede, not coexist. Bitemporal records (valid_from, valid_to) make supersession auditable and reversible.\n\n**3. Read path:**\n\n- Each turn builds a recall query from the current intent, retrieves top-k from L2 (similarity + recency + importance weighting) and matching facts from L3.\n- A relevance gate drops weak matches rather than stuffing them in; wrong memories poison the response worse than missing ones.\n- Recall budget: a few hundred tokens of memory per turn, never a transcript dump.\n\n**4. Forgetting and privacy:**\n\n- Decay: episodic entries lose retrieval weight over time unless reinforced by access.\n- Consolidation: a periodic job merges related episodes into summaries (many \"billing question\" episodes become one pattern note).\n- GDPR deletion: per-user partition keys everywhere; deletion removes L2/L3/L4 rows and invalidates caches. Hard isolation per user; memory is never shared across tenants by similarity.\n\n**5. Scale sketch (1M users):**\n\n```\nStorage: ~thousands of L2 entries + hundreds of L3 facts per\n  active user; vector DB partitioned by user_id (metadata\n  filter or namespace per tenant tier)\nWrite path: async after session close; queue + worker pool\nRead path: p95 < 150ms recall (ANN on a per-user slice is small)\nCost: extraction pass on session close is the main LLM cost;\n  use a cheap model (Haiku 4.5 / V4 Flash) with a strict schema\n```",
+        "level": 4
+      }
+    ],
+    "source": "upstream"
+  }
+]

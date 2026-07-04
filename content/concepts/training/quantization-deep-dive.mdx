@@ -1,0 +1,70 @@
+---
+title: Quantization Deep Dive
+slug: quantization-deep-dive
+type: concept
+area: training
+difficulty: intermediate
+tags:
+  - training
+  - quantization
+  - deep
+  - dive
+diagrams:
+  - diagrams/quantization-deep-dive--overview.svg
+est_minutes: 5
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The 30-second version
+
+Quantization is the process of reducing the precision of model weights (e.g., from 16-bit to 4-bit) to save memory and increase inference speed. This is the primary tool for deploying large models on consumer and single-GPU hardware.
+
+## The analogy
+
+Think of **Quantization Deep Dive** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Quantization Deep Dive overview](diagrams/quantization-deep-dive--overview.svg)
+
+Quantization is the process of reducing the precision of model weights (e.g., from 16-bit to 4-bit) to save memory and increase inference speed. This is the primary tool for deploying large models on consumer and single-GPU hardware.
+
+## A concrete example
+
+Quantization is the process of reducing the precision of model weights (e.g., from 16-bit to 4-bit) to save memory and increase inference speed. This is the primary tool for deploying large models on consumer and single-GPU hardware.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: Why do we use NF4 instead of standard Float4 for QLoRA?
+
+**Strong answer:**
+Standard Float4 has a fixed grid that doesn't map well to the actual distribution of LLM weights, which typically follow a zero-centered normal distribution. NF4 (NormalFloat4) is a data type that is mathematically optimized so that each quantization bin contains an equal number of values from the normal distribution. This prevents "clustering" of weights and ensures that the model preserves as much information (entropy) as possible, leading to significantly higher accuracy than standard 4-bit integers.
+
+### Q: How does AWQ differ from GPTQ?
+
+**Strong answer:**
+GPTQ is a "Layer-wise" quantization method that minimizes the mean squared error of the weights. AWQ (Activation-aware Weight Quantization) is "input-aware." It identifies which weights are the most "salient" based on the actual activation values seen during a small calibration run. By preserving only these important weights (usually 1%) in higher precision and quantizing the rest, AWQ achieves better perplexity than GPTQ, especially for smaller models or more aggressive quantization (e.g., 3-bit).
+
+## Go deeper
+
+- [Upstream chapter (Quantization Deep Dive)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/03-training-and-adaptation/07-quantization-deep-dive.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

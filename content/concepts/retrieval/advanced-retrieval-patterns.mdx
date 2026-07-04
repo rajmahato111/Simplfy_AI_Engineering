@@ -75,7 +75,7 @@ The throughline: every pattern here is a query-time tax, paid on every request, 
 
 ## Where people go wrong
 
-1. **Stacking every pattern by default.** Decomposition, HyDE, multi-query, and self-query filtering running on every request multiplies latency and LLM cost for questions that needed none of it. Match the pattern to a diagnosed failure mode, same as [reranking](./reranking.mdx).
+1. **Stacking every pattern by default.** Decomposition, HyDE, multi-query, and self-query filtering running on every request multiplies latency and LLM cost for questions that needed none of it. Match the pattern to a diagnosed failure mode, same as [reranking](./reranking-strategies.mdx).
 2. **Trusting HyDE on out-of-corpus questions.** If the corpus doesn't contain the answer, HyDE still generates a fluent hypothetical — and confidently retrieves whatever is *nearest* to that hallucination. Pair it with a literal-query fallback.
 3. **Treating self-query filters as free precision.** A misparsed filter doesn't degrade gracefully — it silently drops the correct document before semantic search even runs.
 4. **Multi-query without deduplication.** Four paraphrases that all surface the same three chunks add latency without adding recall; check paraphrase diversity before shipping.
@@ -96,6 +96,6 @@ Likely follow-ups:
 ## Go deeper
 
 - [Hybrid Search](./hybrid-search.mdx) — the dense-plus-lexical fusion these patterns often sit on top of.
-- [Reranking](./reranking.mdx) — the complementary precision layer applied after these patterns produce a candidate pool.
+- [Reranking](./reranking-strategies.mdx) — the complementary precision layer applied after these patterns produce a candidate pool.
 - [Contextual Retrieval](./contextual-retrieval.mdx) — the ingestion-time alternative that fixes some of the same mismatches for a one-time cost instead of a per-query one.
 - Upstream reference: [Advanced Retrieval Patterns — AI System Design Guide](https://github.com/ombharatiya/ai-system-design-guide/blob/main/06-retrieval-systems/09-advanced-retrieval-patterns.md) (MIT; see [CREDITS](../../../CREDITS.md)).

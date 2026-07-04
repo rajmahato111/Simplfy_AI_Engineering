@@ -1,0 +1,75 @@
+---
+title: Framework Selection Guide
+slug: framework-selection-guide
+type: concept
+area: frameworks
+difficulty: intermediate
+tags:
+  - frameworks
+  - framework
+  - selection
+  - guide
+diagrams:
+  - diagrams/framework-selection-guide--overview.svg
+est_minutes: 5
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The 30-second version
+
+The landscape of AI frameworks has consolidated significantly over the past year. Every major AI lab now ships an agent SDK, Microsoft merged AutoGen and Semantic Kernel into a unified Agent Framework, and interoperability protocols (MCP, A2A) are table stakes. This guide provides the Decision Matrix for choosing your stack based on production requirements, team expertise, and system scale.
+
+## The analogy
+
+Think of **Framework Selection Guide** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Framework Selection Guide overview](diagrams/framework-selection-guide--overview.svg)
+
+The landscape of AI frameworks has consolidated significantly over the past year. Every major AI lab now ships an agent SDK, Microsoft merged AutoGen and Semantic Kernel into a unified Agent Framework, and interoperability protocols (MCP, A2A) are table stakes. This guide provides the **Decision Matrix** for choosing your stack based on production requirements, team expertise, and system scale.
+
+## A concrete example
+
+The landscape of AI frameworks has consolidated significantly over the past year. Every major AI lab now ships an agent SDK, Microsoft merged AutoGen and Semantic Kernel into a unified Agent Framework, and interoperability protocols (MCP, A2A) are table stakes. This guide provides the Decision Matrix for choosing your stack based on production requirements, team expertise, and system scale.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: Why do we see a trend towards "Programming" (DSPy) instead of "Prompting"?
+
+**Strong answer:**
+**Industrialization**. Prompt engineering is "Alchemy": it is inconsistent and does not scale. Programming LLMs via Frameworks like DSPy allows us to treat AI as a **Software Engineering discipline**. We can apply CI/CD, unit testing (metrics), and automated optimization. This moves AI from "Nondeterministic Magic" to a **Predictable Component** of a larger distributed system, which is a requirement for any mission-critical production environment.
+
+### Q: If you had to build a system that works across OpenAI, Anthropic, and local Llama models, how would you architect it?
+
+**Strong answer:**
+I would use **DSPy** for the prompt layer and **LangGraph** for the orchestration layer. DSPy's **Signatures** allow me to decouple the task definition from the model's specific behavior. I would then use a **Universal Model Gateway** (like LiteLLM or an internal proxy) to handle the different API formats. For tool access, I would use **MCP** — it is model-agnostic, so the same MCP servers work regardless of which LLM backend is active. If I need cross-team agent coordination, I would use **A2A** at the boundary layer. This stack ensures that if I need to switch from GPT-4o to Claude Sonnet 4 for cost or latency reasons, I do not have to rewrite 50 prompts; I just re-compile or update the config.
+
+### Q: With every AI lab shipping its own agent SDK (Claude Agent SDK, OpenAI Agents SDK, Google ADK), how do you avoid vendor lock-in?
+
+**Strong answer:**
+The key is to **separate the orchestration layer from the model layer**. I use a framework-agnostic orchestrator like LangGraph or a thin custom wrapper for the core workflow logic. Model-specific SDKs are useful for prototyping or when you are committed to a single provider, but for production multi-vendor systems, I keep the model interaction behind an abstraction (LiteLLM gateway or DSPy signatures). For tool access, **MCP** provides portability — the same MCP server works with any SDK. For agent coordination, **A2A** provides vendor-neutral agent-to-agent communication. The practical rule: use lab-specific SDKs at the leaf nodes (individual agent implementations) but keep the orchestration graph vendor-neutral.
+
+## Go deeper
+
+- [Upstream chapter (Framework Selection Guide)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/09-frameworks-and-tools/08-framework-selection-guide.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

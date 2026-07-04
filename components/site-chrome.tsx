@@ -68,6 +68,7 @@ const FOOTER_COLUMNS = [
       { href: "/learn", label: "All tracks" },
       { href: "/learn/concepts/retrieval/rag-fundamentals", label: "RAG fundamentals" },
       { href: "/questions", label: "Question bank" },
+      { href: "/frameworks", label: "Answer frameworks" },
     ],
   },
   {
@@ -75,14 +76,23 @@ const FOOTER_COLUMNS = [
     links: [
       { href: "/practice", label: "Guided practice" },
       { href: "/mock", label: "Mock interview" },
+      { href: "/whiteboard", label: "Whiteboard" },
+      { href: "/flashcards", label: "Flashcards" },
       { href: "/tutor", label: "AI tutor" },
+    ],
+  },
+  {
+    title: "Career",
+    links: [
+      { href: "/prep", label: "Prep hub" },
+      { href: "/study-plan", label: "Study plan" },
+      { href: "/pricing", label: "Pricing" },
     ],
   },
   {
     title: "Links",
     links: [
       { href: "/credits", label: "Credits" },
-      { href: "/pricing", label: "Pricing" },
     ],
   },
 ];

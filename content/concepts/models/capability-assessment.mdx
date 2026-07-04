@@ -1,0 +1,111 @@
+---
+title: Capability Assessment
+slug: capability-assessment
+type: concept
+area: models
+difficulty: intermediate
+tags:
+  - models
+  - capability
+  - assessment
+diagrams:
+  - diagrams/capability-assessment--overview.svg
+est_minutes: 5
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The 30-second version
+
+This chapter covers how to evaluate and compare model capabilities for your specific use case. Generic benchmarks rarely tell the full story; this guide helps you conduct meaningful assessments.
+
+## The analogy
+
+Think of **Capability Assessment** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Capability Assessment overview](diagrams/capability-assessment--overview.svg)
+
+This chapter covers how to evaluate and compare model capabilities for your specific use case. Generic benchmarks rarely tell the full story; this guide helps you conduct meaningful assessments.
+
+## A concrete example
+
+This chapter covers how to evaluate and compare model capabilities for your specific use case. Generic benchmarks rarely tell the full story; this guide helps you conduct meaningful assessments.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: How would you evaluate models for a customer support chatbot?
+
+**Strong answer:**
+I would structure evaluation in layers:
+
+**1. Offline evaluation (80% of effort):**
+- Create test set from real support tickets (200+ cases)
+- Cover all categories: billing, technical, returns, general
+- Include easy, medium, hard difficulty
+- Measure: accuracy, helpfulness, safety
+
+**2. Evaluation method:**
+- Use LLM-as-judge for subjective metrics
+- Human review for sample (20%)
+- Track instruction following (format, length)
+
+**3. Metrics:**
+```python
+metrics = {
+    "resolution_accuracy": "Does answer solve the problem?",
+    "safety": "No harmful/wrong advice?", 
+    "tone": "Professional and empathetic?",
+    "escalation_appropriate": "Knows when to involve human?"
+}
+```
+
+**4. Production validation:**
+- Shadow mode: run new model, compare outputs
+- A/B test: 10% traffic to new model
+- Monitor: CSAT, escalation rate, resolution time
+
+### Q: What is wrong with using MMLU to compare models for your use case?
+
+**Strong answer:**
+MMLU has several problems for specific use cases:
+
+**1. Domain mismatch:** MMLU tests academic knowledge. My customer support bot needs product knowledge.
+
+**2. Format mismatch:** MMLU is multiple choice. My use case is free-form generation.
+
+**3. Contamination:** Models may have trained on MMLU questions.
+
+**4. Aggregation hides variance:** Model A might beat B on MMLU but lose on the specific categories I care about.
+
+**5. No context testing:** MMLU does not test RAG or long-context abilities.
+
+**Better approach:** 
+- Use MMLU for initial filtering (saves time)
+- Build custom evaluation for final decision
+- Test on actual use case data
+- Include operational metrics (latency, cost)
+
+## Go deeper
+
+- [Upstream chapter (Capability Assessment)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/02-model-landscape/02-capability-assessment.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

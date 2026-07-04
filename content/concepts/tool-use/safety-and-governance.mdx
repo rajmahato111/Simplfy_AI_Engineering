@@ -1,0 +1,67 @@
+---
+title: Safety and Governance for Tool-Using Agents
+slug: safety-and-governance
+type: concept
+area: tool-use
+difficulty: advanced
+tags:
+  - tool-use
+  - safety
+  - and
+  - governance
+diagrams:
+  - diagrams/safety-and-governance--overview.svg
+est_minutes: 5
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The 30-second version
+
+This is the most important chapter in this section. A tool-using agent is not a chatbot. A chatbot says wrong things. An agent does wrong things: deletes databases, exfiltrates data, submits fraudulent transactions, and brings down production infrastructure. In 2026, 88% of organizations reported confirmed or suspected AI agent security incidents. 80% of organizations say they have encountered risky behaviors from AI agents, including improper data exposure and unauthorized system access. Only 14.4% report all AI agents going live with full security/IT approval. This chapter provides the defense-in-depth architecture you need to deploy agents safely.
+
+## The analogy
+
+Think of **Safety and Governance for Tool-Using Agents** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Safety and Governance for Tool-Using Agents overview](diagrams/safety-and-governance--overview.svg)
+
+This is the most important chapter in this section. A tool-using agent is not a chatbot. A chatbot says wrong things. An agent **does** wrong things: deletes databases, exfiltrates data, submits fraudulent transactions, and brings down production infrastructure. In 2026, 88% of organizations reported confirmed or suspected AI agent security incidents. 80% of organizations say they have encountered risky behaviors from AI agents, including improper data exposure and unauthorized system access. Only 14.4% report all AI agents going live with full security/IT approval. This chapter provides the defense-in-depth architecture you need to deploy agents safely.
+
+> [!NOTE]
+> For prompt injection fundamentals, see [05-prompting-and-context/08-prompt-injection-defense.md](../05-prompting-and-context/08-prompt-injection-defense.md). For basic sandboxing patterns, see [07-agentic-systems/09-agentic-security-and-sandboxing.md](../07-agentic-systems/09-agentic-security-and-sandboxing.md). This chapter focuses specifically on tool-use security, computer agent safety, and enterprise governance in 2026.
+
+## A concrete example
+
+This is the most important chapter in this section. A tool-using agent is not a chatbot. A chatbot says wrong things. An agent does wrong things: deletes databases, exfiltrates data, submits fraudulent transactions, and brings down production infrastructure. In 2026, 88% of organizations reported confirmed or suspected AI agent security incidents. 80% of organizations say they have encountered risky behaviors from AI agents, including improper data exposure and unauthorized system access. Only 14.4% report all AI agents going live with full security/IT approval. This chapter provides the defense-in-depth architecture you need to deploy agents safely.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+- What tradeoffs would you highlight in an interview?
+- How would you measure success in production?
+- What failure modes would you design for?
+
+## Go deeper
+
+- [Upstream chapter (Safety and Governance for Tool-Using Agents)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/17-tool-use-and-computer-agents/07-safety-and-governance.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

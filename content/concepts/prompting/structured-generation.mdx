@@ -1,0 +1,69 @@
+---
+title: Structured Generation
+slug: structured-generation
+type: concept
+area: prompting
+difficulty: intermediate
+tags:
+  - prompting
+  - structured
+  - generation
+diagrams:
+  - diagrams/structured-generation--overview.svg
+est_minutes: 5
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The 30-second version
+
+Structured Generation is the process of forcing an LLM to produce output in a machine-readable format (JSON, YAML, CSV) with 100% reliability. The discipline has moved from "prompt-based requests" to "engine-level constraints."
+
+## The analogy
+
+Think of **Structured Generation** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Structured Generation overview](diagrams/structured-generation--overview.svg)
+
+Structured Generation is the process of forcing an LLM to produce output in a machine-readable format (JSON, YAML, CSV) with 100% reliability. The discipline has moved from "prompt-based requests" to "engine-level constraints."
+
+## A concrete example
+
+Structured Generation is the process of forcing an LLM to produce output in a machine-readable format (JSON, YAML, CSV) with 100% reliability. The discipline has moved from "prompt-based requests" to "engine-level constraints."
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: Why is "JSON Mode" more reliable than prompt-based JSON requests?
+
+**Strong answer:**
+Prompt-based requests rely on the model's *willingness* to follow instructions; "JSON Mode" (or Constrained Decoding) relies on the serving engine's *inability* to do anything else. By applying a "Logit Bias" or a "Grammar Mask" at the inference level, the engine restricts the choice of the next token to only those that would be valid according to the schema. This eliminates the "preamble" (e.g., "Sure, here is your JSON...") and ensures that you never get a malformed string due to high temperature or randomness.
+
+### Q: What is the risk of asking an LLM for too many structured fields at once?
+
+**Strong answer:**
+There is a trade-off between **Schema Complexity** and **Information Integrity**. As the schema grows (e.g., 20+ hierarchical fields), the model's attention is consumed by maintaining the JSON structure (brackets, keys, quotes) rather than verifying the accuracy of the data. This often leads to "Omission Hallucinations" where the model skips fields or fills them with placeholder data. The mitigation is to use a "Chain-of-Density" extraction or split the extraction into multiple parallel sub-tasks.
+
+## Go deeper
+
+- [Upstream chapter (Structured Generation)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/05-prompting-and-context/06-structured-generation.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

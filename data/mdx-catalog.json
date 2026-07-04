@@ -1,0 +1,1002 @@
+[
+  {
+    "upstream_path": "01-foundations/01-llm-internals.md",
+    "section": "01-foundations",
+    "area": "foundations",
+    "slug": "llm-internals",
+    "target_mdx": "concepts/foundations/llm-internals",
+    "skip": false
+  },
+  {
+    "upstream_path": "01-foundations/02-tokenization-deep-dive.md",
+    "section": "01-foundations",
+    "area": "foundations",
+    "slug": "tokenization-deep-dive",
+    "target_mdx": "concepts/foundations/tokenization-deep-dive",
+    "skip": false
+  },
+  {
+    "upstream_path": "01-foundations/03-attention-mechanisms.md",
+    "section": "01-foundations",
+    "area": "foundations",
+    "slug": "attention-mechanisms",
+    "target_mdx": "concepts/foundations/attention-mechanisms",
+    "skip": false
+  },
+  {
+    "upstream_path": "01-foundations/04-transformer-architecture.md",
+    "section": "01-foundations",
+    "area": "foundations",
+    "slug": "transformer-architecture",
+    "target_mdx": "concepts/foundations/transformer-architecture",
+    "skip": false
+  },
+  {
+    "upstream_path": "01-foundations/05-embeddings-and-vector-spaces.md",
+    "section": "01-foundations",
+    "area": "foundations",
+    "slug": "embeddings-and-vector-spaces",
+    "target_mdx": "concepts/foundations/embeddings-and-vector-spaces",
+    "skip": false
+  },
+  {
+    "upstream_path": "01-foundations/06-inference-pipeline.md",
+    "section": "01-foundations",
+    "area": "foundations",
+    "slug": "inference-pipeline",
+    "target_mdx": "concepts/foundations/inference-pipeline",
+    "skip": false
+  },
+  {
+    "upstream_path": "02-model-landscape/01-model-taxonomy.md",
+    "section": "02-model-landscape",
+    "area": "models",
+    "slug": "model-taxonomy",
+    "target_mdx": "concepts/models/model-taxonomy",
+    "skip": false
+  },
+  {
+    "upstream_path": "02-model-landscape/02-capability-assessment.md",
+    "section": "02-model-landscape",
+    "area": "models",
+    "slug": "capability-assessment",
+    "target_mdx": "concepts/models/capability-assessment",
+    "skip": false
+  },
+  {
+    "upstream_path": "02-model-landscape/03-pricing-and-costs.md",
+    "section": "02-model-landscape",
+    "area": "models",
+    "slug": "pricing-and-costs",
+    "target_mdx": "concepts/models/pricing-and-costs",
+    "skip": false
+  },
+  {
+    "upstream_path": "02-model-landscape/04-model-selection-guide.md",
+    "section": "02-model-landscape",
+    "area": "models",
+    "slug": "model-selection-guide",
+    "target_mdx": "concepts/models/model-selection-guide",
+    "skip": false
+  },
+  {
+    "upstream_path": "03-training-and-adaptation/01-pretraining-basics.md",
+    "section": "03-training-and-adaptation",
+    "area": "training",
+    "slug": "pretraining-basics",
+    "target_mdx": "concepts/training/pretraining-basics",
+    "skip": false
+  },
+  {
+    "upstream_path": "03-training-and-adaptation/02-fine-tuning-strategies.md",
+    "section": "03-training-and-adaptation",
+    "area": "training",
+    "slug": "fine-tuning-strategies",
+    "target_mdx": "concepts/training/fine-tuning-strategies",
+    "skip": false
+  },
+  {
+    "upstream_path": "03-training-and-adaptation/03-lora-qlora-peft.md",
+    "section": "03-training-and-adaptation",
+    "area": "training",
+    "slug": "lora-qlora-peft",
+    "target_mdx": "concepts/training/lora-qlora-peft",
+    "skip": false
+  },
+  {
+    "upstream_path": "03-training-and-adaptation/04-rlhf-and-dpo.md",
+    "section": "03-training-and-adaptation",
+    "area": "training",
+    "slug": "rlhf-and-dpo",
+    "target_mdx": "concepts/training/rlhf-and-dpo",
+    "skip": false
+  },
+  {
+    "upstream_path": "03-training-and-adaptation/05-knowledge-distillation.md",
+    "section": "03-training-and-adaptation",
+    "area": "training",
+    "slug": "knowledge-distillation",
+    "target_mdx": "concepts/training/knowledge-distillation",
+    "skip": false
+  },
+  {
+    "upstream_path": "03-training-and-adaptation/06-synthetic-data-generation.md",
+    "section": "03-training-and-adaptation",
+    "area": "training",
+    "slug": "synthetic-data-generation",
+    "target_mdx": "concepts/training/synthetic-data-generation",
+    "skip": false
+  },
+  {
+    "upstream_path": "03-training-and-adaptation/07-quantization-deep-dive.md",
+    "section": "03-training-and-adaptation",
+    "area": "training",
+    "slug": "quantization-deep-dive",
+    "target_mdx": "concepts/training/quantization-deep-dive",
+    "skip": false
+  },
+  {
+    "upstream_path": "03-training-and-adaptation/08-rlvr-and-reasoning-models.md",
+    "section": "03-training-and-adaptation",
+    "area": "training",
+    "slug": "rlvr-and-reasoning-models",
+    "target_mdx": "concepts/training/rlvr-and-reasoning-models",
+    "skip": false
+  },
+  {
+    "upstream_path": "04-inference-optimization/01-inference-fundamentals.md",
+    "section": "04-inference-optimization",
+    "area": "inference",
+    "slug": "inference-fundamentals",
+    "target_mdx": "concepts/inference/inference-fundamentals",
+    "skip": false
+  },
+  {
+    "upstream_path": "04-inference-optimization/02-kv-cache-and-context-caching.md",
+    "section": "04-inference-optimization",
+    "area": "inference",
+    "slug": "kv-cache-and-context-caching",
+    "target_mdx": "concepts/inference/kv-cache-and-context-caching",
+    "skip": false
+  },
+  {
+    "upstream_path": "04-inference-optimization/03-speculative-decoding.md",
+    "section": "04-inference-optimization",
+    "area": "inference",
+    "slug": "speculative-decoding",
+    "target_mdx": "concepts/inference/speculative-decoding",
+    "skip": false
+  },
+  {
+    "upstream_path": "04-inference-optimization/04-batching-strategies.md",
+    "section": "04-inference-optimization",
+    "area": "inference",
+    "slug": "batching-strategies",
+    "target_mdx": "concepts/inference/batching-strategies",
+    "skip": false
+  },
+  {
+    "upstream_path": "04-inference-optimization/05-paged-attention.md",
+    "section": "04-inference-optimization",
+    "area": "inference",
+    "slug": "paged-attention",
+    "target_mdx": "concepts/inference/paged-attention",
+    "skip": false
+  },
+  {
+    "upstream_path": "04-inference-optimization/06-serving-infrastructure.md",
+    "section": "04-inference-optimization",
+    "area": "inference",
+    "slug": "serving-infrastructure",
+    "target_mdx": "concepts/inference/serving-infrastructure",
+    "skip": false
+  },
+  {
+    "upstream_path": "04-inference-optimization/07-cost-optimization-playbook.md",
+    "section": "04-inference-optimization",
+    "area": "inference",
+    "slug": "cost-optimization-playbook",
+    "target_mdx": "concepts/inference/cost-optimization-playbook",
+    "skip": false
+  },
+  {
+    "upstream_path": "04-inference-optimization/08-diffusion-llms.md",
+    "section": "04-inference-optimization",
+    "area": "inference",
+    "slug": "diffusion-llms",
+    "target_mdx": "concepts/inference/diffusion-llms",
+    "skip": false
+  },
+  {
+    "upstream_path": "04-inference-optimization/09-on-device-and-edge-deployment.md",
+    "section": "04-inference-optimization",
+    "area": "inference",
+    "slug": "on-device-and-edge-deployment",
+    "target_mdx": "concepts/inference/on-device-and-edge-deployment",
+    "skip": false
+  },
+  {
+    "upstream_path": "05-prompting-and-context/01-prompt-engineering-fundamentals.md",
+    "section": "05-prompting-and-context",
+    "area": "prompting",
+    "slug": "prompt-engineering-fundamentals",
+    "target_mdx": "concepts/prompting/prompt-engineering-fundamentals",
+    "skip": false
+  },
+  {
+    "upstream_path": "05-prompting-and-context/02-few-shot-and-icl.md",
+    "section": "05-prompting-and-context",
+    "area": "prompting",
+    "slug": "few-shot-and-icl",
+    "target_mdx": "concepts/prompting/few-shot-and-icl",
+    "skip": false
+  },
+  {
+    "upstream_path": "05-prompting-and-context/03-chain-of-thought.md",
+    "section": "05-prompting-and-context",
+    "area": "prompting",
+    "slug": "chain-of-thought",
+    "target_mdx": "concepts/prompting/chain-of-thought",
+    "skip": false
+  },
+  {
+    "upstream_path": "05-prompting-and-context/04-tree-of-thought.md",
+    "section": "05-prompting-and-context",
+    "area": "prompting",
+    "slug": "tree-of-thought",
+    "target_mdx": "concepts/prompting/tree-of-thought",
+    "skip": false
+  },
+  {
+    "upstream_path": "05-prompting-and-context/05-context-engineering.md",
+    "section": "05-prompting-and-context",
+    "area": "prompting",
+    "slug": "context-engineering",
+    "target_mdx": "concepts/prompting/context-engineering",
+    "skip": false
+  },
+  {
+    "upstream_path": "05-prompting-and-context/06-structured-generation.md",
+    "section": "05-prompting-and-context",
+    "area": "prompting",
+    "slug": "structured-generation",
+    "target_mdx": "concepts/prompting/structured-generation",
+    "skip": false
+  },
+  {
+    "upstream_path": "05-prompting-and-context/07-prompt-optimization-dspy.md",
+    "section": "05-prompting-and-context",
+    "area": "prompting",
+    "slug": "prompt-optimization-dspy",
+    "target_mdx": "concepts/prompting/prompt-optimization-dspy",
+    "skip": false
+  },
+  {
+    "upstream_path": "05-prompting-and-context/08-prompt-injection-defense.md",
+    "section": "05-prompting-and-context",
+    "area": "prompting",
+    "slug": "prompt-injection-defense",
+    "target_mdx": "concepts/prompting/prompt-injection-defense",
+    "skip": false
+  },
+  {
+    "upstream_path": "06-retrieval-systems/01-rag-fundamentals.md",
+    "section": "06-retrieval-systems",
+    "area": "retrieval",
+    "slug": "rag-fundamentals",
+    "target_mdx": "concepts/retrieval/rag-fundamentals",
+    "skip": true
+  },
+  {
+    "upstream_path": "06-retrieval-systems/02-chunking-strategies.md",
+    "section": "06-retrieval-systems",
+    "area": "retrieval",
+    "slug": "chunking-strategies",
+    "target_mdx": "concepts/retrieval/chunking-strategies",
+    "skip": true
+  },
+  {
+    "upstream_path": "06-retrieval-systems/03-embedding-models.md",
+    "section": "06-retrieval-systems",
+    "area": "retrieval",
+    "slug": "embedding-models",
+    "target_mdx": "concepts/retrieval/embedding-models",
+    "skip": false
+  },
+  {
+    "upstream_path": "06-retrieval-systems/04-vector-databases.md",
+    "section": "06-retrieval-systems",
+    "area": "retrieval",
+    "slug": "vector-databases",
+    "target_mdx": "concepts/retrieval/vector-databases",
+    "skip": false
+  },
+  {
+    "upstream_path": "06-retrieval-systems/05-hybrid-search.md",
+    "section": "06-retrieval-systems",
+    "area": "retrieval",
+    "slug": "hybrid-search",
+    "target_mdx": "concepts/retrieval/hybrid-search",
+    "skip": false
+  },
+  {
+    "upstream_path": "06-retrieval-systems/06-reranking-strategies.md",
+    "section": "06-retrieval-systems",
+    "area": "retrieval",
+    "slug": "reranking-strategies",
+    "target_mdx": "concepts/retrieval/reranking-strategies",
+    "skip": false
+  },
+  {
+    "upstream_path": "06-retrieval-systems/07-graph-rag.md",
+    "section": "06-retrieval-systems",
+    "area": "retrieval",
+    "slug": "graph-rag",
+    "target_mdx": "concepts/retrieval/graph-rag",
+    "skip": false
+  },
+  {
+    "upstream_path": "06-retrieval-systems/08-agentic-rag.md",
+    "section": "06-retrieval-systems",
+    "area": "retrieval",
+    "slug": "agentic-rag",
+    "target_mdx": "concepts/retrieval/agentic-rag",
+    "skip": false
+  },
+  {
+    "upstream_path": "06-retrieval-systems/09-advanced-retrieval-patterns.md",
+    "section": "06-retrieval-systems",
+    "area": "retrieval",
+    "slug": "advanced-retrieval-patterns",
+    "target_mdx": "concepts/retrieval/advanced-retrieval-patterns",
+    "skip": false
+  },
+  {
+    "upstream_path": "06-retrieval-systems/10-contextual-retrieval.md",
+    "section": "06-retrieval-systems",
+    "area": "retrieval",
+    "slug": "contextual-retrieval",
+    "target_mdx": "concepts/retrieval/contextual-retrieval",
+    "skip": false
+  },
+  {
+    "upstream_path": "06-retrieval-systems/11-late-interaction-colbert.md",
+    "section": "06-retrieval-systems",
+    "area": "retrieval",
+    "slug": "late-interaction-colbert",
+    "target_mdx": "concepts/retrieval/late-interaction-colbert",
+    "skip": false
+  },
+  {
+    "upstream_path": "06-retrieval-systems/12-multimodal-rag.md",
+    "section": "06-retrieval-systems",
+    "area": "retrieval",
+    "slug": "multimodal-rag",
+    "target_mdx": "concepts/retrieval/multimodal-rag",
+    "skip": false
+  },
+  {
+    "upstream_path": "06-retrieval-systems/13-rag-evaluation-patterns.md",
+    "section": "06-retrieval-systems",
+    "area": "retrieval",
+    "slug": "rag-evaluation-patterns",
+    "target_mdx": "concepts/retrieval/rag-evaluation-patterns",
+    "skip": false
+  },
+  {
+    "upstream_path": "06-retrieval-systems/14-production-rag-at-scale.md",
+    "section": "06-retrieval-systems",
+    "area": "retrieval",
+    "slug": "production-rag-at-scale",
+    "target_mdx": "concepts/retrieval/production-rag-at-scale",
+    "skip": false
+  },
+  {
+    "upstream_path": "06-retrieval-systems/15-data-engineering-for-ai.md",
+    "section": "06-retrieval-systems",
+    "area": "retrieval",
+    "slug": "data-engineering-for-ai",
+    "target_mdx": "concepts/retrieval/data-engineering-for-ai",
+    "skip": false
+  },
+  {
+    "upstream_path": "07-agentic-systems/01-agent-fundamentals.md",
+    "section": "07-agentic-systems",
+    "area": "agents",
+    "slug": "agent-fundamentals",
+    "target_mdx": "concepts/agents/agent-fundamentals",
+    "skip": false
+  },
+  {
+    "upstream_path": "07-agentic-systems/02-reasoning-loops-react-and-beyond.md",
+    "section": "07-agentic-systems",
+    "area": "agents",
+    "slug": "reasoning-loops-react-and-beyond",
+    "target_mdx": "concepts/agents/reasoning-loops-react-and-beyond",
+    "skip": false
+  },
+  {
+    "upstream_path": "07-agentic-systems/03-tool-use-and-mcp.md",
+    "section": "07-agentic-systems",
+    "area": "agents",
+    "slug": "tool-use-and-mcp",
+    "target_mdx": "concepts/agents/tool-use-and-mcp",
+    "skip": false
+  },
+  {
+    "upstream_path": "07-agentic-systems/04-multi-agent-orchestration.md",
+    "section": "07-agentic-systems",
+    "area": "agents",
+    "slug": "multi-agent-orchestration",
+    "target_mdx": "concepts/agents/multi-agent-orchestration",
+    "skip": false
+  },
+  {
+    "upstream_path": "07-agentic-systems/05-agent-memory-and-state.md",
+    "section": "07-agentic-systems",
+    "area": "agents",
+    "slug": "agent-memory-and-state",
+    "target_mdx": "concepts/agents/agent-memory-and-state",
+    "skip": false
+  },
+  {
+    "upstream_path": "07-agentic-systems/06-planning-and-decomposition.md",
+    "section": "07-agentic-systems",
+    "area": "agents",
+    "slug": "planning-and-decomposition",
+    "target_mdx": "concepts/agents/planning-and-decomposition",
+    "skip": false
+  },
+  {
+    "upstream_path": "07-agentic-systems/07-error-handling-and-recovery.md",
+    "section": "07-agentic-systems",
+    "area": "agents",
+    "slug": "error-handling-and-recovery",
+    "target_mdx": "concepts/agents/error-handling-and-recovery",
+    "skip": false
+  },
+  {
+    "upstream_path": "07-agentic-systems/08-human-in-the-loop-patterns.md",
+    "section": "07-agentic-systems",
+    "area": "agents",
+    "slug": "human-in-the-loop-patterns",
+    "target_mdx": "concepts/agents/human-in-the-loop-patterns",
+    "skip": false
+  },
+  {
+    "upstream_path": "07-agentic-systems/09-agentic-security-and-sandboxing.md",
+    "section": "07-agentic-systems",
+    "area": "agents",
+    "slug": "agentic-security-and-sandboxing",
+    "target_mdx": "concepts/agents/agentic-security-and-sandboxing",
+    "skip": false
+  },
+  {
+    "upstream_path": "07-agentic-systems/10-evaluating-agentic-systems.md",
+    "section": "07-agentic-systems",
+    "area": "agents",
+    "slug": "evaluating-agentic-systems",
+    "target_mdx": "concepts/agents/evaluating-agentic-systems",
+    "skip": false
+  },
+  {
+    "upstream_path": "07-agentic-systems/11-durable-execution.md",
+    "section": "07-agentic-systems",
+    "area": "agents",
+    "slug": "durable-execution",
+    "target_mdx": "concepts/agents/durable-execution",
+    "skip": false
+  },
+  {
+    "upstream_path": "07-agentic-systems/12-loop-engineering.md",
+    "section": "07-agentic-systems",
+    "area": "agents",
+    "slug": "loop-engineering",
+    "target_mdx": "concepts/agents/loop-engineering",
+    "skip": false
+  },
+  {
+    "upstream_path": "08-memory-and-state/01-memory-architectures.md",
+    "section": "08-memory-and-state",
+    "area": "memory",
+    "slug": "memory-architectures",
+    "target_mdx": "concepts/memory/memory-architectures",
+    "skip": false
+  },
+  {
+    "upstream_path": "08-memory-and-state/02-short-term-context.md",
+    "section": "08-memory-and-state",
+    "area": "memory",
+    "slug": "short-term-context",
+    "target_mdx": "concepts/memory/short-term-context",
+    "skip": false
+  },
+  {
+    "upstream_path": "08-memory-and-state/03-long-term-memory.md",
+    "section": "08-memory-and-state",
+    "area": "memory",
+    "slug": "long-term-memory",
+    "target_mdx": "concepts/memory/long-term-memory",
+    "skip": false
+  },
+  {
+    "upstream_path": "08-memory-and-state/04-agentic-memory-mem0.md",
+    "section": "08-memory-and-state",
+    "area": "memory",
+    "slug": "agentic-memory-mem0",
+    "target_mdx": "concepts/memory/agentic-memory-mem0",
+    "skip": false
+  },
+  {
+    "upstream_path": "08-memory-and-state/05-semantic-caching.md",
+    "section": "08-memory-and-state",
+    "area": "memory",
+    "slug": "semantic-caching",
+    "target_mdx": "concepts/memory/semantic-caching",
+    "skip": false
+  },
+  {
+    "upstream_path": "08-memory-and-state/06-state-management-patterns.md",
+    "section": "08-memory-and-state",
+    "area": "memory",
+    "slug": "state-management-patterns",
+    "target_mdx": "concepts/memory/state-management-patterns",
+    "skip": false
+  },
+  {
+    "upstream_path": "09-frameworks-and-tools/01-langchain-deep-dive.md",
+    "section": "09-frameworks-and-tools",
+    "area": "frameworks",
+    "slug": "langchain-deep-dive",
+    "target_mdx": "concepts/frameworks/langchain-deep-dive",
+    "skip": false
+  },
+  {
+    "upstream_path": "09-frameworks-and-tools/02-langgraph-orchestration.md",
+    "section": "09-frameworks-and-tools",
+    "area": "frameworks",
+    "slug": "langgraph-orchestration",
+    "target_mdx": "concepts/frameworks/langgraph-orchestration",
+    "skip": false
+  },
+  {
+    "upstream_path": "09-frameworks-and-tools/03-langsmith-observability.md",
+    "section": "09-frameworks-and-tools",
+    "area": "frameworks",
+    "slug": "langsmith-observability",
+    "target_mdx": "concepts/frameworks/langsmith-observability",
+    "skip": false
+  },
+  {
+    "upstream_path": "09-frameworks-and-tools/04-llamaindex.md",
+    "section": "09-frameworks-and-tools",
+    "area": "frameworks",
+    "slug": "llamaindex",
+    "target_mdx": "concepts/frameworks/llamaindex",
+    "skip": false
+  },
+  {
+    "upstream_path": "09-frameworks-and-tools/05-dspy.md",
+    "section": "09-frameworks-and-tools",
+    "area": "frameworks",
+    "slug": "dspy",
+    "target_mdx": "concepts/frameworks/dspy",
+    "skip": false
+  },
+  {
+    "upstream_path": "09-frameworks-and-tools/06-semantic-kernel.md",
+    "section": "09-frameworks-and-tools",
+    "area": "frameworks",
+    "slug": "semantic-kernel",
+    "target_mdx": "concepts/frameworks/semantic-kernel",
+    "skip": false
+  },
+  {
+    "upstream_path": "09-frameworks-and-tools/07-autogen-crewai.md",
+    "section": "09-frameworks-and-tools",
+    "area": "frameworks",
+    "slug": "autogen-crewai",
+    "target_mdx": "concepts/frameworks/autogen-crewai",
+    "skip": false
+  },
+  {
+    "upstream_path": "09-frameworks-and-tools/08-framework-selection-guide.md",
+    "section": "09-frameworks-and-tools",
+    "area": "frameworks",
+    "slug": "framework-selection-guide",
+    "target_mdx": "concepts/frameworks/framework-selection-guide",
+    "skip": false
+  },
+  {
+    "upstream_path": "09-frameworks-and-tools/09-claude-code.md",
+    "section": "09-frameworks-and-tools",
+    "area": "frameworks",
+    "slug": "claude-code",
+    "target_mdx": "concepts/frameworks/claude-code",
+    "skip": false
+  },
+  {
+    "upstream_path": "09-frameworks-and-tools/10-opencoderguide.md",
+    "section": "09-frameworks-and-tools",
+    "area": "frameworks",
+    "slug": "opencoderguide",
+    "target_mdx": "concepts/frameworks/opencoderguide",
+    "skip": false
+  },
+  {
+    "upstream_path": "09-frameworks-and-tools/11-pydantic-ai-and-mastra.md",
+    "section": "09-frameworks-and-tools",
+    "area": "frameworks",
+    "slug": "pydantic-ai-and-mastra",
+    "target_mdx": "concepts/frameworks/pydantic-ai-and-mastra",
+    "skip": false
+  },
+  {
+    "upstream_path": "09-frameworks-and-tools/12-navigating-framework-churn.md",
+    "section": "09-frameworks-and-tools",
+    "area": "frameworks",
+    "slug": "navigating-framework-churn",
+    "target_mdx": "concepts/frameworks/navigating-framework-churn",
+    "skip": false
+  },
+  {
+    "upstream_path": "10-document-processing/01-ocr-and-layout.md",
+    "section": "10-document-processing",
+    "area": "document-processing",
+    "slug": "ocr-and-layout",
+    "target_mdx": "concepts/document-processing/ocr-and-layout",
+    "skip": false
+  },
+  {
+    "upstream_path": "11-infrastructure-and-mlops/01-llm-infrastructure.md",
+    "section": "11-infrastructure-and-mlops",
+    "area": "mlops",
+    "slug": "llm-infrastructure",
+    "target_mdx": "concepts/mlops/llm-infrastructure",
+    "skip": false
+  },
+  {
+    "upstream_path": "11-infrastructure-and-mlops/02-cicd.md",
+    "section": "11-infrastructure-and-mlops",
+    "area": "mlops",
+    "slug": "cicd",
+    "target_mdx": "concepts/mlops/cicd",
+    "skip": false
+  },
+  {
+    "upstream_path": "11-infrastructure-and-mlops/03-ai-gateways-and-model-routing.md",
+    "section": "11-infrastructure-and-mlops",
+    "area": "mlops",
+    "slug": "ai-gateways-and-model-routing",
+    "target_mdx": "concepts/mlops/ai-gateways-and-model-routing",
+    "skip": false
+  },
+  {
+    "upstream_path": "11-infrastructure-and-mlops/04-finops-and-token-economics.md",
+    "section": "11-infrastructure-and-mlops",
+    "area": "mlops",
+    "slug": "finops-and-token-economics",
+    "target_mdx": "concepts/mlops/finops-and-token-economics",
+    "skip": false
+  },
+  {
+    "upstream_path": "12-security-and-access/01-llm-security.md",
+    "section": "12-security-and-access",
+    "area": "security",
+    "slug": "llm-security",
+    "target_mdx": "concepts/security/llm-security",
+    "skip": false
+  },
+  {
+    "upstream_path": "12-security-and-access/02-access-control.md",
+    "section": "12-security-and-access",
+    "area": "security",
+    "slug": "access-control",
+    "target_mdx": "concepts/security/access-control",
+    "skip": false
+  },
+  {
+    "upstream_path": "13-reliability-and-safety/01-guardrails.md",
+    "section": "13-reliability-and-safety",
+    "area": "reliability",
+    "slug": "guardrails",
+    "target_mdx": "concepts/reliability/guardrails",
+    "skip": false
+  },
+  {
+    "upstream_path": "13-reliability-and-safety/02-ensemble-methods.md",
+    "section": "13-reliability-and-safety",
+    "area": "reliability",
+    "slug": "ensemble-methods",
+    "target_mdx": "concepts/reliability/ensemble-methods",
+    "skip": false
+  },
+  {
+    "upstream_path": "13-reliability-and-safety/03-reliability-patterns.md",
+    "section": "13-reliability-and-safety",
+    "area": "reliability",
+    "slug": "reliability-patterns",
+    "target_mdx": "concepts/reliability/reliability-patterns",
+    "skip": false
+  },
+  {
+    "upstream_path": "13-reliability-and-safety/04-ai-governance-and-compliance.md",
+    "section": "13-reliability-and-safety",
+    "area": "reliability",
+    "slug": "ai-governance-and-compliance",
+    "target_mdx": "concepts/reliability/ai-governance-and-compliance",
+    "skip": false
+  },
+  {
+    "upstream_path": "14-evaluation-and-observability/01-llm-evaluation.md",
+    "section": "14-evaluation-and-observability",
+    "area": "evals",
+    "slug": "llm-evaluation",
+    "target_mdx": "concepts/evals/llm-evaluation",
+    "skip": false
+  },
+  {
+    "upstream_path": "14-evaluation-and-observability/02-observability.md",
+    "section": "14-evaluation-and-observability",
+    "area": "evals",
+    "slug": "observability",
+    "target_mdx": "concepts/evals/observability",
+    "skip": false
+  },
+  {
+    "upstream_path": "14-evaluation-and-observability/03-benchmarks-and-leaderboards.md",
+    "section": "14-evaluation-and-observability",
+    "area": "evals",
+    "slug": "benchmarks-and-leaderboards",
+    "target_mdx": "concepts/evals/benchmarks-and-leaderboards",
+    "skip": false
+  },
+  {
+    "upstream_path": "15-ai-design-patterns/01-design-patterns.md",
+    "section": "15-ai-design-patterns",
+    "area": "patterns",
+    "slug": "design-patterns",
+    "target_mdx": "concepts/patterns/design-patterns",
+    "skip": false
+  },
+  {
+    "upstream_path": "15-ai-design-patterns/02-anti-patterns.md",
+    "section": "15-ai-design-patterns",
+    "area": "patterns",
+    "slug": "anti-patterns",
+    "target_mdx": "concepts/patterns/anti-patterns",
+    "skip": false
+  },
+  {
+    "upstream_path": "16-case-studies/01-enterprise-rag.md",
+    "section": "16-case-studies",
+    "area": "case-studies",
+    "slug": "enterprise-rag",
+    "target_mdx": "walkthroughs/enterprise-rag",
+    "skip": true
+  },
+  {
+    "upstream_path": "16-case-studies/02-conversational-agent.md",
+    "section": "16-case-studies",
+    "area": "case-studies",
+    "slug": "conversational-agent",
+    "target_mdx": "walkthroughs/conversational-agent",
+    "skip": false
+  },
+  {
+    "upstream_path": "16-case-studies/03-financial-analysis.md",
+    "section": "16-case-studies",
+    "area": "case-studies",
+    "slug": "financial-analysis",
+    "target_mdx": "walkthroughs/financial-analysis",
+    "skip": false
+  },
+  {
+    "upstream_path": "16-case-studies/04-code-assistant.md",
+    "section": "16-case-studies",
+    "area": "case-studies",
+    "slug": "code-assistant",
+    "target_mdx": "walkthroughs/code-assistant",
+    "skip": false
+  },
+  {
+    "upstream_path": "16-case-studies/05-content-moderation.md",
+    "section": "16-case-studies",
+    "area": "case-studies",
+    "slug": "content-moderation",
+    "target_mdx": "walkthroughs/content-moderation",
+    "skip": false
+  },
+  {
+    "upstream_path": "16-case-studies/06-real-time-search.md",
+    "section": "16-case-studies",
+    "area": "case-studies",
+    "slug": "real-time-search",
+    "target_mdx": "walkthroughs/real-time-search",
+    "skip": false
+  },
+  {
+    "upstream_path": "16-case-studies/07-autonomous-coding-agent.md",
+    "section": "16-case-studies",
+    "area": "case-studies",
+    "slug": "autonomous-coding-agent",
+    "target_mdx": "walkthroughs/autonomous-coding-agent",
+    "skip": false
+  },
+  {
+    "upstream_path": "16-case-studies/08-multi-tenant-saas.md",
+    "section": "16-case-studies",
+    "area": "case-studies",
+    "slug": "multi-tenant-saas",
+    "target_mdx": "walkthroughs/multi-tenant-saas",
+    "skip": false
+  },
+  {
+    "upstream_path": "16-case-studies/09-customer-support-automation.md",
+    "section": "16-case-studies",
+    "area": "case-studies",
+    "slug": "customer-support-automation",
+    "target_mdx": "walkthroughs/customer-support-automation",
+    "skip": false
+  },
+  {
+    "upstream_path": "16-case-studies/10-document-intelligence.md",
+    "section": "16-case-studies",
+    "area": "case-studies",
+    "slug": "document-intelligence",
+    "target_mdx": "walkthroughs/document-intelligence",
+    "skip": false
+  },
+  {
+    "upstream_path": "16-case-studies/11-recommendation-engine.md",
+    "section": "16-case-studies",
+    "area": "case-studies",
+    "slug": "recommendation-engine",
+    "target_mdx": "walkthroughs/recommendation-engine",
+    "skip": false
+  },
+  {
+    "upstream_path": "16-case-studies/12-compliance-automation.md",
+    "section": "16-case-studies",
+    "area": "case-studies",
+    "slug": "compliance-automation",
+    "target_mdx": "walkthroughs/compliance-automation",
+    "skip": false
+  },
+  {
+    "upstream_path": "16-case-studies/13-voice-ai-healthcare.md",
+    "section": "16-case-studies",
+    "area": "case-studies",
+    "slug": "voice-ai-healthcare",
+    "target_mdx": "walkthroughs/voice-ai-healthcare",
+    "skip": false
+  },
+  {
+    "upstream_path": "16-case-studies/14-fraud-detection.md",
+    "section": "16-case-studies",
+    "area": "case-studies",
+    "slug": "fraud-detection",
+    "target_mdx": "walkthroughs/fraud-detection",
+    "skip": false
+  },
+  {
+    "upstream_path": "16-case-studies/15-knowledge-management.md",
+    "section": "16-case-studies",
+    "area": "case-studies",
+    "slug": "knowledge-management",
+    "target_mdx": "walkthroughs/knowledge-management",
+    "skip": false
+  },
+  {
+    "upstream_path": "16-case-studies/16-computer-use-agent-production.md",
+    "section": "16-case-studies",
+    "area": "case-studies",
+    "slug": "computer-use-agent-production",
+    "target_mdx": "walkthroughs/computer-use-agent-production",
+    "skip": false
+  },
+  {
+    "upstream_path": "16-case-studies/17-multi-tenant-fine-tuning-platform.md",
+    "section": "16-case-studies",
+    "area": "case-studies",
+    "slug": "multi-tenant-fine-tuning-platform",
+    "target_mdx": "walkthroughs/multi-tenant-fine-tuning-platform",
+    "skip": false
+  },
+  {
+    "upstream_path": "16-case-studies/18-eval-gated-cicd.md",
+    "section": "16-case-studies",
+    "area": "case-studies",
+    "slug": "eval-gated-cicd",
+    "target_mdx": "walkthroughs/eval-gated-cicd",
+    "skip": false
+  },
+  {
+    "upstream_path": "16-case-studies/19-customer-distillation-pipeline.md",
+    "section": "16-case-studies",
+    "area": "case-studies",
+    "slug": "customer-distillation-pipeline",
+    "target_mdx": "walkthroughs/customer-distillation-pipeline",
+    "skip": false
+  },
+  {
+    "upstream_path": "16-case-studies/20-mcp-knowledge-agent.md",
+    "section": "16-case-studies",
+    "area": "case-studies",
+    "slug": "mcp-knowledge-agent",
+    "target_mdx": "walkthroughs/mcp-knowledge-agent",
+    "skip": false
+  },
+  {
+    "upstream_path": "17-tool-use-and-computer-agents/01-tool-use-landscape.md",
+    "section": "17-tool-use-and-computer-agents",
+    "area": "tool-use",
+    "slug": "tool-use-landscape",
+    "target_mdx": "concepts/tool-use/tool-use-landscape",
+    "skip": false
+  },
+  {
+    "upstream_path": "17-tool-use-and-computer-agents/02-architecture-patterns.md",
+    "section": "17-tool-use-and-computer-agents",
+    "area": "tool-use",
+    "slug": "architecture-patterns",
+    "target_mdx": "concepts/tool-use/architecture-patterns",
+    "skip": false
+  },
+  {
+    "upstream_path": "17-tool-use-and-computer-agents/03-openclaw-deep-dive.md",
+    "section": "17-tool-use-and-computer-agents",
+    "area": "tool-use",
+    "slug": "openclaw-deep-dive",
+    "target_mdx": "concepts/tool-use/openclaw-deep-dive",
+    "skip": false
+  },
+  {
+    "upstream_path": "17-tool-use-and-computer-agents/04-computer-use-agents.md",
+    "section": "17-tool-use-and-computer-agents",
+    "area": "tool-use",
+    "slug": "computer-use-agents",
+    "target_mdx": "concepts/tool-use/computer-use-agents",
+    "skip": false
+  },
+  {
+    "upstream_path": "17-tool-use-and-computer-agents/05-building-tool-agents.md",
+    "section": "17-tool-use-and-computer-agents",
+    "area": "tool-use",
+    "slug": "building-tool-agents",
+    "target_mdx": "concepts/tool-use/building-tool-agents",
+    "skip": false
+  },
+  {
+    "upstream_path": "17-tool-use-and-computer-agents/06-use-cases-and-case-studies.md",
+    "section": "17-tool-use-and-computer-agents",
+    "area": "tool-use",
+    "slug": "use-cases-and-case-studies",
+    "target_mdx": "concepts/tool-use/use-cases-and-case-studies",
+    "skip": false
+  },
+  {
+    "upstream_path": "17-tool-use-and-computer-agents/07-safety-and-governance.md",
+    "section": "17-tool-use-and-computer-agents",
+    "area": "tool-use",
+    "slug": "safety-and-governance",
+    "target_mdx": "concepts/tool-use/safety-and-governance",
+    "skip": false
+  },
+  {
+    "upstream_path": "18-voice-and-audio-agents/01-realtime-voice-agents.md",
+    "section": "18-voice-and-audio-agents",
+    "area": "voice",
+    "slug": "realtime-voice-agents",
+    "target_mdx": "concepts/voice/realtime-voice-agents",
+    "skip": false
+  },
+  {
+    "upstream_path": "19-multimodal-generation/01-multimodal-generation.md",
+    "section": "19-multimodal-generation",
+    "area": "multimodal",
+    "slug": "multimodal-generation",
+    "target_mdx": "concepts/multimodal/multimodal-generation",
+    "skip": false
+  }
+]

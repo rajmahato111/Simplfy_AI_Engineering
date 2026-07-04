@@ -1,0 +1,72 @@
+---
+title: Navigating Framework Churn
+slug: navigating-framework-churn
+type: concept
+area: frameworks
+difficulty: intermediate
+tags:
+  - frameworks
+  - navigating
+  - framework
+  - churn
+diagrams:
+  - diagrams/navigating-framework-churn--overview.svg
+est_minutes: 5
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The 30-second version
+
+AI orchestration frameworks change faster than the content teaching them can keep up. LlamaIndex and LangChain each re-architected their entire package layout in 2024 and removed their original headline abstractions within a year. The result: a course recorded twelve months ago often fails on the first `import`. This page is about that problem, why it happens, and how to learn and build so your knowledge and your code survive the churn.
+
+## The analogy
+
+Think of **Navigating Framework Churn** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Navigating Framework Churn overview](diagrams/navigating-framework-churn--overview.svg)
+
+AI orchestration frameworks change faster than the content teaching them can keep up. LlamaIndex and LangChain each re-architected their entire package layout in 2024 and removed their original headline abstractions within a year. The result: a course recorded twelve months ago often fails on the first `import`. This page is about that problem, why it happens, and how to learn and build so your knowledge and your code survive the churn.
+
+The one-line version: **frameworks are how you ship this quarter; primitives are what you keep. Pin the former, learn the latter.**
+
+## A concrete example
+
+AI orchestration frameworks change faster than the content teaching them can keep up. LlamaIndex and LangChain each re-architected their entire package layout in 2024 and removed their original headline abstractions within a year. The result: a course recorded twelve months ago often fails on the first `import`. This page is about that problem, why it happens, and how to learn and build so your knowledge and your code survive the churn.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: A teammate followed a six-month-old LlamaIndex tutorial and it fails on import. Walk me through what happened and how you would fix it.
+
+**Strong answer:**
+The tutorial was recorded against an older pinned version, and a fresh install pulled a newer one where the package layout changed. Since v0.10, LlamaIndex is `llama-index-core` plus separate integration packages, so a top-level import like `from llama_index import SimpleDirectoryReader` now has to be `from llama_index.core import SimpleDirectoryReader`, and `ServiceContext` was removed in v0.11 in favor of the global `Settings` object. If the error is instead "can't instantiate abstract class OpenAI," that is a partial upgrade where core and the OpenAI integration package drifted apart; the fix is to upgrade them together. The durable fix is a pinned lockfile so the environment is reproducible, and reading the migration guide rather than guessing. Longer term I would point the teammate at the project's current quickstart for code and use the tutorial only for the concepts.
+
+### Q: Given how fast these frameworks churn, how do you decide whether to use one at all?
+
+**Strong answer:**
+I look at what the framework is actually buying me. Its original job was smoothing over inconsistent provider APIs, but tool calling and structured outputs have converged across the major SDKs, so that value has shrunk. If I need breadth of integrations or batteries-included scaffolding to move fast, the framework earns its keep. If I am making a handful of model calls or writing library code, the raw provider SDK is more stable and easier to debug. For production I usually wrap the SDK behind a thin interface of my own, so a framework or model swap touches one module. Whatever I choose, I pin and lock it and keep the framework-specific code isolated, because I am assuming this quarter's blessed API will be deprecated.
+
+## Go deeper
+
+- [Upstream chapter (Navigating Framework Churn)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/09-frameworks-and-tools/12-navigating-framework-churn.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

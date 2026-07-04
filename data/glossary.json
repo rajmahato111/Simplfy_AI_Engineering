@@ -1,0 +1,842 @@
+[
+  {
+    "id": "agentic-coding",
+    "term": "Agentic Coding",
+    "definition": "LLM autonomously editing files, running shell commands, writing tests and iterating until a coding task is complete. Exemplified by Claude Code, OpenHands, and Cline.",
+    "letter": "A",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "agentic-system",
+    "term": "Agentic System",
+    "definition": "LLM application that autonomously plans and executes multi-step tasks using tools.",
+    "letter": "A",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "ai-control",
+    "term": "AI Control",
+    "definition": "Safety approach that assumes a model may be misaligned and designs deployment protocols (monitoring, defer-on-critical-action, resampling, factored cognition) to stay safe even then. Distinct from alignment, which aims to make the model trustworthy in the first place. See Research Radar.",
+    "letter": "A",
+    "chapter_refs": [
+      "RESEARCH-RADAR"
+    ],
+    "source": "upstream"
+  },
+  {
+    "id": "ai-gateway",
+    "term": "AI Gateway",
+    "definition": "A control-plane proxy between your apps and model providers (LiteLLM, OpenRouter, Portkey, Kong). Exposes one OpenAI-compatible API and centralizes routing, fallback, load balancing, rate-limit handling, virtual keys and budgets, caching, and observability. See AI Gateways and Model Routing.",
+    "letter": "A",
+    "chapter_refs": [
+      "11-infrastructure-and-mlops/03-ai-gateways-and-model-routing"
+    ],
+    "source": "upstream"
+  },
+  {
+    "id": "attention-mechanism",
+    "term": "Attention Mechanism",
+    "definition": "Neural network component that allows models to focus on relevant parts of input. Self-attention compares each token to all others.",
+    "letter": "A",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "abac",
+    "term": "ABAC (Attribute-Based Access Control)",
+    "definition": "Access control based on attributes of user, resource, and environment rather than fixed roles.",
+    "letter": "A",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "batching",
+    "term": "Batching",
+    "definition": "Processing multiple requests together to improve GPU utilization. Continuous batching adds new requests while others generate.",
+    "letter": "B",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "benchmark-saturation",
+    "term": "Benchmark Saturation",
+    "definition": "When frontier models cluster so near a benchmark's ceiling that score differences fall within noise (prompt phrasing, run variance), so the benchmark no longer separates models. MMLU, HumanEval, and GSM8K are saturated. See Benchmarks and Leaderboards.",
+    "letter": "B",
+    "chapter_refs": [
+      "14-evaluation-and-observability/03-benchmarks-and-leaderboards"
+    ],
+    "source": "upstream"
+  },
+  {
+    "id": "bm25",
+    "term": "BM25",
+    "definition": "Traditional keyword-based ranking algorithm. Often combined with vector search for hybrid retrieval.",
+    "letter": "B",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "budget-tokens",
+    "term": "Budget Tokens",
+    "definition": "The configurable compute budget for Extended Thinking (Claude) or reasoning (o3). Higher budget → more internal reasoning steps → higher accuracy and cost.",
+    "letter": "B",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "c2pa",
+    "term": "C2PA (Content Credentials)",
+    "definition": "An open standard that cryptographically binds provenance metadata (who made this, whether AI was involved, what edits) to a media asset, with tamper-evident hard bindings and watermark-based soft bindings that survive re-encoding. The provenance layer behind AI-content labeling laws; removable, so layer it with watermarking and detection. See Multimodal Generation.",
+    "letter": "C",
+    "chapter_refs": [
+      "19-multimodal-generation/01-multimodal-generation"
+    ],
+    "source": "upstream"
+  },
+  {
+    "id": "capability-index",
+    "term": "Capability Index (Composite Benchmark)",
+    "definition": "A weighted aggregate of many benchmarks (e.g. Artificial Analysis Intelligence Index, Epoch Capability Index, HAL for agents) used to rank frontier models so the ranking keeps discriminating as individual benchmarks saturate.",
+    "letter": "C",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "chain-of-thought",
+    "term": "Chain-of-Thought (CoT)",
+    "definition": "Prompting technique that elicits step-by-step reasoning before final answer.",
+    "letter": "C",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "chunking",
+    "term": "Chunking",
+    "definition": "Splitting documents into smaller pieces for embedding and retrieval. Strategies include fixed-size, semantic, and hierarchical.",
+    "letter": "C",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "claude-code",
+    "term": "Claude Code",
+    "definition": "Anthropic's terminal-native autonomous coding agent. Uses bash, text_editor, and computer tools to read, edit, and run code across a full project. Controlled via CLAUDE.md manifest files.",
+    "letter": "C",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "claude-fable-5",
+    "term": "Claude Fable 5",
+    "definition": "Anthropic's most capable widely released model (June 9, 2026, `claude-fable-5`). A Mythos-class model made safe for general availability: $10/$50 per 1M, 1M context, adaptive thinking always on. Sensitive queries fall back to Claude Opus 4.8 in under 5% of sessions. The unrestricted variant, Claude Mythos 5, is limited to Project Glasswing partners.",
+    "letter": "C",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "cline",
+    "term": "Cline",
+    "definition": "Open-source VS Code extension providing autonomous AI coding with tool use (file editing, terminal, browser). MCP-native.",
+    "letter": "C",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "computer-use",
+    "term": "Computer-Use",
+    "definition": "A model capability (native to Claude 3.5+) to control a GUI by simulating mouse clicks, keyboard input, and screenshots. Enables browser and desktop automation.",
+    "letter": "C",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "context7",
+    "term": "Context7",
+    "definition": "MCP server that fetches up-to-date library documentation at runtime, solving the \"stale training data\" problem for coding agents.",
+    "letter": "C",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "context-window",
+    "term": "Context Window",
+    "definition": "Maximum number of tokens an LLM can process in a single request. Ranges from 4K to 1M+ tokens.",
+    "letter": "C",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "context-rot",
+    "term": "Context Rot",
+    "definition": "Degradation in output quality as irrelevant or stale tokens accumulate in the context window, often well before the advertised limit. Motivates compaction and just-in-time retrieval. See Context Engineering.",
+    "letter": "C",
+    "chapter_refs": [
+      "05-prompting-and-context/05-context-engineering"
+    ],
+    "source": "upstream"
+  },
+  {
+    "id": "cosine-similarity",
+    "term": "Cosine Similarity",
+    "definition": "Measure of similarity between two vectors. Standard metric for comparing embeddings.",
+    "letter": "C",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "cursor",
+    "term": "Cursor",
+    "definition": "AI-native IDE (fork of VS Code) with deep model integration for code completion, agentic editing, and multi-file context awareness.",
+    "letter": "C",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "data-contamination",
+    "term": "Data Contamination",
+    "definition": "When benchmark questions or their answers leak into a model's training data, inflating scores through memorization rather than capability. Countered with time-gated, private, or held-out test sets. See Benchmarks and Leaderboards.",
+    "letter": "D",
+    "chapter_refs": [
+      "14-evaluation-and-observability/03-benchmarks-and-leaderboards"
+    ],
+    "source": "upstream"
+  },
+  {
+    "id": "diffusion-language-model",
+    "term": "Diffusion Language Model",
+    "definition": "A non-autoregressive LLM that generates text by iteratively denoising a masked sequence in parallel rather than left to right, trading some quality for much higher throughput (reported 1,000+ tokens/sec). Strong on code and infilling; early-stage in 2026. See Diffusion Language Models.",
+    "letter": "D",
+    "chapter_refs": [
+      "04-inference-optimization/08-diffusion-llms"
+    ],
+    "source": "upstream"
+  },
+  {
+    "id": "dpo",
+    "term": "DPO (Direct Preference Optimization)",
+    "definition": "Fine-tuning method that optimizes directly on preference data without a separate reward model.",
+    "letter": "D",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "dspy",
+    "term": "DSPy",
+    "definition": "Framework for programming LLMs through optimizable modules rather than manual prompts.",
+    "letter": "D",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "durable-execution",
+    "term": "Durable Execution",
+    "definition": "An execution model (Temporal, Restate, DBOS) that makes long-running agents survive crashes and restarts via an append-only event history and deterministic replay, giving exactly-once side effects, durable timers, and pauses that outlive deploys. See Durable Execution.",
+    "letter": "D",
+    "chapter_refs": [
+      "07-agentic-systems/11-durable-execution"
+    ],
+    "source": "upstream"
+  },
+  {
+    "id": "effective-context-length",
+    "term": "Effective Context Length",
+    "definition": "The context length at which a model still maintains quality, routinely shorter than the advertised window. On RULER, many models claiming 128K hold quality only to ~32-64K. Design for effective, not advertised, context.",
+    "letter": "E",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "embedding",
+    "term": "Embedding",
+    "definition": "Dense vector representation of text. Used for semantic search and similarity comparison.",
+    "letter": "E",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "endpointing",
+    "term": "Endpointing (Turn Detection)",
+    "definition": "In voice agents, deciding when the user has finished speaking so the agent can respond. Learned turn-detection models fire on a semantically complete thought, beating fixed silence timeouts that tax every turn. See Real-Time Voice Agents.",
+    "letter": "E",
+    "chapter_refs": [
+      "18-voice-and-audio-agents/01-realtime-voice-agents"
+    ],
+    "source": "upstream"
+  },
+  {
+    "id": "ensemble",
+    "term": "Ensemble",
+    "definition": "Combining multiple model outputs to improve reliability. Includes voting, debate, and mixture-of-agents.",
+    "letter": "E",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "eval-awareness",
+    "term": "Eval Awareness",
+    "definition": "A model's tendency to detect when it is being evaluated and alter behavior accordingly, which confounds safety and capability benchmarks and argues for naturalistic, held-out test conditions.",
+    "letter": "E",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "extended-thinking",
+    "term": "Extended Thinking",
+    "definition": "Claude's (3.7+) internal reasoning mode where the model performs a scratchpad reasoning pass before producing a response. Configurable via `thinking.budget_tokens`. Not shown to end users by default.",
+    "letter": "E",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "eu-ai-act",
+    "term": "EU AI Act",
+    "definition": "Regulation (EU) 2024/1689, the first comprehensive AI law, structured by risk tier (prohibited, high-risk, limited, minimal) with separate GPAI obligations and fines up to 7% of global turnover. Prohibitions and GPAI rules are enforceable as of 2026; high-risk obligations are provisionally pushed to around 2027. See AI Governance and Compliance.",
+    "letter": "E",
+    "chapter_refs": [
+      "13-reliability-and-safety/04-ai-governance-and-compliance"
+    ],
+    "source": "upstream"
+  },
+  {
+    "id": "few-shot-prompting",
+    "term": "Few-Shot Prompting",
+    "definition": "Including examples in the prompt to guide model behavior.",
+    "letter": "F",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "fine-tuning",
+    "term": "Fine-Tuning",
+    "definition": "Training a pre-trained model on task-specific data to improve performance.",
+    "letter": "F",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "finops-for-ai",
+    "term": "FinOps for AI",
+    "definition": "The discipline of measuring, attributing, and optimizing AI spend: cost per token/request/task, prompt caching, batch economics, showback and chargeback, and unit economics. See FinOps and Token Economics.",
+    "letter": "F",
+    "chapter_refs": [
+      "11-infrastructure-and-mlops/04-finops-and-token-economics"
+    ],
+    "source": "upstream"
+  },
+  {
+    "id": "framework-churn",
+    "term": "Framework Churn",
+    "definition": "The rapid, breaking evolution of AI orchestration frameworks (LlamaIndex, LangChain), which reshuffle package layouts and remove abstractions roughly yearly, breaking older tutorials and courses on a fresh install. Survive it by pinning/locking versions and learning primitives over APIs. See Navigating Framework Churn.",
+    "letter": "F",
+    "chapter_refs": [
+      "09-frameworks-and-tools/12-navigating-framework-churn"
+    ],
+    "source": "upstream"
+  },
+  {
+    "id": "function-calling",
+    "term": "Function Calling",
+    "definition": "LLM capability to output structured tool invocations rather than plain text.",
+    "letter": "F",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "gguf",
+    "term": "GGUF",
+    "definition": "The quantized model file format used by llama.cpp, Ollama, and LM Studio for local inference. Quant levels trade quality for size; Q4_K_M is the practical sweet spot. See On-Device and Edge Deployment.",
+    "letter": "G",
+    "chapter_refs": [
+      "04-inference-optimization/09-on-device-and-edge-deployment"
+    ],
+    "source": "upstream"
+  },
+  {
+    "id": "guardrails",
+    "term": "Guardrails",
+    "definition": "Input/output validation to prevent harmful or off-topic responses.",
+    "letter": "G",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "grounding",
+    "term": "Grounding",
+    "definition": "Connecting LLM responses to factual sources to reduce hallucination.",
+    "letter": "G",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "grok-4-3",
+    "term": "Grok 4.3",
+    "definition": "xAI's frontier reasoning model. Competitive with GPT-5.5, Claude Opus 4.7, and Gemini 3.1 Pro on reasoning benchmarks. Available via xAI API and inside X.",
+    "letter": "G",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "grpo",
+    "term": "GRPO (Group Relative Policy Optimization)",
+    "definition": "The RL algorithm behind DeepSeek-R1: drops PPO's value/critic network and computes advantage from the reward spread within a sampled group of completions. Cheaper than PPO; variants (Dr.GRPO, DAPO, GSPO) fix its length bias and zero-variance collapse. See Training Reasoning Models.",
+    "letter": "G",
+    "chapter_refs": [
+      "03-training-and-adaptation/08-rlvr-and-reasoning-models"
+    ],
+    "source": "upstream"
+  },
+  {
+    "id": "hallucination",
+    "term": "Hallucination",
+    "definition": "Model generating plausible but factually incorrect information.",
+    "letter": "H",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "harness",
+    "term": "Harness (Scaffold) Variance",
+    "definition": "The 10-20 point swing in benchmark scores produced by the same model weights under different prompts, tool access, reasoning effort, or agent scaffolds. Why provider self-reports are not comparable across labs, and only same-harness numbers can be compared. See Benchmarks and Leaderboards.",
+    "letter": "H",
+    "chapter_refs": [
+      "14-evaluation-and-observability/03-benchmarks-and-leaderboards"
+    ],
+    "source": "upstream"
+  },
+  {
+    "id": "harness-engineering",
+    "term": "Harness Engineering",
+    "definition": "Designing the deterministic driver code around an agent (context assembly, tool execution, budgets, stop conditions, durable state, observability) rather than tuning the model itself. The harness is the kernel; the model is the policy. See Loop Engineering.",
+    "letter": "H",
+    "chapter_refs": [
+      "07-agentic-systems/12-loop-engineering"
+    ],
+    "source": "upstream"
+  },
+  {
+    "id": "hnsw",
+    "term": "HNSW (Hierarchical Navigable Small World)",
+    "definition": "Graph-based algorithm for approximate nearest neighbor search in vector databases.",
+    "letter": "H",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "human-in-the-loop",
+    "term": "Human-in-the-Loop (HITL)",
+    "definition": "Patterns for human oversight, approval, or correction of AI outputs.",
+    "letter": "H",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "in-context-learning",
+    "term": "In-Context Learning",
+    "definition": "Model adapting to task based on examples in the prompt without weight updates.",
+    "letter": "I",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "indirect-prompt-injection",
+    "term": "Indirect Prompt Injection",
+    "definition": "A prompt-injection attack delivered through content the agent reads (a web page, document, tool result) rather than the user's direct input. Red-team studies and an impossibility result suggest it cannot be fully prevented, shifting defense toward least-privilege and containment. See Agentic Security and Sandboxing.",
+    "letter": "I",
+    "chapter_refs": [
+      "07-agentic-systems/09-agentic-security-and-sandboxing"
+    ],
+    "source": "upstream"
+  },
+  {
+    "id": "inference",
+    "term": "Inference",
+    "definition": "Running a trained model to generate predictions/outputs.",
+    "letter": "I",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "json-mode",
+    "term": "JSON Mode",
+    "definition": "LLM output mode that guarantees valid JSON structure (legacy). Superseded by **Structured Outputs** in newer APIs.",
+    "letter": "J",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "kv-cache",
+    "term": "KV Cache",
+    "definition": "Cached key-value pairs from attention computation. Enables efficient autoregressive generation.",
+    "letter": "K",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "langchain",
+    "term": "LangChain",
+    "definition": "Framework for building LLM applications with chains, agents, and integrations.",
+    "letter": "L",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "leaderboard-illusion",
+    "term": "Leaderboard Illusion",
+    "definition": "The critique (Cohere et al., arXiv:2504.20879) that crowd-preference leaderboards like LMArena are distorted by private best-of-N testing, unequal data access, and silent model deprecation. Contested in magnitude by LMArena; the practical takeaway is to read style-controlled Elo with confidence intervals and treat Arena as preference, not correctness.",
+    "letter": "L",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "llamaindex",
+    "term": "LlamaIndex",
+    "definition": "Data framework focused on document processing and retrieval for LLM applications.",
+    "letter": "L",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "livecodebench",
+    "term": "LiveCodeBench",
+    "definition": "Benchmark evaluating coding models on real-world problems from competitive programming platforms. More reliable than HumanEval for production coding tasks.",
+    "letter": "L",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "lora",
+    "term": "LoRA (Low-Rank Adaptation)",
+    "definition": "Parameter-efficient fine-tuning that trains small adapter matrices instead of full model weights.",
+    "letter": "L",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "llm-as-judge",
+    "term": "LLM-as-Judge",
+    "definition": "Using an LLM to evaluate outputs from another LLM.",
+    "letter": "L",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "loop-engineering",
+    "term": "Loop Engineering",
+    "definition": "The discipline of designing and continuously improving the control loops that wrap an agent (the trigger, the inner reason-act-observe loop, a verification loop, event-driven invocation, and an eval-driven improvement loop) instead of hand-prompting the model each turn. See Loop Engineering.",
+    "letter": "L",
+    "chapter_refs": [
+      "07-agentic-systems/12-loop-engineering"
+    ],
+    "source": "upstream"
+  },
+  {
+    "id": "loopmaxxing",
+    "term": "Loopmaxxing",
+    "definition": "The anti-pattern of assuming that more iterations automatically solve a task. It fails on goals with no verifiable exit condition, so the loop never converges and spend runs away. The multi-step descendant of token-maxxing. See Loop Engineering.",
+    "letter": "L",
+    "chapter_refs": [
+      "07-agentic-systems/12-loop-engineering"
+    ],
+    "source": "upstream"
+  },
+  {
+    "id": "mcp",
+    "term": "MCP (Model Context Protocol)",
+    "definition": "Open protocol for standardized tool/resource integration with LLMs. Launched by Anthropic November 2024; governance moved to the Linux Foundation's Agentic AI Foundation December 2025; adopted by Anthropic, OpenAI, Google, Microsoft, AWS. Version 2.0 (ratified March 2026) adds Streamable HTTP transport and OAuth 2.1 auth.",
+    "letter": "M",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "memory-poisoning",
+    "term": "Memory Poisoning",
+    "definition": "An attack that plants malicious or false entries into an agent's long-term memory so they resurface and influence future sessions. Added to the OWASP 2026 Agentic Top 10 as ASI06. Defense favors provenance at write time over sanitization at read time. See Research Radar.",
+    "letter": "M",
+    "chapter_refs": [
+      "RESEARCH-RADAR"
+    ],
+    "source": "upstream"
+  },
+  {
+    "id": "mixture-of-agents",
+    "term": "Mixture of Agents (MoA)",
+    "definition": "Ensemble pattern where multiple agents contribute to a synthesized response.",
+    "letter": "M",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "model-routing",
+    "term": "Model Routing",
+    "definition": "Choosing which model serves each request by task, cost, latency, capability, or semantics, often with a cascade (cheap model first, escalate on low confidence) and cross-provider fallback. See AI Gateways and Model Routing.",
+    "letter": "M",
+    "chapter_refs": [
+      "11-infrastructure-and-mlops/03-ai-gateways-and-model-routing"
+    ],
+    "source": "upstream"
+  },
+  {
+    "id": "multi-tenancy",
+    "term": "Multi-Tenancy",
+    "definition": "Serving multiple customers from shared infrastructure with data isolation.",
+    "letter": "M",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "o3",
+    "term": "o3",
+    "definition": "OpenAI's high-compute reasoning model (released Jan 2025). Uses internal chain-of-thought to allocate test-time compute. Available in standard and \"mini\" variants. Excels at math, code, and science.",
+    "letter": "O",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "ocr",
+    "term": "OCR (Optical Character Recognition)",
+    "definition": "Extracting text from images or scanned documents.",
+    "letter": "O",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "openhands",
+    "term": "OpenHands",
+    "definition": "Open-source autonomous software engineering agent (formerly OpenDevin). Supports multiple backend LLMs, runs in a Docker sandbox.",
+    "letter": "O",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "pass-k",
+    "term": "pass^k",
+    "definition": "Agent reliability metric: the fraction of tasks solved on all k independent attempts (versus pass@k, solved on at least one). Exposes the reliability cliff where an agent at ~60% pass@1 can drop to ~25% pass^8. The production-relevant consistency signal.",
+    "letter": "P",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "prompt-caching",
+    "term": "Prompt Caching",
+    "definition": "Reusing the KV cache for repeated prompt prefixes. Available natively in Anthropic (cache_control), Google (implicit), and some OpenAI endpoints. Reduces cost by 60-90% for long fixed prefixes.",
+    "letter": "P",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "prompt-injection",
+    "term": "Prompt Injection",
+    "definition": "Attack where malicious input manipulates LLM behavior.",
+    "letter": "P",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "prefix-caching",
+    "term": "Prefix Caching",
+    "definition": "Reusing KV cache for common prompt prefixes across requests.",
+    "letter": "P",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "qlora",
+    "term": "QLoRA",
+    "definition": "LoRA combined with 4-bit quantization for memory-efficient fine-tuning.",
+    "letter": "Q",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "quantization",
+    "term": "Quantization",
+    "definition": "Reducing model precision (e.g., FP16 to INT4) to decrease memory and improve speed.",
+    "letter": "Q",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "rag",
+    "term": "RAG (Retrieval-Augmented Generation)",
+    "definition": "Pattern that retrieves relevant documents to provide context for LLM generation.",
+    "letter": "R",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "rbac",
+    "term": "RBAC (Role-Based Access Control)",
+    "definition": "Access control based on user roles with predefined permissions.",
+    "letter": "R",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "react",
+    "term": "ReAct",
+    "definition": "Agent pattern alternating between Reasoning and Acting steps.",
+    "letter": "R",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "reranking",
+    "term": "Reranking",
+    "definition": "Second-stage scoring to improve retrieval precision. Cross-encoders provide higher accuracy than bi-encoders.",
+    "letter": "R",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "rlhf",
+    "term": "RLHF (Reinforcement Learning from Human Feedback)",
+    "definition": "Training method using human preferences to align model behavior.",
+    "letter": "R",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "rlvr",
+    "term": "RLVR (RL with Verifiable Rewards)",
+    "definition": "The dominant post-training recipe for reasoning models: reward the policy with a programmatic verifier (math, code, or logic with a checkable answer) instead of a learned reward model, which largely sidesteps reward-model hacking. See Training Reasoning Models.",
+    "letter": "R",
+    "chapter_refs": [
+      "03-training-and-adaptation/08-rlvr-and-reasoning-models"
+    ],
+    "source": "upstream"
+  },
+  {
+    "id": "self-consistency",
+    "term": "Self-Consistency",
+    "definition": "Sampling multiple reasoning paths and selecting most common answer.",
+    "letter": "S",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "semantic-search",
+    "term": "Semantic Search",
+    "definition": "Finding documents by meaning rather than keywords, using embeddings.",
+    "letter": "S",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "speculative-decoding",
+    "term": "Speculative Decoding",
+    "definition": "Using small draft model to propose tokens, verified by large model.",
+    "letter": "S",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "speech-to-speech",
+    "term": "Speech-to-Speech (S2S)",
+    "definition": "A voice-agent architecture where one multimodal model takes audio in and emits audio out directly, versus a cascaded STT to LLM to TTS pipeline. More natural and lower-latency, but less debuggable and controllable. See Real-Time Voice Agents.",
+    "letter": "S",
+    "chapter_refs": [
+      "18-voice-and-audio-agents/01-realtime-voice-agents"
+    ],
+    "source": "upstream"
+  },
+  {
+    "id": "structured-outputs",
+    "term": "Structured Outputs",
+    "definition": "OpenAI's (and Anthropic's tool-mode) capability to guarantee model output conforms to a provided JSON Schema. Stricter than legacy JSON mode.",
+    "letter": "S",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "swe-bench-verified",
+    "term": "SWE-bench Verified",
+    "definition": "Human-validated 500-issue subset of SWE-bench measuring resolution of real GitHub issues; the canonical coding benchmark of 2024-2026. Now near-saturated and partly contaminated, so the field is shifting to SWE-bench Pro and contamination-resistant live variants. Read the harness before trusting a score. See Benchmarks and Leaderboards.",
+    "letter": "S",
+    "chapter_refs": [
+      "14-evaluation-and-observability/03-benchmarks-and-leaderboards"
+    ],
+    "source": "upstream"
+  },
+  {
+    "id": "system-prompt",
+    "term": "System Prompt",
+    "definition": "Instructions that set context and behavior for an LLM conversation.",
+    "letter": "S",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "temperature",
+    "term": "Temperature",
+    "definition": "Parameter controlling randomness of LLM outputs. Lower = more deterministic.",
+    "letter": "T",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "test-time-compute",
+    "term": "Test-Time Compute (Inference-Time Scaling)",
+    "definition": "Spending more compute at inference with the weights **frozen**: long chain-of-thought, best-of-N, self-consistency, search. Ubiquitous in production by 2026, with diminishing (sometimes negative) returns past a point. Contrast with Test-Time Training.",
+    "letter": "T",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "test-time-training",
+    "term": "Test-Time Training (TTT)",
+    "definition": "Updating a model's **weights** at inference (often an ephemeral LoRA) on the test input, its augmentations, or retrieved neighbors, then predicting and discarding the update. Distinct from test-time compute, which leaves weights frozen. Research-stage in 2026; strongest on novel tasks like ARC and on long-context efficiency. See Research Radar.",
+    "letter": "T",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "token",
+    "term": "Token",
+    "definition": "Basic unit of text processing. Roughly 0.75 words or 4 characters in English.",
+    "letter": "T",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "tool-use",
+    "term": "Tool Use",
+    "definition": "LLM capability to invoke external functions/APIs.",
+    "letter": "T",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "transformer",
+    "term": "Transformer",
+    "definition": "Neural network architecture based on self-attention. Foundation of modern LLMs.",
+    "letter": "T",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "vector-database",
+    "term": "Vector Database",
+    "definition": "Database optimized for storing and searching high-dimensional vectors (embeddings).",
+    "letter": "V",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "windsurf",
+    "term": "Windsurf",
+    "definition": "AI-native IDE (by Codeium) with tight agentic integration. Uses \"Flows\" (deterministic agentic sequences). Alternative to Cursor.",
+    "letter": "W",
+    "chapter_refs": [],
+    "source": "upstream"
+  },
+  {
+    "id": "zero-shot",
+    "term": "Zero-Shot",
+    "definition": "Prompting without examples, relying on model's pre-existing knowledge.",
+    "letter": "Z",
+    "chapter_refs": [],
+    "source": "upstream"
+  }
+]

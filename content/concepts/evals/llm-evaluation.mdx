@@ -1,0 +1,119 @@
+---
+title: LLM Evaluation
+slug: llm-evaluation
+type: concept
+area: evals
+difficulty: intermediate
+tags:
+  - evals
+  - llm
+  - evaluation
+diagrams:
+  - diagrams/llm-evaluation--overview.svg
+est_minutes: 5
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The 30-second version
+
+Evaluating LLM systems is fundamentally different from traditional ML. This chapter covers metrics, methodologies, and practical approaches for measuring quality in production. It is about evaluating *your* system; for how to read public model benchmarks like MMLU, SWE-bench, and Arena Elo, see [Benchmarks and Leaderboards](03-benchmarks-and-leaderboards.md).
+
+## The analogy
+
+Think of **LLM Evaluation** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![LLM Evaluation overview](diagrams/llm-evaluation--overview.svg)
+
+Evaluating LLM systems is fundamentally different from traditional ML. This chapter covers metrics, methodologies, and practical approaches for measuring quality in production. It is about evaluating *your* system; for how to read public model benchmarks like MMLU, SWE-bench, and Arena Elo, see [Benchmarks and Leaderboards](03-benchmarks-and-leaderboards.md).
+
+## A concrete example
+
+Evaluating LLM systems is fundamentally different from traditional ML. This chapter covers metrics, methodologies, and practical approaches for measuring quality in production. It is about evaluating *your* system; for how to read public model benchmarks like MMLU, SWE-bench, and Arena Elo, see [Benchmarks and Leaderboards](03-benchmarks-and-leaderboards.md).
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: How would you evaluate a RAG system?
+
+**Strong answer:**
+I would evaluate at multiple levels:
+
+**1. Retrieval quality:**
+- Precision@K: Are retrieved docs relevant?
+- Recall@K: Did we find all relevant docs?
+- MRR: Is the best doc ranked highly?
+
+**2. Generation quality:**
+- Faithfulness: Is response grounded in context?
+- Relevance: Does it answer the question?
+- Completeness: All aspects addressed?
+
+**3. End-to-end:**
+- Answer correctness vs ground truth
+- User satisfaction (thumbs up/down)
+
+**Tools:**
+- RAGAS for automated metrics
+- LLM-as-judge for subjective quality
+- Human evaluation for gold standard
+
+**Process:**
+1. Create evaluation dataset (100+ examples)
+2. Run automated metrics on every change
+3. LLM judge for deeper analysis
+4. Human review for final validation
+5. Monitor in production continuously
+
+### Q: What are the limitations of LLM-as-judge?
+
+**Strong answer:**
+Several known biases and limitations:
+
+**Biases:**
+- Position bias: Prefers first option in comparisons
+- Length bias: Prefers longer responses
+- Self-preference: May prefer own model's style
+- Format bias: Influenced by formatting
+
+**Mitigations:**
+- Swap positions and check consistency
+- Use different model as judge
+- Calibrate with human annotations
+- Multiple judge prompts
+
+**When unreliable:**
+- Highly domain-specific content
+- Subtle factual errors
+- Cultural/contextual nuances
+- Safety edge cases
+
+**Best practice:**
+- Use for rapid iteration
+- Calibrate against human judgments
+- Do not rely solely on LLM judges
+- Human review for high-stakes decisions
+
+## Go deeper
+
+- [Upstream chapter (LLM Evaluation)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/14-evaluation-and-observability/01-llm-evaluation.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

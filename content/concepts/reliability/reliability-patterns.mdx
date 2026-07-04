@@ -1,0 +1,97 @@
+---
+title: Reliability Patterns
+slug: reliability-patterns
+type: concept
+area: reliability
+difficulty: intermediate
+tags:
+  - reliability
+  - patterns
+diagrams:
+  - diagrams/reliability-patterns--overview.svg
+est_minutes: 5
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The 30-second version
+
+Production LLM systems need robust reliability patterns beyond basic retry logic. This chapter covers advanced patterns for building resilient AI applications.
+
+## The analogy
+
+Think of **Reliability Patterns** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Reliability Patterns overview](diagrams/reliability-patterns--overview.svg)
+
+Production LLM systems need robust reliability patterns beyond basic retry logic. This chapter covers advanced patterns for building resilient AI applications.
+
+## A concrete example
+
+Production LLM systems need robust reliability patterns beyond basic retry logic. This chapter covers advanced patterns for building resilient AI applications.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: How do you design for high availability in LLM systems?
+
+**Strong answer:**
+
+"I use multiple layers of reliability:
+
+**Retry with backoff:** Exponential backoff with jitter for transient failures. Important to distinguish retryable (rate limits, timeouts) from non-retryable (auth, bad request) errors.
+
+**Circuit breaker:** If a provider fails repeatedly, stop trying for a cooldown period. This prevents wasting latency on a dead provider and gives it time to recover.
+
+**Multi-provider failover:** Never depend on a single provider. I configure primary/secondary/tertiary with automatic failover. Each provider has its own circuit breaker.
+
+**Graceful degradation:** Define what happens when no providers are available. Better to return a degraded response (simpler model, cached result) than to fail completely.
+
+**Bulkheading:** Isolate different workloads. A batch processing surge should not take down real-time queries.
+
+The key insight is assuming failure. LLM APIs are less reliable than traditional APIs. Design as if the provider will go down, because it will."
+
+### Q: What is the difference between circuit breaker and retry?
+
+**Strong answer:**
+
+"They solve different problems:
+
+**Retry** handles transient failures. If a single request fails, try again. It assumes failures are independent and the next attempt may succeed.
+
+**Circuit breaker** handles systemic failures. If many requests are failing, stop trying entirely. It assumes the downstream system is unhealthy and repeated attempts waste resources and slow recovery.
+
+**How they work together:**
+1. Request fails → retry with backoff (attempt 1, 2, 3)
+2. If all retries fail → circuit breaker records failure
+3. After N failures → circuit opens, rejects requests immediately
+4. After timeout → circuit half-opens, allows limited test requests
+5. If tests succeed → circuit closes, normal operation resumes
+
+Without circuit breaker: during an outage, every request waits through all retries before failing. Latency spikes, resources exhausted.
+
+With circuit breaker: after detecting the outage, requests fail fast. System remains responsive, can fail over to alternatives."
+
+## Go deeper
+
+- [Upstream chapter (Reliability Patterns)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/13-reliability-and-safety/03-reliability-patterns.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

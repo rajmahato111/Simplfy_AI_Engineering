@@ -1,0 +1,69 @@
+---
+title: LangSmith Observability
+slug: langsmith-observability
+type: concept
+area: frameworks
+difficulty: intermediate
+tags:
+  - frameworks
+  - langsmith
+  - observability
+diagrams:
+  - diagrams/langsmith-observability--overview.svg
+est_minutes: 5
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The 30-second version
+
+In 2023, LLM observability was "logging strings." Now it is Full Trajectory Debugging and Automated Evaluation Pipelines. LangSmith is the LangChain-native option in a crowded "LLMOps" layer that also includes Langfuse (acquired by ClickHouse in January 2026), LangWatch, Braintrust, and Arize Phoenix.
+
+## The analogy
+
+Think of **LangSmith Observability** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![LangSmith Observability overview](diagrams/langsmith-observability--overview.svg)
+
+In 2023, LLM observability was "logging strings." Now it is **Full Trajectory Debugging** and **Automated Evaluation Pipelines**. LangSmith is the LangChain-native option in a crowded "LLMOps" layer that also includes Langfuse (acquired by ClickHouse in January 2026), LangWatch, Braintrust, and Arize Phoenix.
+
+## A concrete example
+
+In 2023, LLM observability was "logging strings." Now it is Full Trajectory Debugging and Automated Evaluation Pipelines. LangSmith is the LangChain-native option in a crowded "LLMOps" layer that also includes Langfuse (acquired by ClickHouse in January 2026), LangWatch, Braintrust, and Arize Phoenix.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: Why is "Trace Attribution" critical for Staff-level engineers?
+
+**Strong answer:**
+In complex multi-agent systems, the final output might be bad, but the error happened 10 steps ago in a "Researcher" node. Without **Trace Attribution**, you're just guessing where to fix the prompt. Attribution allows me to see the **Line of Reasoning**. I can see that the "Researcher" failed to find the right URL, which led to the "Summarizer" hallucinating. This allows for **Targeted Optimization** instead of broad "Prompt Engineering."
+
+### Q: How do you justify the cost of an observability platform like LangSmith?
+
+**Strong answer:**
+The cost is offset by **Developer Productivity** and **Token Efficiency**. A single day of an engineer "guessing" why a model is failing costs significantly more than a monthly subscription. Moreover, by using LangSmith to find "Meandering" agents (those taking too many steps), I can optimize the graphs to reduce the average number of steps from 8 to 5, which directly results in a **30-40% reduction in LLM API bills**.
+
+## Go deeper
+
+- [Upstream chapter (LangSmith Observability)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/09-frameworks-and-tools/03-langsmith-observability.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

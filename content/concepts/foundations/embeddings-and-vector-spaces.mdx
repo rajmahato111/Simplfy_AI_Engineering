@@ -1,0 +1,126 @@
+---
+title: Embeddings and Vector Spaces
+slug: embeddings-and-vector-spaces
+type: concept
+area: foundations
+difficulty: beginner
+tags:
+  - foundations
+  - embeddings
+  - and
+  - vector
+  - spaces
+diagrams:
+  - diagrams/embeddings-and-vector-spaces--overview.svg
+est_minutes: 5
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The 30-second version
+
+Embeddings are dense vector representations of text that capture semantic meaning. They are foundational to RAG systems, semantic search, and many AI applications.
+
+## The analogy
+
+Think of **Embeddings and Vector Spaces** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Embeddings and Vector Spaces overview](diagrams/embeddings-and-vector-spaces--overview.svg)
+
+Embeddings are dense vector representations of text that capture semantic meaning. They are foundational to RAG systems, semantic search, and many AI applications.
+
+## A concrete example
+
+Embeddings are dense vector representations of text that capture semantic meaning. They are foundational to RAG systems, semantic search, and many AI applications.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: How do embedding models learn semantic similarity?
+
+**Strong answer:**
+Embedding models are trained with contrastive learning. The objective is to make embeddings of semantically similar texts close together and dissimilar texts far apart.
+
+Training process:
+1. Positive pairs: Texts that should be similar (query-document pairs, paraphrases, translations)
+2. Negative pairs: Texts that should be dissimilar (often from same batch or hard negatives from BM25)
+3. Loss function: Pushes positive pairs close, negative pairs far
+
+The model learns to place texts in a high-dimensional space where distance correlates with semantic similarity. This enables retrieval: embed the query, find nearest neighbors in the document embedding space.
+
+Modern models like E5 and BGE are also instruction-tuned, where you prefix with task instructions to specialize the embedding.
+
+### Q: When would you use ColBERT over a bi-encoder?
+
+**Strong answer:**
+ColBERT uses late interaction: instead of one embedding per document, it keeps per-token embeddings. At query time, it computes token-level similarity.
+
+Choose ColBERT when:
+- Retrieval precision is critical (legal, medical, high-stakes)
+- You can afford 10-100x storage overhead per document
+- Query latency budget is 50ms+ (slightly slower than bi-encoder)
+- Your queries benefit from lexical matching (technical terms)
+
+Choose bi-encoder when:
+- Storage is constrained
+- Need sub-20ms latency
+- Retrieval precision from bi-encoder is sufficient
+- Frequent re-indexing (ColBERT reindex is expensive)
+
+In practice, a common pattern is: bi-encoder for first-stage retrieval (top 100), then cross-encoder or ColBERT for reranking.
+
+### Q: How do you handle embedding drift when updating models?
+
+**Strong answer:**
+Embedding models produce vectors that are only meaningful relative to the same model. If you update the model, all old embeddings become incompatible.
+
+My approach:
+1. **Never update in place.** Create a parallel index with new embeddings.
+2. **Test before switching.** Compare retrieval quality on a test set with both old and new embeddings.
+3. **Background rebuild.** Re-embed the entire corpus with the new model in the background.
+4. **Atomic switch.** Once the new index is complete and validated, switch traffic atomically.
+5. **Rollback plan.** Keep the old index available for quick rollback.
+
+For cost estimation: if you have 10M documents at 500 tokens average, and text-embedding-3-large costs $0.13/1M tokens, re-embedding costs about $650. Plan for this cost when considering model updates.
+
+### Q: How do you choose dimensions for embeddings?
+
+**Strong answer:**
+Higher dimensions capture more information but cost more storage and computation.
+
+Considerations:
+- **Storage:** 1024-d float32 = 4 KB per embedding. At 10M docs = 40 GB just for embeddings.
+- **Search speed:** Higher dimensions = slower nearest neighbor search.
+- **Quality:** Diminishing returns above certain dimensions for most tasks.
+
+Practical approach:
+1. Start with the model's recommended dimensions.
+2. If using Matryoshka models (like text-embedding-3), experiment with lower dimensions on your task.
+3. Benchmark quality at different dimensions: often 256-512 is 95% of full quality.
+4. For two-stage retrieval: use low dimensions for first stage, full dimensions for reranking.
+
+For most applications, 768-1024 dimensions provide good balance. The exception is very high-precision requirements where 2048-4096 may help.
+
+## Go deeper
+
+- [Upstream chapter (Embeddings and Vector Spaces)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/01-foundations/05-embeddings-and-vector-spaces.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

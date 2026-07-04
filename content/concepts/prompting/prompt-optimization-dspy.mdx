@@ -1,0 +1,70 @@
+---
+title: Prompt Optimization (DSPy)
+slug: prompt-optimization-dspy
+type: concept
+area: prompting
+difficulty: intermediate
+tags:
+  - prompting
+  - prompt
+  - optimization
+  - dspy
+diagrams:
+  - diagrams/prompt-optimization-dspy--overview.svg
+est_minutes: 5
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The 30-second version
+
+Prompting has moved from the "Hand-tuning" era to the "Programmatic" era. DSPy (Declarative Self-improving Language Programs) is the de-facto standard for building robust LLM pipelines where prompts are optimized automatically by algorithms. The 3.x line (DSPy 3.1.3 shipped Feb 5, 2026, with point releases through May 2026) introduces tighter integration with reasoning-native models and a cleaner async runtime.
+
+## The analogy
+
+Think of **Prompt Optimization (DSPy)** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Prompt Optimization (DSPy) overview](diagrams/prompt-optimization-dspy--overview.svg)
+
+Prompting has moved from the "Hand-tuning" era to the "Programmatic" era. **DSPy (Declarative Self-improving Language Programs)** is the de-facto standard for building robust LLM pipelines where prompts are optimized automatically by algorithms. The 3.x line (DSPy 3.1.3 shipped Feb 5, 2026, with point releases through May 2026) introduces tighter integration with reasoning-native models and a cleaner async runtime.
+
+## A concrete example
+
+Prompting has moved from the "Hand-tuning" era to the "Programmatic" era. DSPy (Declarative Self-improving Language Programs) is the de-facto standard for building robust LLM pipelines where prompts are optimized automatically by algorithms. The 3.x line (DSPy 3.1.3 shipped Feb 5, 2026, with point releases through May 2026) introduces tighter integration with reasoning-native models and a cleaner async runtime.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: How does DSPy solve the "fragility" of prompt engineering?
+
+**Strong answer:**
+DSPy moves the complexity of "formatting" and "grounding" away from the human and into the compiler. When we hand-write prompts, we are effectively "hard-coding" behavior that is specific to one model at one specific time (point-in-time tuning). If that model is updated or swapped, the prompt breaks. DSPy treats the prompt as a learnable parameter. By defining a clear **Signature** and a **Metric**, we allow the system to "search" for the most effective prompt through thousands of simulated iterations, making the final system much more resilient to model changes.
+
+### Q: What is a "Teleprompter" in the context of DSPy?
+
+**Strong answer:**
+A Teleprompter is a programmatic optimizer. Its job is to take a DSPy program (which might be a complex chain of modules) and a small set of training examples, and then "compile" them into an optimized version. It does this by generating potential "thinking patterns" and examples, testing them against a metric, and selecting the most effective ones. In short, a Teleprompter is the "Gradient Descent" of the prompt engineering world.
+
+## Go deeper
+
+- [Upstream chapter (Prompt Optimization (DSPy))](https://github.com/ombharatiya/ai-system-design-guide/blob/main/05-prompting-and-context/07-prompt-optimization-dspy.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

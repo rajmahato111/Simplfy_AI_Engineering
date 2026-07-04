@@ -1,0 +1,118 @@
+---
+title: LLM Infrastructure
+slug: llm-infrastructure
+type: concept
+area: mlops
+difficulty: intermediate
+tags:
+  - mlops
+  - llm
+  - infrastructure
+diagrams:
+  - diagrams/llm-infrastructure--overview.svg
+est_minutes: 5
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The 30-second version
+
+Building production LLM systems requires understanding deployment options, scaling patterns, and operational concerns. This chapter covers the infrastructure layer.
+
+## The analogy
+
+Think of **LLM Infrastructure** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![LLM Infrastructure overview](diagrams/llm-infrastructure--overview.svg)
+
+Building production LLM systems requires understanding deployment options, scaling patterns, and operational concerns. This chapter covers the infrastructure layer.
+
+## A concrete example
+
+Building production LLM systems requires understanding deployment options, scaling patterns, and operational concerns. This chapter covers the infrastructure layer.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: How would you design infrastructure for 1M LLM queries per day?
+
+**Strong answer:**
+
+"At 1M queries per day, that is about 12 queries per second on average, with peaks potentially 3-5x higher. Here is my approach:
+
+**Architecture:**
+- Load balancer distributing across multiple API endpoints
+- Model router for cost optimization (route simple queries to cheaper models)
+- Redis cache for frequent queries
+- Queue-based processing for async workloads
+
+**Cost optimization is critical at this scale:**
+- Route 60-70% of simple queries to GPT-4o-mini or Claude Haiku
+- Implement semantic caching (30%+ cache hit rate target)
+- Use batch API for non-urgent requests (50% discount)
+- At this volume, self-hosting becomes cost-competitive
+
+**Reliability:**
+- Multi-provider setup with automatic failover
+- Rate limiting per user to prevent abuse
+- Queue-based architecture for handling spikes
+- Graceful degradation when providers are unavailable
+
+**Monitoring:**
+- Real-time cost tracking with budget alerts
+- Latency percentiles (p50, p95, p99)
+- Quality metrics sampled continuously
+- Error rate and rate-limit hit tracking
+
+At 1M queries with average 2K tokens, using GPT-4o would cost about $25K/day. With routing and caching, I can reduce this to $5-8K/day."
+
+### Q: When would you self-host vs use API providers?
+
+**Strong answer:**
+
+"My decision framework considers several factors:
+
+**Use API providers when:**
+- Volume is under 1M queries/month (cost crossover point)
+- Time-to-market is critical
+- Team lacks GPU infrastructure expertise
+- You want the latest models immediately
+- Workload is variable and hard to predict
+
+**Self-host when:**
+- Data cannot leave your infrastructure (compliance, security)
+- Volume exceeds 10M queries/month (significant savings)
+- You need latency under 100ms P99
+- You need custom model weights or fine-tuning
+- You want full control over model behavior
+
+**Hybrid approach often works best:**
+- Self-host for high-volume predictable workloads
+- API for spikes and specialized models
+- API as fallback for self-hosted failures
+
+The hidden costs of self-hosting: GPU procurement/rental, engineering time for ops, model updates, monitoring infrastructure. Factor in at least 1-2 dedicated engineers for infrastructure."
+
+## Go deeper
+
+- [Upstream chapter (LLM Infrastructure)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/11-infrastructure-and-mlops/01-llm-infrastructure.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

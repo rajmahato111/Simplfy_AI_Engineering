@@ -1,0 +1,156 @@
+---
+title: Transformer Architecture
+slug: transformer-architecture
+type: concept
+area: foundations
+difficulty: beginner
+tags:
+  - foundations
+  - transformer
+  - architecture
+diagrams:
+  - diagrams/transformer-architecture--overview.svg
+est_minutes: 5
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The 30-second version
+
+This chapter provides a comprehensive view of the complete transformer architecture, bringing together the components from previous chapters into a unified understanding.
+
+## The analogy
+
+Think of **Transformer Architecture** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Transformer Architecture overview](diagrams/transformer-architecture--overview.svg)
+
+This chapter provides a comprehensive view of the complete transformer architecture, bringing together the components from previous chapters into a unified understanding.
+
+## A concrete example
+
+This chapter provides a comprehensive view of the complete transformer architecture, bringing together the components from previous chapters into a unified understanding.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: Walk me through the forward pass of a transformer.
+
+**Strong answer:**
+For a decoder-only model generating text:
+
+1. **Tokenization:** Convert input text to token IDs
+
+2. **Embedding:** Look up token embeddings from the embedding table
+
+3. **For each transformer layer:**
+   - Apply RMSNorm to input
+   - Compute Q, K, V projections
+   - Apply RoPE to Q and K for position
+   - For generation: append new K, V to KV cache
+   - Compute attention (masked, so each position only sees previous)
+   - Project attention output and add residual
+   - Apply RMSNorm
+   - Pass through SwiGLU feed-forward network
+   - Add residual
+
+4. **Output norm:** Apply final RMSNorm
+
+5. **LM head:** Project to vocabulary size to get logits
+
+6. **Sample:** Select next token from logits using temperature/top-p
+
+For generation, repeat steps 3-6 for each new token, reusing the KV cache from previous positions.
+
+### Q: What is the difference between pre-norm and post-norm?
+
+**Strong answer:**
+The difference is where layer normalization is applied relative to sublayers (attention, FFN):
+
+**Post-norm (original transformer):**
+```
+x = LayerNorm(x + Sublayer(x))
+```
+Normalize after adding residual.
+
+**Pre-norm (modern transformers):**
+```
+x = x + Sublayer(LayerNorm(x))
+```
+Normalize before the sublayer.
+
+Pre-norm is preferred because:
+1. Gradients flow more directly through residual connections
+2. Training is more stable, especially for deep models
+3. Less sensitive to initialization and learning rate
+4. No need for learning rate warmup
+
+The cost is slightly lower final performance in some benchmarks, but the training stability is worth it for large models.
+
+### Q: Explain GQA and why it matters for serving.
+
+**Strong answer:**
+Grouped Query Attention (GQA) shares Key and Value heads across groups of Query heads.
+
+Standard Multi-Head Attention: 64 query heads, 64 KV heads (1:1)
+GQA: 64 query heads, 8 KV heads (8:1)
+
+Implementation: Each KV head is used by 8 query heads via repetition.
+
+**Why it matters:**
+The KV cache stores K and V for all positions during generation. For Llama 70B at 8K context:
+- MHA: 2.6 MB/token * 8K = 21 GB per request
+- GQA (8:1): ~2.6 GB per request
+
+8x reduction enables:
+- Larger batch sizes (more concurrent users)
+- Longer contexts
+- Lower GPU memory requirements
+
+Quality impact: Minimal. Research shows GQA achieves 99%+ of MHA quality.
+
+### Q: What changed between GPT-2 and Llama 2?
+
+**Strong answer:**
+Key architecture improvements:
+
+| Component | GPT-2 | Llama 2 |
+|-----------|-------|---------|
+| Norm | Post-LayerNorm | Pre-RMSNorm |
+| Position | Learned absolute | RoPE (rotary) |
+| Activation | GELU | SwiGLU |
+| Attention | MHA | GQA (for 70B) |
+| Bias | Present | Removed |
+
+Impact:
+- RMSNorm: Faster and equally effective
+- RoPE: Better length extrapolation
+- SwiGLU: ~1% quality improvement
+- GQA: 8x smaller KV cache for serving
+- No bias: Fewer parameters, no quality loss
+
+These changes enable training larger models more stably and serving them more efficiently.
+
+## Go deeper
+
+- [Upstream chapter (Transformer Architecture)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/01-foundations/04-transformer-architecture.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

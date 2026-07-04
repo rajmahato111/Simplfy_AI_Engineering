@@ -15,8 +15,25 @@ export default function LearnIndexPage() {
   }
 
   const areaLabels: Record<string, string> = {
+    foundations: "Foundations",
+    models: "Model landscape",
+    training: "Training & adaptation",
+    inference: "Inference optimization",
+    prompting: "Prompting & context",
     retrieval: "Retrieval & RAG",
     agents: "Agentic systems",
+    memory: "Memory & state",
+    frameworks: "Frameworks & tools",
+    "document-processing": "Document processing",
+    mlops: "Infrastructure & MLOps",
+    security: "Security & access",
+    reliability: "Reliability & safety",
+    evals: "Evaluation & observability",
+    patterns: "Design patterns",
+    "case-studies": "Case studies",
+    "tool-use": "Tool use & computer agents",
+    voice: "Voice & audio",
+    multimodal: "Multimodal generation",
     general: "General",
   };
 
@@ -43,7 +60,7 @@ export default function LearnIndexPage() {
               {areaSlugs.map((slug) => {
                 const doc = getContentBySlug(slug);
                 const title = doc?.frontmatter.title ?? slug;
-                const { type, difficulty, est_minutes } = doc?.frontmatter ?? {};
+                const { type, difficulty, est_minutes, status } = doc?.frontmatter ?? {};
                 return (
                   <Link
                     key={slug}
@@ -52,6 +69,9 @@ export default function LearnIndexPage() {
                   >
                     <div className="flex flex-wrap gap-2">
                       {type && <Badge className="capitalize">{type}</Badge>}
+                      {status === "draft" && (
+                        <Badge className="border-amber-200 bg-amber-50 text-amber-900">Draft</Badge>
+                      )}
                       {difficulty && <Badge className="capitalize">{difficulty}</Badge>}
                       {est_minutes && <Badge>{est_minutes} min</Badge>}
                     </div>

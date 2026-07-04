@@ -1,0 +1,151 @@
+---
+title: Guardrails and Safety
+slug: guardrails
+type: concept
+area: reliability
+difficulty: intermediate
+tags:
+  - reliability
+  - guardrails
+diagrams:
+  - diagrams/guardrails--overview.svg
+est_minutes: 5
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The 30-second version
+
+Guardrails are systems that constrain LLM behavior to ensure safe, reliable outputs and prevent unsafe actions. This chapter covers input validation, output filtering, prompt injection defense, action safety, hallucination mitigation, and reliability patterns for production systems.
+
+## The analogy
+
+Think of **Guardrails and Safety** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Guardrails and Safety overview](diagrams/guardrails--overview.svg)
+
+Guardrails are systems that constrain LLM behavior to ensure safe, reliable outputs and prevent unsafe actions. This chapter covers input validation, output filtering, prompt injection defense, action safety, hallucination mitigation, and reliability patterns for production systems.
+
+## A concrete example
+
+Guardrails are systems that constrain LLM behavior to ensure safe, reliable outputs and prevent unsafe actions. This chapter covers input validation, output filtering, prompt injection defense, action safety, hallucination mitigation, and reliability patterns for production systems.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: How do you prevent hallucination in a production RAG system?
+
+**Strong answer:**
+Multi-layer approach:
+
+**1. Retrieval quality:**
+- High-quality retrieval is the first defense
+- If we retrieve wrong context, model will hallucinate
+- Use reranking to ensure relevance
+
+**2. Prompt engineering:**
+- Explicit instruction: "Answer only from context"
+- Encourage abstention: "If not in context, say you don't know"
+- Low temperature (0.1-0.3)
+
+**3. Output validation:**
+- Factuality checking: NLI model or LLM judge
+- Citation verification: Check claims against sources
+- Self-consistency: Multiple samples should agree
+
+**4. Abstention strategy:**
+- Train/prompt model to say "I don't know"
+- Detect low-confidence responses
+- Escalate to human when uncertain
+
+**5. Monitoring:**
+- Track hallucination rate in production
+- User feedback on accuracy
+- Regular evaluation on test set
+
+### Q: How do you protect an LLM application from prompt injection?
+
+**Strong answer:**
+
+"Defense in depth with multiple layers:
+
+**Detection:**
+- Pattern matching for known injection phrases ('ignore previous instructions')
+- ML classifier trained on injection examples
+- Anomaly detection for unusual input patterns
+
+**Mitigation:**
+- Sandwich defense: wrap user input with instruction reminders
+- Clear delimiters: use unique markers around user content
+- Input/output isolation: summarize intent before acting on it
+- Parameterization: separate data from instructions (like SQL params)
+
+**Architecture:**
+- Least privilege: agents only have permissions they need
+- Action validation: verify actions before execution
+- Output filtering: catch responses that leak system prompts
+
+No single defense is perfect. The goal is that an attacker needs to bypass multiple layers. I also monitor for injection attempts to update defenses.
+
+For high-security applications, I use a two-stage approach: first LLM extracts intent without acting, second LLM acts only on the extracted intent."
+
+### Q: Design a guardrail system for a customer service chatbot.
+
+**Strong answer:**
+I would implement guardrails at input and output:
+
+**Input guardrails:**
+1. Topic filter: Only allow product/service questions
+2. PII detection: Redact or warn about sensitive data
+3. Jailbreak/injection detection: Block manipulation attempts
+4. Rate limiting: Prevent abuse
+
+**Output guardrails:**
+1. Content safety: No harmful/inappropriate content
+2. Relevance check: Response addresses the question
+3. Brand voice: Consistent tone and messaging
+4. Factuality: Claims supported by knowledge base
+5. PII filter: Ensure no PII leaks in responses
+
+**Behavioral guardrails:**
+- Confidence thresholds: escalate to human if uncertain
+- Refusal patterns: graceful decline for out-of-scope requests
+- Disclosure: clearly identify as AI when appropriate
+
+**Fallback chain:**
+```
+Primary LLM -> Backup LLM -> Canned responses -> Human escalation
+```
+
+**Monitoring:**
+- Log all guardrail triggers
+- Track guardrail trigger rates
+- Alert on high block rates (may indicate attack or model issue)
+- Sample blocked conversations for review
+- User satisfaction tracking
+
+The balance is: enough guardrails to be safe, not so many that the bot is useless. Tune thresholds based on the risk profile -- financial services tighter than casual chat.
+
+## Go deeper
+
+- [Upstream chapter (Guardrails and Safety)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/13-reliability-and-safety/01-guardrails.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

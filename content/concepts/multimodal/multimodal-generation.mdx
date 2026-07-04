@@ -1,0 +1,70 @@
+---
+title: Multimodal Generation
+slug: multimodal-generation
+type: concept
+area: multimodal
+difficulty: intermediate
+tags:
+  - multimodal
+  - generation
+diagrams:
+  - diagrams/multimodal-generation--overview.svg
+est_minutes: 5
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The 30-second version
+
+Generating images, video, and audio is a different engineering problem from understanding them. A generative-media product is an asset-processing pipeline of long-running, non-deterministic, expensive jobs, and most of the work is orchestrating that safely, proving provenance, and evaluating quality you cannot reproduce exactly. This chapter leads with those durable concerns and treats the specific models as a perishable snapshot. Every capability figure below is a reported or vendor claim unless tied to a primary source.
+
+## The analogy
+
+Think of **Multimodal Generation** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Multimodal Generation overview](diagrams/multimodal-generation--overview.svg)
+
+Generating images, video, and audio is a different engineering problem from understanding them. A generative-media product is an **asset-processing pipeline of long-running, non-deterministic, expensive jobs**, and most of the work is orchestrating that safely, proving provenance, and evaluating quality you cannot reproduce exactly. This chapter leads with those durable concerns and treats the specific models as a perishable snapshot. Every capability figure below is a reported or vendor claim unless tied to a primary source.
+
+**Scoping (read first):** this topic is load-bearing for creative, media, marketing, game, and avatar products, and largely noise for backend services, data platforms, RAG, and text-only agents. The one piece that reaches *any* product touching user-uploaded or AI-generated media is **provenance and safety**, because the legal obligations attach to generating or distributing synthetic media, not to your domain. If your system never emits a pixel or a waveform, only that section applies.
+
+## A concrete example
+
+Generating images, video, and audio is a different engineering problem from understanding them. A generative-media product is an asset-processing pipeline of long-running, non-deterministic, expensive jobs, and most of the work is orchestrating that safely, proving provenance, and evaluating quality you cannot reproduce exactly. This chapter leads with those durable concerns and treats the specific models as a perishable snapshot. Every capability figure below is a reported or vendor claim unless tied to a primary source.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: Design the backbone of a service that turns a script into a narrated, music-backed video. What are the hard parts?
+
+**Strong answer:**
+The backbone is an asynchronous DAG of stages, each a swappable model: prompt to keyframe images, image-to-video for motion, TTS for narration, a music model for score, and lip-sync to bind voice to video, then a mux step. Because video generation takes tens of seconds to minutes, every stage is a job: submit returns an ID, work runs on an autoscaling GPU worker pool scaled on queue depth, and completion fires a webhook with a polling fallback. The hard parts are cost and reliability. Cost: cache on the full request fingerprint, draft cheaply and only re-render approved drafts at full quality, and cap per-user spend, since each retry costs real money. Reliability: attach idempotency keys so a retried or redelivered job does not pay twice, and store a full manifest of prompt, seed, parameters, and model versions per asset, both for debugging and as the provenance record. I would also gate generation with input and output moderation and attach C2PA credentials, because the synthetic-media obligations apply regardless of my domain.
+
+### Q: How do you regression-test a generative pipeline when outputs are not reproducible?
+
+**Strong answer:**
+You give up exact match and test perceptually and statistically. I keep a versioned golden prompt set covering real use cases and known failure modes, and run it on every change. Where reproducibility holds, self-hosted with pinned hardware and seeds, I can use seed-locked checks; on hosted APIs I assume non-reproducibility, so I compare distributions of metric scores rather than single outputs and use perceptual similarity, perceptual hashes, SSIM, and CLIP-embedding distance to a baseline, plus a VLM-as-judge on a rubric for prompt adherence and artifacts. I track those distributions over time and alert on drift, because a sudden shift usually means the provider silently updated the model behind a stable name, so I also pin to dated model versions when the API allows. Releases gate on statistical significance, not raw deltas, and I version prompts independently of models so I can attribute a regression to the right change.
+
+## Go deeper
+
+- [Upstream chapter (Multimodal Generation)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/19-multimodal-generation/01-multimodal-generation.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

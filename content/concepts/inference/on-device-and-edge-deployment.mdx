@@ -1,0 +1,71 @@
+---
+title: On-Device and Edge Deployment
+slug: on-device-and-edge-deployment
+type: concept
+area: inference
+difficulty: intermediate
+tags:
+  - inference
+  - device
+  - and
+  - edge
+  - deployment
+diagrams:
+  - diagrams/on-device-and-edge-deployment--overview.svg
+est_minutes: 5
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The 30-second version
+
+Not every model has to run in someone else's cloud. Running LLMs locally, on a laptop, a workstation GPU, a phone, or an edge box, is a real deployment target in 2026, driven by privacy, offline operation, latency, and cost at steady volume. The catch is that the tool that makes local models easy to *try* (Ollama) is not the tool that serves them in *production* (vLLM), and the two get conflated constantly. This chapter sorts out the runtime stack, the prototype-to-production path, the hardware limits, and when local actually beats an API.
+
+## The analogy
+
+Think of **On-Device and Edge Deployment** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![On-Device and Edge Deployment overview](diagrams/on-device-and-edge-deployment--overview.svg)
+
+Not every model has to run in someone else's cloud. Running LLMs **locally**, on a laptop, a workstation GPU, a phone, or an edge box, is a real deployment target in 2026, driven by privacy, offline operation, latency, and cost at steady volume. The catch is that the tool that makes local models easy to *try* (Ollama) is not the tool that serves them in *production* (vLLM), and the two get conflated constantly. This chapter sorts out the runtime stack, the prototype-to-production path, the hardware limits, and when local actually beats an API.
+
+## A concrete example
+
+Not every model has to run in someone else's cloud. Running LLMs locally, on a laptop, a workstation GPU, a phone, or an edge box, is a real deployment target in 2026, driven by privacy, offline operation, latency, and cost at steady volume. The catch is that the tool that makes local models easy to *try* (Ollama) is not the tool that serves them in *production* (vLLM), and the two get conflated constantly. This chapter sorts out the runtime stack, the prototype-to-production path, the hardware limits, and when local actually beats an API.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: A team prototyped on Ollama and wants to ship it as a shared API. What changes and why?
+
+**Strong answer:**
+Ollama is the wrong tool for a shared endpoint. It serves with limited parallelism and queues excess requests first-in-first-out, so under concurrency latency spikes and requests start failing. The fix is to switch the serving engine to vLLM (or TensorRT-LLM or TGI), keeping the same OpenAI-compatible API so the app barely changes. vLLM wins structurally, not by tuning: PagedAttention stores the KV cache in non-contiguous blocks to eliminate most of the memory waste, and continuous batching swaps finished requests out and queued ones in mid-batch, so concurrent demand becomes throughput. First-party benchmarks show roughly an order-of-magnitude higher throughput and far lower tail latency under load. I would also right-size the model and quant to the target GPU with KV-cache headroom, and add autoscaling and monitoring, which Ollama does not provide.
+
+### Q: When would you choose local or on-device inference over a cloud API?
+
+**Strong answer:**
+When data cannot leave the box for privacy or residency reasons, when the system must work offline or air-gapped, when I need the lowest possible latency by cutting the network round trip, or when I have steady high volume where a reserved GPU beats per-token pricing, which is reported to break even around a few million tokens a day. I would stay on an API for frontier quality, spiky demand where idle GPUs waste money, low volume below break-even, or when the team lacks the ops capacity to run a serving stack. In practice it is usually a hybrid: small, private, or offline paths run local on quantized models, and heavy or frontier or bursty paths go to the cloud. On phones specifically, I would plan for sub-1B-to-3B models, since mobile is memory and bandwidth constrained.
+
+## Go deeper
+
+- [Upstream chapter (On-Device and Edge Deployment)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/04-inference-optimization/09-on-device-and-edge-deployment.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

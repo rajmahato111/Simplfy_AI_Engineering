@@ -1,0 +1,70 @@
+---
+title: Short-Term Context Management
+slug: short-term-context
+type: concept
+area: memory
+difficulty: intermediate
+tags:
+  - memory
+  - short
+  - term
+  - context
+diagrams:
+  - diagrams/short-term-context--overview.svg
+est_minutes: 5
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The 30-second version
+
+Short-term context (L1 Memory) is the high-speed interface where reasoning happens. Managing it well is no longer about "message lists" but about KV Cache Optimization and Dynamic Context Allocation.
+
+## The analogy
+
+Think of **Short-Term Context Management** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Short-Term Context Management overview](diagrams/short-term-context--overview.svg)
+
+Short-term context (L1 Memory) is the high-speed interface where reasoning happens. Managing it well is no longer about "message lists" but about **KV Cache Optimization** and **Dynamic Context Allocation**.
+
+## A concrete example
+
+Short-term context (L1 Memory) is the high-speed interface where reasoning happens. Managing it well is no longer about "message lists" but about KV Cache Optimization and Dynamic Context Allocation.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: What is the difference between "Model Context Window" and "Application Context Window"?
+
+**Strong answer:**
+The **Model Context Window** is the hard limit defined by the architecture (e.g., 128K for GPT-4o). The **Application Context Window** is a configuration set by the engineer (e.g., 16K limit) to manage **Latency and Cost**. In production, we rarely use the full model window for every turn because attention overhead increases with context size, leading to slower generation. We use a **Buffer Zone** to leave space for the model's new response.
+
+### Q: How does "Prefix Caching" change how you design System Prompts?
+
+**Strong answer:**
+It forces me to move **Static content to the front** and **Dynamic content to the back**. Early-LLM patterns often put the user's name or date at the very top. That breaks the prefix cache. I put "Immutable Rules" and "Tool Schemas" at the beginning and the "User Context" (which changes every turn) at the end. This ensures the first 5,000 tokens are identical across all users, maximizing cache hits on the inference server.
+
+## Go deeper
+
+- [Upstream chapter (Short-Term Context Management)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/08-memory-and-state/02-short-term-context.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

@@ -1,0 +1,44 @@
+---
+title: 'Case Study: Real-Time AI Search Engine'
+slug: real-time-search
+type: walkthrough
+area: case-studies
+difficulty: advanced
+tags:
+  - case-studies
+  - real
+  - time
+  - search
+diagrams:
+  - diagrams/real-time-search--overview.svg
+est_minutes: 15
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The question
+
+A fintech startup needs to build a real-time market intelligence platform that lets analysts ask natural language questions about live market data, news, and company filings.
+
+## What the interviewer is actually testing
+
+- Data freshness: queries must reflect information from the last 5 minutes
+- Scale: 10,000 concurrent users, 50,000 queries/hour
+- Accuracy: financial data cannot be hallucinated
+- Latency: p95 response time under 3 seconds
+- [Upstream chapter (Case Study: Real-Time AI Search Engine)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/16-case-studies/06-real-time-search.md)
+
+## How it actually works
+
+
+![Case Study: Real-Time AI Search Engine overview](diagrams/real-time-search--overview.svg)
+
+
+
+## Go deeper
+
+- [Upstream chapter (Case Study: Real-Time AI Search Engine)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/16-case-studies/06-real-time-search.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

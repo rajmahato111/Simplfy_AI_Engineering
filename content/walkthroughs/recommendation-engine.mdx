@@ -1,0 +1,43 @@
+---
+title: 'Case Study: AI-Powered Recommendation Engine'
+slug: recommendation-engine
+type: walkthrough
+area: case-studies
+difficulty: advanced
+tags:
+  - case-studies
+  - recommendation
+  - engine
+diagrams:
+  - diagrams/recommendation-engine--overview.svg
+est_minutes: 15
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The question
+
+A streaming platform with 50 million users needs to build a recommendation system that combines collaborative filtering with LLM-generated explanations: "Because you enjoyed Inception, you might like Tenet for its mind-bending time mechanics."
+
+## What the interviewer is actually testing
+
+- Real-time recommendations (under 200ms p95)
+- Must explain why each recommendation was made
+- Cold-start handling for new users
+- Privacy: cannot leak viewing history between users
+- Daily active: 5M users, each viewing 10+ recommendation sets
+
+## How it actually works
+
+
+![Case Study: AI-Powered Recommendation Engine overview](diagrams/recommendation-engine--overview.svg)
+
+
+
+## Go deeper
+
+- [Upstream chapter (Case Study: AI-Powered Recommendation Engine)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/16-case-studies/11-recommendation-engine.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

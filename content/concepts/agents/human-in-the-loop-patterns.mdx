@@ -1,0 +1,71 @@
+---
+title: Human-in-the-Loop Patterns
+slug: human-in-the-loop-patterns
+type: concept
+area: agents
+difficulty: intermediate
+tags:
+  - agents
+  - human
+  - the
+  - loop
+  - patterns
+diagrams:
+  - diagrams/human-in-the-loop-patterns--overview.svg
+est_minutes: 5
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The 30-second version
+
+No agent is 100% reliable. Human-in-the-Loop (HITL) is the bridge that ensures safety and accuracy in high-stakes environments. Production stacks have moved beyond "Approval Buttons" to Co-Reasoning and Interrupt-Based Steering, exposed natively in frameworks like LangGraph (interrupt+resume) and Microsoft Agent Framework.
+
+## The analogy
+
+Think of **Human-in-the-Loop Patterns** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![Human-in-the-Loop Patterns overview](diagrams/human-in-the-loop-patterns--overview.svg)
+
+No agent is 100% reliable. **Human-in-the-Loop (HITL)** is the bridge that ensures safety and accuracy in high-stakes environments. Production stacks have moved beyond "Approval Buttons" to **Co-Reasoning** and **Interrupt-Based Steering**, exposed natively in frameworks like LangGraph (interrupt+resume) and Microsoft Agent Framework.
+
+## A concrete example
+
+No agent is 100% reliable. Human-in-the-Loop (HITL) is the bridge that ensures safety and accuracy in high-stakes environments. Production stacks have moved beyond "Approval Buttons" to Co-Reasoning and Interrupt-Based Steering, exposed natively in frameworks like LangGraph (interrupt+resume) and Microsoft Agent Framework.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: How do you design an HITL system that doesn't "Fatigue" the human operator?
+
+**Strong answer:**
+We use **Threshold Tuning**. We don't ask for approval on every action. We only trigger HITL for: 1) High-risk "Writing" tools, 2) Low-confidence reasoning steps, or 3) Actions that violate a "Policy" set by the business. Additionally, we provide the human with a **Contextual Summary**—instead of the whole log, we show them a 1-sentence "Diff" of what the agent wants to do. This reduces the "Review cognitive load" from minutes to seconds.
+
+### Q: What is the "Over-Reliance" risk in HITL, and how do you mitigate it?
+
+**Strong answer:**
+Over-reliance happens when humans start clicking "Approve" without reading the logs. We mitigate this with **Forced Review Checkpoints** (e.g., the human MUST edit at least one word in the proposed plan) or **Synthetic Error Injections** (intentionally showing the human a "wrong" plan 1% of the time to see if they catch it). If they pass the "Trap," they continue; if they fail, they are flagged for additional training.
+
+## Go deeper
+
+- [Upstream chapter (Human-in-the-Loop Patterns)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/07-agentic-systems/08-human-in-the-loop-patterns.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)

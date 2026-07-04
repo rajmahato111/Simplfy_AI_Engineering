@@ -1,0 +1,73 @@
+---
+title: AI Gateways and Model Routing
+slug: ai-gateways-and-model-routing
+type: concept
+area: mlops
+difficulty: intermediate
+tags:
+  - mlops
+  - gateways
+  - and
+  - model
+  - routing
+diagrams:
+  - diagrams/ai-gateways-and-model-routing--overview.svg
+est_minutes: 5
+source_attribution: >-
+  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
+  edition with interview lens. See CREDITS.md.
+last_reviewed: '2026-07-04'
+status: draft
+---
+## The 30-second version
+
+The case for a routing layer is now empirical, not aspirational. Per Datadog's 2026 State of AI Engineering, 69% of companies run three or more models in production, and rate-limit / capacity errors are the single largest production failure mode (about 5% of requests fail, and roughly 60% of those failures are capacity-driven). Datadog's own framing: operational complexity, not model intelligence, is now the primary barrier to reliable AI at scale.
+
+## The analogy
+
+Think of **AI Gateways and Model Routing** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+
+## How it actually works
+
+
+![AI Gateways and Model Routing overview](diagrams/ai-gateways-and-model-routing--overview.svg)
+
+The case for a routing layer is now empirical, not aspirational. Per Datadog's 2026 State of AI Engineering, **69% of companies run three or more models in production**, and **rate-limit / capacity errors are the single largest production failure mode** (about 5% of requests fail, and roughly 60% of those failures are capacity-driven). Datadog's own framing: operational complexity, not model intelligence, is now the primary barrier to reliable AI at scale.
+
+Once you depend on multiple models and your traffic is non-trivial, a single provider becomes a single point of failure, and rate limits, not model quality, are what page you at 2am. An **AI gateway** is the standard mitigation. This chapter covers what it does, how routing and fallback work, the 2026 tool landscape, and when you actually need one.
+
+## A concrete example
+
+The case for a routing layer is now empirical, not aspirational. Per Datadog's 2026 State of AI Engineering, 69% of companies run three or more models in production, and rate-limit / capacity errors are the single largest production failure mode (about 5% of requests fail, and roughly 60% of those failures are capacity-driven). Datadog's own framing: operational complexity, not model intelligence, is now the primary barrier to reliable AI at scale.
+
+## The tradeoffs that matter
+
+| Choice | Upside | Cost |
+|--------|--------|------|
+| Simpler design | Faster to ship | Less resilient |
+| Heavier retrieval | Better grounding | More latency |
+| Bigger model | Higher quality | Higher $/query |
+
+## Where people go wrong
+
+- Skipping evaluation and hoping demos generalize
+- Ignoring latency/cost until production traffic arrives
+- Treating retrieval quality as a generation problem
+
+## The interview lens
+
+### Q: Rate-limit errors are your top production failure. How does a gateway help, and how could it make things worse?
+
+**Strong answer:**
+A gateway helps by load-balancing across multiple keys, regions, and providers (which multiplies rate-limit headroom) and by failing over to an alternate provider on a 429 through an ordered fallback chain, so a single provider's throttling stops being a hard outage. It also makes the failure visible: centralized traces show which provider was tried and why it failed. It makes things worse if retries are naive: blind, immediate retries add load during the exact moment the provider is overloaded, a thundering herd that deepens the outage. The fixes are exponential backoff with jitter, honoring the provider's `Retry-After` header, and a circuit breaker that stops hammering a dead endpoint globally rather than retrying per request. And the gateway itself must be highly available with externalized state, or it just relocates the single point of failure.
+
+### Q: When is a full gateway overkill, and what would you do instead?
+
+**Strong answer:**
+For a single provider or a prototype, a gateway is overkill; it adds a network hop and an HA burden for capabilities you do not need yet. I would use a thin in-app abstraction: depend on the provider SDK behind a small interface of my own, with a basic fallback chain and backoff. I would adopt a real gateway once I cross into multiple providers, multiple teams needing budgets and spend attribution, or recurring rate-limit pain, which is roughly when retry and key-management logic starts getting copy-pasted across services. Even then I would roll it out in shadow mode first and make it highly available before it became load-bearing.
+
+## Go deeper
+
+- [Upstream chapter (AI Gateways and Model Routing)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/11-infrastructure-and-mlops/03-ai-gateways-and-model-routing.md)
+- Related questions in the [question bank](/questions)
+- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)
