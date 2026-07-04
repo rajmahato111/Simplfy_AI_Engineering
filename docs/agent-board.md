@@ -10,16 +10,16 @@ Coordination rules: [`dual-tool-coordination.md`](./dual-tool-coordination.md)
 
 ## Merge gate (human)
 
-**No new feature work** until open PRs are reviewed and merged to **`main`** by the
-merge approver (senior/lead engineer). See [`pr-merge-governance.md`](./pr-merge-governance.md)
-for the bootstrap PR merge order (#1 → #4).
+**Single shipping PR → `main`:** open PR from `cursor/shipping-bootstrap-42a0` consolidates
+T-002, T-010, T-012, T-011, T-051 + merge governance. Supersedes draft PRs #1–#4.
 
-| PR | Branch | Status | Merge approver |
-|----|--------|--------|----------------|
-| #1 | `cursor/coordination-and-foundation-42a0` | Awaiting human review | — |
-| #2 | `cursor/hello-interview-ui-42a0` | Awaiting human review | — |
-| #3 | `cursor/content-render-qa-42a0` | Awaiting human review | — |
-| #4 | `cursor/content-schema-42a0` | Awaiting human review | — |
+After merge approver merges to `main`, delete remote branches listed in
+[`pr-merge-governance.md`](./pr-merge-governance.md) § branch cleanup.
+
+| PR | Branch | Status |
+|----|--------|--------|
+| **#5 (shipping)** | `cursor/shipping-bootstrap-42a0` → `main` | **Ready for merge approver review** |
+| ~~#1–#4~~ | stacked drafts | Superseded — close after #5 opens |
 
 ---
 

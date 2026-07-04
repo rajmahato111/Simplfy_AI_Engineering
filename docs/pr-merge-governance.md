@@ -124,10 +124,23 @@ Merge **in order** after human review (oldest/foundation first):
 | 3 | Content render QA | `cursor/content-render-qa-42a0` | Rebase on `main` → review → merge |
 | 4 | Frontmatter schema | `cursor/content-schema-42a0` | Rebase on `main` → review → merge |
 
-After PR #1 merges, retarget or rebase subsequent PRs so each targets `main`.
+After PR #5 merges to `main`, delete these remote branches (local copies too):
 
-**No new feature branches** until the merge approver confirms the stack is landed or
-explicitly green-lights parallel work on the board.
+```bash
+git checkout main && git pull origin main
+git push origin --delete \
+  cursor/coordination-and-foundation-42a0 \
+  cursor/hello-interview-ui-42a0 \
+  cursor/content-render-qa-42a0 \
+  cursor/content-schema-42a0 \
+  cursor/pr-merge-governance-42a0 \
+  cursor/shipping-bootstrap-42a0
+git branch -D cursor/coordination-and-foundation-42a0 cursor/hello-interview-ui-42a0 \
+  cursor/content-render-qa-42a0 cursor/content-schema-42a0 cursor/pr-merge-governance-42a0 \
+  cursor/shipping-bootstrap-42a0 2>/dev/null || true
+```
+
+Close superseded draft PRs #1–#4 on GitHub after merge.
 
 ---
 
