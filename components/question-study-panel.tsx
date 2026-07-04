@@ -5,10 +5,16 @@ import { useState } from "react";
 type Props = {
   strongAnswerCovers: string[];
   sampleAnswerExcerpt?: string;
+  sampleAnswerMd?: string;
 };
 
-export function QuestionStudyPanel({ strongAnswerCovers, sampleAnswerExcerpt }: Props) {
+export function QuestionStudyPanel({
+  strongAnswerCovers,
+  sampleAnswerExcerpt,
+  sampleAnswerMd,
+}: Props) {
   const [revealed, setRevealed] = useState(false);
+  const sampleText = sampleAnswerMd ?? sampleAnswerExcerpt;
 
   return (
     <section className="mt-8 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
@@ -38,10 +44,18 @@ export function QuestionStudyPanel({ strongAnswerCovers, sampleAnswerExcerpt }: 
           ) : (
             <p className="text-sm text-zinc-600">No bullet rubric for this question yet.</p>
           )}
-          {sampleAnswerExcerpt && (
+          {sampleText && (
             <>
-              <h3 className="text-sm font-semibold text-zinc-900">Sample excerpt</h3>
-              <p className="text-sm italic text-zinc-600">{sampleAnswerExcerpt}</p>
+              <h3 className="text-sm font-semibold text-zinc-900">
+                {sampleAnswerMd ? "Sample answer" : "Sample excerpt"}
+              </h3>
+              {sampleAnswerMd ? (
+                <pre className="max-h-[32rem] overflow-auto whitespace-pre-wrap rounded-lg bg-zinc-50 p-4 text-sm leading-relaxed text-zinc-700">
+                  {sampleAnswerMd}
+                </pre>
+              ) : (
+                <p className="text-sm italic text-zinc-600">{sampleAnswerExcerpt}</p>
+              )}
             </>
           )}
           <button

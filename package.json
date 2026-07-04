@@ -20,7 +20,8 @@
     "ingest:questions": "tsx scripts/ingest-questions.ts",
     "ingest:frameworks": "tsx scripts/ingest-frameworks.ts",
     "ingest:meta-pages": "tsx scripts/ingest-meta-pages.ts",
-    "ingest:all": "npm run ingest:glossary && npm run ingest:patterns && npm run ingest:questions && npm run ingest:frameworks && npm run ingest:meta-pages",
+    "ingest:whiteboard": "tsx scripts/ingest-whiteboard-exercises.ts",
+    "ingest:all": "npm run ingest:glossary && npm run ingest:patterns && npm run ingest:questions && npm run ingest:frameworks && npm run ingest:meta-pages && npm run ingest:whiteboard",
     "setup:env": "bash scripts/setup-env.sh"
   },
   "dependencies": {

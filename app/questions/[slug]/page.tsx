@@ -97,6 +97,7 @@ export default async function QuestionDetailPage({ params }: Props) {
       <QuestionStudyPanel
         strongAnswerCovers={q.strong_answer_covers}
         sampleAnswerExcerpt={q.sample_answer_excerpt}
+        sampleAnswerMd={q.sample_answer_md}
       />
     </div>
   );

@@ -18,6 +18,7 @@ export type Question = {
   follow_ups?: string[];
   key_insight?: string;
   sample_answer_excerpt?: string;
+  sample_answer_md?: string;
   status: "draft" | "reviewed" | "approved";
   source?: "upstream" | "local";
 };
