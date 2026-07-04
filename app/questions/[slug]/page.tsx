@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getQuestionBySlug } from "@/lib/questions";
 import { relatedChaptersForQuestion } from "@/lib/related-chapters";
+import { formatCohort } from "@/lib/format-cohort";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { QuestionStudyPanel } from "@/components/question-study-panel";
@@ -30,7 +31,7 @@ export default async function QuestionDetailPage({ params }: Props) {
       <div className="mt-4 flex flex-wrap gap-2">
         <Badge>{q.topic_label ?? q.topic}</Badge>
         <Badge className="capitalize">{q.difficulty}</Badge>
-        {q.cohort && <Badge>{q.cohort}</Badge>}
+        {q.cohort && <Badge>{formatCohort(q.cohort)}</Badge>}
         {q.upstream_id && <Badge>{q.upstream_id}</Badge>}
       </div>
       <h1 className="mt-4 text-3xl font-semibold text-zinc-900">{q.title}</h1>
