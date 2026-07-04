@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1176" height="376" viewBox="0 0 1176 376" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN (8px grid, 24px padding)
+Canvas 1176x376. Title center (588,44). Content bottom y=352.
+
+Container "Vector database": x=272 y=88 w=680 h=264 -> 272..952, caption (288,110)
+
+Nodes (h=64 unless noted):
+  Query embedding (orange)  x=48   w=160 y=176 -> 48..208,    c=(128,208)
+  Metadata filter (yellow)  x=304  w=152 y=176 -> 304..456,   c=(380,208)
+  ANN index (green)         x=520  w=176 y=176 -> 520..696,   c=(608,208)
+  Payload store (green)     x=760  w=160 y=176 -> 760..920,   c=(840,208)
+  Top-k chunks (orange)     x=1016 w=136 y=176 -> 1016..1152, c=(1084,208)
+  Post-filter trap (red, h=64, 12px text) x=488 w=240 y=272 -> 488..728, c=(608,304)
+
+Arrows (straight, y=208, end 2px before target edge):
+  A1 Query -> Filter    (208,208)->(302,208)
+  A2 Filter -> Index    (456,208)->(518,208)   label "allow-list"  c=(487,194)
+  A3 Index -> Payload   (696,208)->(758,208)   label "top-k IDs"   c=(727,194)
+  A4 Payload -> Top-k   (920,208)->(1014,208)  label "chunk text"  c=(984,194)
+-->
+  <rect width="1176" height="376" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="588" y="44" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">Inside a filtered vector query</text>
+
+  <!-- container -->
+  <rect x="272" y="88" width="680" height="264" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="288" y="110" font-size="12" fill="#64748B">Vector database</text>
+
+  <!-- arrows -->
+  <line x1="208" y1="208" x2="302" y2="208" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="456" y1="208" x2="518" y2="208" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="696" y1="208" x2="758" y2="208" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="920" y1="208" x2="1014" y2="208" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- arrow labels (white backing) -->
+  <rect x="458" y="181" width="58" height="18" fill="#ffffff"/>
+  <text x="487" y="194" font-size="12" fill="#475569" text-anchor="middle">allow-list</text>
+  <rect x="699" y="181" width="56" height="18" fill="#ffffff"/>
+  <text x="727" y="194" font-size="12" fill="#475569" text-anchor="middle">top-k IDs</text>
+  <rect x="954" y="181" width="60" height="18" fill="#ffffff"/>
+  <text x="984" y="194" font-size="12" fill="#475569" text-anchor="middle">chunk text</text>
+
+  <!-- nodes -->
+  <rect x="48" y="176" width="160" height="64" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="128" y="205" font-size="14" fill="#7C2D12" text-anchor="middle">Query<tspan x="128" dy="17">embedding</tspan></text>
+
+  <rect x="304" y="176" width="152" height="64" rx="10" fill="#FEFCE8" stroke="#CA8A04" stroke-width="1.5"/>
+  <text x="380" y="205" font-size="14" fill="#713F12" text-anchor="middle">Metadata filter<tspan x="380" dy="17">(tenant, date)</tspan></text>
+
+  <rect x="520" y="176" width="176" height="64" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="608" y="205" font-size="14" fill="#064E3B" text-anchor="middle">ANN index<tspan x="608" dy="17">(HNSW graph)</tspan></text>
+
+  <rect x="760" y="176" width="160" height="64" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="840" y="205" font-size="14" fill="#064E3B" text-anchor="middle">Payload store<tspan x="840" dy="17">(text + metadata)</tspan></text>
+
+  <rect x="1016" y="176" width="136" height="64" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="1084" y="205" font-size="14" fill="#7C2D12" text-anchor="middle">Top-k<tspan x="1084" dy="17">chunks</tspan></text>
+
+  <!-- annotation: post-filter trap -->
+  <rect x="488" y="272" width="240" height="64" rx="10" fill="#FEF2F2" stroke="#DC2626" stroke-width="1.5"/>
+  <text x="608" y="292" font-size="12" fill="#7F1D1D" text-anchor="middle">Filtering AFTER search can<tspan x="608" dy="16">return zero rows — filter</tspan><tspan x="608" dy="16">during the graph walk</tspan></text>
+</svg>
