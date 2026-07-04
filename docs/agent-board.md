@@ -9,6 +9,15 @@
 | ID | Tool | Branch | Status | Paths (locks) |
 |----|------|--------|--------|---------------|
 | T-001 | Claude Code | `claude/ai-interview-platform-prd-4si5f9` | `ready_for_browser_qa` | `content/concepts/retrieval/**`, walkthrough pilot |
+| T-020–T-022 | Claude Code | `claude/t020-022-rag-cluster` | `in_progress` | `content/concepts/retrieval/**` (13 new chapters + diagrams) |
+
+**T-020–T-022 notes (2026-07-04):** human approved in chat: start RAG cluster while
+PR #15 is open; branch stacked on T-001 branch (rebase onto `main` after #15 merges).
+Batches: T-020 retrieval engine (embedding models, vector DBs, hybrid search,
+reranking) · T-021 advanced retrieval (GraphRAG, agentic RAG, advanced patterns,
+contextual retrieval, ColBERT) · T-022 production & eval (multimodal RAG, RAG
+evaluation, production RAG at scale, data engineering). Three writer sub-agents in
+parallel → reviewer agent → orchestrator fixes → draft PR.
 
 **T-001 notes (2026-07-04):** pilot batch written by 2 writer sub-agents, audited by
 reviewer agent (12 findings), all fixes applied, diagrams re-rendered + visually
