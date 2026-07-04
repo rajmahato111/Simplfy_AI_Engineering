@@ -1,0 +1,470 @@
+[
+  {
+    "id": "retrieval-basic-rag",
+    "name": "Basic RAG",
+    "category": "Retrieval",
+    "use_case": "Simple Q&A over documents",
+    "key_tradeoff": "Easy to implement, limited accuracy",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "retrieval-hybrid-search",
+    "name": "Hybrid Search",
+    "category": "Retrieval",
+    "use_case": "Combining semantic + keyword",
+    "key_tradeoff": "Better recall, more complexity",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "retrieval-reranking",
+    "name": "Reranking",
+    "category": "Retrieval",
+    "use_case": "High-precision retrieval",
+    "key_tradeoff": "Accuracy vs latency",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "retrieval-query-expansion",
+    "name": "Query Expansion",
+    "category": "Retrieval",
+    "use_case": "Ambiguous queries",
+    "key_tradeoff": "Better recall, more tokens",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "retrieval-hyde",
+    "name": "HyDE",
+    "category": "Retrieval",
+    "use_case": "No direct matches expected",
+    "key_tradeoff": "Creative, but can hallucinate",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "retrieval-parent-child-chunking",
+    "name": "Parent-Child Chunking",
+    "category": "Retrieval",
+    "use_case": "Need surrounding context",
+    "key_tradeoff": "Memory overhead",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "generation-zero-shot",
+    "name": "Zero-Shot",
+    "category": "Generation",
+    "use_case": "Simple tasks",
+    "key_tradeoff": "Fast, less reliable",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "generation-few-shot",
+    "name": "Few-Shot",
+    "category": "Generation",
+    "use_case": "Need format control",
+    "key_tradeoff": "Token cost",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "generation-chain-of-thought",
+    "name": "Chain-of-Thought",
+    "category": "Generation",
+    "use_case": "Reasoning tasks",
+    "key_tradeoff": "Latency, shows work",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "generation-self-consistency",
+    "name": "Self-Consistency",
+    "category": "Generation",
+    "use_case": "High-stakes answers",
+    "key_tradeoff": "3-5x cost",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "generation-structured-output",
+    "name": "Structured Output",
+    "category": "Generation",
+    "use_case": "API responses",
+    "key_tradeoff": "Constrained creativity",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "agent-react",
+    "name": "ReAct",
+    "category": "Agent",
+    "use_case": "Tool-using agents",
+    "key_tradeoff": "Medium",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "agent-plan-and-execute",
+    "name": "Plan-and-Execute",
+    "category": "Agent",
+    "use_case": "Multi-step tasks",
+    "key_tradeoff": "High",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "agent-multi-agent-debate",
+    "name": "Multi-Agent Debate",
+    "category": "Agent",
+    "use_case": "Verification",
+    "key_tradeoff": "High",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "agent-human-in-the-loop",
+    "name": "Human-in-the-Loop",
+    "category": "Agent",
+    "use_case": "High-stakes actions",
+    "key_tradeoff": "Medium",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "agent-swarm-handoff",
+    "name": "Swarm / Handoff",
+    "category": "Agent",
+    "use_case": "Specialised sub-agents",
+    "key_tradeoff": "High",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "agentic-coding-scaffold-implement-verify",
+    "name": "Scaffold → Implement → Verify",
+    "category": "Agentic Coding",
+    "use_case": "Full feature development",
+    "key_tradeoff": "Claude Code / OpenHands",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "agentic-coding-read-plan-edit",
+    "name": "Read-Plan-Edit",
+    "category": "Agentic Coding",
+    "use_case": "Refactoring existing code",
+    "key_tradeoff": "Claude Code text_editor",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "agentic-coding-test-driven-agent",
+    "name": "Test-Driven Agent",
+    "category": "Agentic Coding",
+    "use_case": "High reliability code",
+    "key_tradeoff": "Agent writes tests first",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "agentic-coding-shadow-review",
+    "name": "Shadow Review",
+    "category": "Agentic Coding",
+    "use_case": "PR quality gate",
+    "key_tradeoff": "Agent reviews diff before merge",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "agentic-coding-claude-md-manifest",
+    "name": "CLAUDE.md Manifest",
+    "category": "Agentic Coding",
+    "use_case": "Project context injection",
+    "key_tradeoff": "Claude Code CLAUDE.md file",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "agentic-coding-sub-agent-parallelism",
+    "name": "Sub-Agent Parallelism",
+    "category": "Agentic Coding",
+    "use_case": "Large codebase changes",
+    "key_tradeoff": "Multiple agents per module",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "reliability-retry-with-backoff",
+    "name": "Retry with Backoff",
+    "category": "Reliability",
+    "use_case": "Transient failures",
+    "key_tradeoff": "Exponential backoff",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "reliability-circuit-breaker",
+    "name": "Circuit Breaker",
+    "category": "Reliability",
+    "use_case": "Cascading failures",
+    "key_tradeoff": "Fail-fast after threshold",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "reliability-fallback-model",
+    "name": "Fallback Model",
+    "category": "Reliability",
+    "use_case": "Primary unavailable",
+    "key_tradeoff": "Secondary model",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "reliability-timeout",
+    "name": "Timeout",
+    "category": "Reliability",
+    "use_case": "Slow responses",
+    "key_tradeoff": "Cancel + fallback",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "reliability-bulkhead",
+    "name": "Bulkhead",
+    "category": "Reliability",
+    "use_case": "Resource isolation",
+    "key_tradeoff": "Separate pools",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "caching-exact-match",
+    "name": "Exact Match",
+    "category": "Caching",
+    "use_case": "Low",
+    "key_tradeoff": "Identical queries",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "caching-semantic-cache",
+    "name": "Semantic Cache",
+    "category": "Caching",
+    "use_case": "Medium",
+    "key_tradeoff": "Similar queries",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "caching-kv-cache",
+    "name": "KV Cache",
+    "category": "Caching",
+    "use_case": "High",
+    "key_tradeoff": "Same prefix",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "caching-response-cache",
+    "name": "Response Cache",
+    "category": "Caching",
+    "use_case": "Varies",
+    "key_tradeoff": "Deterministic outputs",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "security-input-validation",
+    "name": "Input Validation",
+    "category": "Security",
+    "use_case": "Prompt injection",
+    "key_tradeoff": "Sanitize, detect",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "security-output-filtering",
+    "name": "Output Filtering",
+    "category": "Security",
+    "use_case": "Data leakage",
+    "key_tradeoff": "PII detection, blocklists",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "security-tenant-isolation",
+    "name": "Tenant Isolation",
+    "category": "Security",
+    "use_case": "Cross-tenant access",
+    "key_tradeoff": "Filter at query time",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "security-rate-limiting",
+    "name": "Rate Limiting",
+    "category": "Security",
+    "use_case": "Abuse",
+    "key_tradeoff": "Per-user/tenant limits",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "evaluation-golden-set",
+    "name": "Golden Set",
+    "category": "Evaluation",
+    "use_case": "Regression testing",
+    "key_tradeoff": "Pass rate",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "evaluation-llm-as-judge",
+    "name": "LLM-as-Judge",
+    "category": "Evaluation",
+    "use_case": "Quality scoring",
+    "key_tradeoff": "1-5 scale",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "evaluation-human-eval",
+    "name": "Human Eval",
+    "category": "Evaluation",
+    "use_case": "Ground truth",
+    "key_tradeoff": "Agreement rate",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "evaluation-a-b-testing",
+    "name": "A/B Testing",
+    "category": "Evaluation",
+    "use_case": "Production comparison",
+    "key_tradeoff": "User metrics",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "cost-optimization-model-routing",
+    "name": "Model Routing",
+    "category": "Cost Optimization",
+    "use_case": "50-70%",
+    "key_tradeoff": "Complexity",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "cost-optimization-caching",
+    "name": "Caching",
+    "category": "Cost Optimization",
+    "use_case": "20-40%",
+    "key_tradeoff": "Staleness",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "cost-optimization-prompt-compression",
+    "name": "Prompt Compression",
+    "category": "Cost Optimization",
+    "use_case": "10-30%",
+    "key_tradeoff": "Quality risk",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "cost-optimization-batch-processing",
+    "name": "Batch Processing",
+    "category": "Cost Optimization",
+    "use_case": "30-50%",
+    "key_tradeoff": "Latency",
+    "kind": "pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "anti-patterns-context-stuffing",
+    "name": "Context Stuffing",
+    "category": "Anti-Patterns",
+    "use_case": "Token waste",
+    "key_tradeoff": "Retrieve relevant only",
+    "kind": "anti-pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "anti-patterns-retry-forever",
+    "name": "Retry Forever",
+    "category": "Anti-Patterns",
+    "use_case": "Resource exhaustion",
+    "key_tradeoff": "Circuit breaker",
+    "kind": "anti-pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "anti-patterns-trust-all-output",
+    "name": "Trust All Output",
+    "category": "Anti-Patterns",
+    "use_case": "Hallucination",
+    "key_tradeoff": "Verify, ground",
+    "kind": "anti-pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "anti-patterns-single-model",
+    "name": "Single Model",
+    "category": "Anti-Patterns",
+    "use_case": "Single point of failure",
+    "key_tradeoff": "Multi-provider",
+    "kind": "anti-pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "anti-patterns-no-observability",
+    "name": "No Observability",
+    "category": "Anti-Patterns",
+    "use_case": "Blind debugging",
+    "key_tradeoff": "Trace everything",
+    "kind": "anti-pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "anti-patterns-infinite-agentic-loop",
+    "name": "Infinite Agentic Loop",
+    "category": "Anti-Patterns",
+    "use_case": "Agent spins without progress",
+    "key_tradeoff": "Max turns + Critic agent",
+    "kind": "anti-pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "anti-patterns-over-trusting-computer-use",
+    "name": "Over-trusting Computer-Use",
+    "category": "Anti-Patterns",
+    "use_case": "Agent clicks wrong UI elements",
+    "key_tradeoff": "Screenshot validation + HITL",
+    "kind": "anti-pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "anti-patterns-no-claude-md-manifest",
+    "name": "No CLAUDE.md / Manifest",
+    "category": "Anti-Patterns",
+    "use_case": "Agent lacks project context",
+    "key_tradeoff": "Always provide coding manifest",
+    "kind": "anti-pattern",
+    "source": "upstream"
+  },
+  {
+    "id": "anti-patterns-thinking-mode-always-on",
+    "name": "Thinking Mode Always On",
+    "category": "Anti-Patterns",
+    "use_case": "3-10x cost with no benefit",
+    "key_tradeoff": "Gate on complexity classifier",
+    "kind": "anti-pattern",
+    "source": "upstream"
+  }
+]

@@ -14,7 +14,11 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:reindex": "tsx scripts/rebuild-search-index.ts",
-    "ingest:validate": "tsx scripts/ingest-validate.ts"
+    "ingest:validate": "tsx scripts/ingest-validate.ts",
+    "ingest:glossary": "tsx scripts/ingest-glossary.ts",
+    "ingest:patterns": "tsx scripts/ingest-patterns.ts",
+    "ingest:questions": "tsx scripts/ingest-questions.ts",
+    "ingest:all": "npm run ingest:glossary && npm run ingest:patterns && npm run ingest:questions"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.2",

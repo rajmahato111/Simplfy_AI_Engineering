@@ -52,6 +52,7 @@ export async function searchContentHybrid(query: string, limit = 20) {
           area: getContentBySlug(r.slug)?.frontmatter.area ?? "general",
           excerpt: r.excerpt,
           score: 1,
+          href: `/learn/${r.slug}`,
         }));
       }
     }
