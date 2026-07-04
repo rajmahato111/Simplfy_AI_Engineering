@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1128" height="696" viewBox="0 0 1128 696" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN (8px grid)
+Canvas 1128x696. Title center (564,44).
+
+TOP container (plan-and-execute): x=56 y=88 w=1048 h=176 (56..1104, 88..264), caption (72,110)
+  Row y=152..216 (h=64, center=184):
+    Goal    (orange) x=88  w=136 -> 88..224,  c=(156,184)
+    Planner (violet) x=352 w=160 -> 352..512, c=(432,184)
+    Steps   (indigo) x=656 w=200 -> 656..856, c=(756,184)  two-line "Steps"/"parallelizable"
+    Result  (orange) x=944 w=136 -> 944..1080, c=(1012,184)
+  Arrows (straight, 0 bends): Goal->Planner (224,184)->(350,184); Planner->Steps (512,184)->(654,184); Steps->Result (856,184)->(942,184)
+
+BOTTOM container (dynamic replanning): x=56 y=336 w=1048 h=336 (56..1104, 336..672), caption (72,358)
+  Row 1 y=400..464 (center=432):
+    Goal         (orange) x=88  w=136 -> 88..224,  c=(156,432)
+    Planner      (violet) x=352 w=160 -> 352..512, c=(432,432)
+    Execute step (indigo) x=656 w=176 -> 656..832, c=(744,432)
+  Row 2 y=544..608 (center=576):
+    Checkpoint (yellow) x=656 w=176 -> 656..832, c=(744,576)  two-line "Checkpoint"/"outcome vs. plan" (directly below Execute step for a straight vertical arrow)
+    Result     (orange) x=920 w=136 -> 920..1056, c=(988,576)
+
+  Arrows:
+    Goal->Planner            (224,432)->(350,432)                straight
+    Planner->Execute step    (512,432)->(654,432)                straight
+    Execute->Checkpoint      (744,464)->(744,542)                straight, vertical down
+    Checkpoint->Result       (832,576)->(918,576)                straight, label "matches plan"
+    Checkpoint->Planner      polyline (656,576)->(432,576)->(432,466)   1 bend (left, then up), label "mismatch: replan"
+      verified: does not cross Goal->Planner or Planner->Execute (different y), does not cross Execute->Checkpoint (different x range)
+-->
+  <rect width="1128" height="696" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="564" y="44" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">Plan-and-execute vs. dynamic replanning</text>
+
+  <!-- TOP: plan-and-execute -->
+  <rect x="56" y="88" width="1048" height="176" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="72" y="110" font-size="12" fill="#64748B">Plan-and-execute — commit to the full sequence upfront</text>
+
+  <line x1="224" y1="184" x2="350" y2="184" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="512" y1="184" x2="654" y2="184" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="856" y1="184" x2="942" y2="184" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="88" y="152" width="136" height="64" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="156" y="189" font-size="14" fill="#7C2D12" text-anchor="middle">Goal</text>
+
+  <rect x="352" y="152" width="160" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="432" y="189" font-size="14" fill="#2E1065" text-anchor="middle">Planner</text>
+
+  <rect x="656" y="152" width="200" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="756" y="181" font-size="14" fill="#1E1B4B" text-anchor="middle">Steps<tspan x="756" dy="17" font-size="12" fill="#334155">parallelizable</tspan></text>
+
+  <rect x="944" y="152" width="136" height="64" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="1012" y="189" font-size="14" fill="#7C2D12" text-anchor="middle">Result</text>
+
+  <!-- BOTTOM: dynamic replanning -->
+  <rect x="56" y="336" width="1048" height="336" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="72" y="358" font-size="12" fill="#64748B">Dynamic replanning — checkpoint after every step, replan on mismatch</text>
+
+  <!-- arrows: row 1 -->
+  <line x1="224" y1="432" x2="350" y2="432" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="512" y1="432" x2="654" y2="432" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <!-- execute -> checkpoint -->
+  <line x1="744" y1="464" x2="744" y2="542" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <!-- checkpoint -> result -->
+  <line x1="832" y1="576" x2="918" y2="576" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <!-- checkpoint -> planner (mismatch loop) -->
+  <polyline points="656,576 432,576 432,466" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- labels -->
+  <rect x="848" y="554" width="60" height="18" fill="#ffffff"/>
+  <text x="878" y="567" font-size="12" fill="#475569" text-anchor="middle">OK</text>
+
+  <rect x="479" y="554" width="130" height="18" fill="#ffffff"/>
+  <text x="544" y="567" font-size="12" fill="#475569" text-anchor="middle">mismatch: replan</text>
+
+  <!-- nodes: row 1 -->
+  <rect x="88" y="400" width="136" height="64" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="156" y="437" font-size="14" fill="#7C2D12" text-anchor="middle">Goal</text>
+
+  <rect x="352" y="400" width="160" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="432" y="437" font-size="14" fill="#2E1065" text-anchor="middle">Planner</text>
+
+  <rect x="656" y="400" width="176" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="744" y="437" font-size="14" fill="#1E1B4B" text-anchor="middle">Execute step</text>
+
+  <!-- nodes: row 2 -->
+  <rect x="656" y="544" width="176" height="64" rx="10" fill="#FEFCE8" stroke="#CA8A04" stroke-width="1.5"/>
+  <text x="744" y="573" font-size="14" fill="#713F12" text-anchor="middle">Checkpoint<tspan x="744" dy="17" font-size="12" fill="#713F12">outcome vs. plan</tspan></text>
+
+  <rect x="920" y="544" width="136" height="64" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="988" y="581" font-size="14" fill="#7C2D12" text-anchor="middle">Result</text>
+</svg>

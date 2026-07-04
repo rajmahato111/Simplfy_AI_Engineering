@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="416" viewBox="0 0 1160 416" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN (8px grid)
+Canvas 1160x416. Title center (580,44).
+
+Main row y=96 h=64 (96..160) c_y=128
+  Agent (violet)        x=64  w=160 (64..224)   c=(144,128)
+  Policy gate (red)     x=320 w=192 (320..512)  c=(416,128)
+  Sandbox (indigo)      x=616 w=176 (616..792)  c=(704,128)
+  External tool (orange) x=896 w=192 (896..1088) c=(992,128)
+
+Denied branch: Audit log (neutral) x=320 w=192 y=232 h=64 (232..296) c=(416,264)
+Return branch: Result/untrusted (neutral) x=48 w=192 y=328 h=64 (328..392) c=(144,360)
+  (kept clear of Audit log's row so the return transit line at y=320 never crosses it)
+
+Container "Isolated execution boundary": x=600 y=88 w=512 h=192 (600..1112, 88..280)
+  caption (616,110)
+
+Arrows (#475569, start at source edge, end 2px before target edge, one L-bend max):
+  A1 Agent->Gate            (224,128)->(318,128)
+  A2 Gate->Sandbox          (512,128)->(614,128)  label "allowed" c(565,128)
+  A3 Sandbox->External      (792,128)->(894,128)  label "executes call" c(843,128)
+  A4 Gate->AuditLog         (416,160)->(416,230)  label "denied" c(416,196)
+  A5 External->Result       (992,160)->(992,320)->(242,320)  label "result (untrusted)" c(617,320)
+  A6 Result->Agent          (144,328)->(144,162)  [straight vertical, clear of Audit log's column]
+-->
+  <rect width="1160" height="416" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="580" y="44" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">Containing what an agent can do</text>
+
+  <!-- container -->
+  <rect x="600" y="88" width="512" height="192" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="616" y="110" font-size="12" fill="#64748B">Isolated execution boundary</text>
+
+  <!-- arrows -->
+  <line x1="224" y1="128" x2="318" y2="128" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="512" y1="128" x2="614" y2="128" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="792" y1="128" x2="894" y2="128" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="416" y1="160" x2="416" y2="230" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <polyline points="992,160 992,320 242,320" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="144" y1="328" x2="144" y2="162" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- arrow labels with backing rects -->
+  <rect x="533" y="116" width="64" height="18" fill="#ffffff"/>
+  <text x="565" y="129" font-size="12" fill="#475569" text-anchor="middle">allowed</text>
+
+  <rect x="791" y="116" width="104" height="18" fill="#ffffff"/>
+  <text x="843" y="129" font-size="12" fill="#475569" text-anchor="middle">executes call</text>
+
+  <rect x="384" y="187" width="64" height="18" fill="#ffffff"/>
+  <text x="416" y="200" font-size="12" fill="#475569" text-anchor="middle">denied</text>
+
+  <rect x="557" y="308" width="120" height="18" fill="#ffffff"/>
+  <text x="617" y="321" font-size="12" fill="#475569" text-anchor="middle">result (untrusted)</text>
+
+  <!-- nodes -->
+  <rect x="64" y="96" width="160" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="144" y="133" font-size="14" fill="#2E1065" text-anchor="middle">Agent</text>
+
+  <rect x="320" y="96" width="192" height="64" rx="10" fill="#FEF2F2" stroke="#DC2626" stroke-width="1.5"/>
+  <text x="416" y="124" font-size="14" fill="#7F1D1D" text-anchor="middle">Policy gate<tspan x="416" dy="17">(proxy check)</tspan></text>
+
+  <rect x="616" y="96" width="176" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="704" y="124" font-size="14" fill="#1E1B4B" text-anchor="middle">Sandbox<tspan x="704" dy="17">(ephemeral)</tspan></text>
+
+  <rect x="896" y="96" width="192" height="64" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="992" y="124" font-size="14" fill="#7C2D12" text-anchor="middle">External tool<tspan x="992" dy="17">/ system</tspan></text>
+
+  <rect x="320" y="232" width="192" height="64" rx="10" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <text x="416" y="260" font-size="14" fill="#334155" text-anchor="middle">Audit log<tspan x="416" dy="17">(every attempt)</tspan></text>
+
+  <rect x="48" y="328" width="192" height="64" rx="10" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <text x="144" y="356" font-size="14" fill="#334155" text-anchor="middle">Result<tspan x="144" dy="17">(untrusted data)</tspan></text>
+</svg>

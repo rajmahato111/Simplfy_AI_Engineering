@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="504" viewBox="0 0 1000 504" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN (8px grid)
+Canvas 1000x504. Title center (500,44).
+Loop container (dashed): x=56 y=88 w=616 h=392 (56..672, 88..480), caption (72,110)
+
+Nodes (h=64, w=160 unless noted):
+  Observe      (indigo) x=96  y=144 -> 96..256,  144..208  c=(176,176)
+  Think        (violet) x=472 y=144 -> 472..632, 144..208  c=(552,176)
+  Act          (indigo) x=472 y=384 -> 472..632, 384..448  c=(552,416)
+  Environment  (green)  x=96  y=384 -> 96..256,  384..448  c=(176,416)
+  Final answer (orange, outside container) x=800 y=144 w=176 -> 800..976, 144..208 c=(888,176)
+
+Arrows (#475569, end 2px before target edge, straight orthogonal segments):
+  A1 Environment->Observe   (176,384)->(176,210)              vertical, up
+  A2 Observe->Think         (256,176)->(470,176)               horizontal
+  A3 Think->Act             (552,208)->(552,386)               vertical, down
+  A4 Act->Environment       (472,416)->(258,416)               horizontal, leftward
+  A5 Think->Final answer    (632,176)->(798,176)               horizontal, exit arrow
+
+Arrow labels (12px, white backing):
+  L1 "world state"            near (229,303) for A1
+  L4 "tool result"             near (364,403) for A4
+  L5 "exit: done or budget hit" near (716,199) for A5
+-->
+  <rect width="1000" height="504" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="500" y="44" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">The agent loop: observe, think, act</text>
+
+  <!-- loop container -->
+  <rect x="56" y="88" width="616" height="392" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="72" y="110" font-size="12" fill="#64748B">The agent loop — runs until exit condition</text>
+
+  <!-- arrows -->
+  <line x1="176" y1="384" x2="176" y2="210" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="256" y1="176" x2="470" y2="176" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="552" y1="208" x2="552" y2="386" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="472" y1="416" x2="258" y2="416" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="632" y1="176" x2="798" y2="176" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- arrow labels -->
+  <rect x="184" y="294" width="90" height="18" fill="#ffffff"/>
+  <text x="229" y="307" font-size="12" fill="#475569" text-anchor="middle">world state</text>
+
+  <rect x="319" y="394" width="90" height="18" fill="#ffffff"/>
+  <text x="364" y="407" font-size="12" fill="#475569" text-anchor="middle">tool result</text>
+
+  <rect x="641" y="186" width="150" height="18" fill="#ffffff"/>
+  <text x="716" y="199" font-size="12" fill="#475569" text-anchor="middle">exit: done or budget hit</text>
+
+  <!-- nodes -->
+  <rect x="96" y="144" width="160" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="176" y="173" font-size="14" fill="#1E1B4B" text-anchor="middle">Observe<tspan x="176" dy="17" font-size="12" fill="#334155">reads state</tspan></text>
+
+  <rect x="472" y="144" width="160" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="552" y="173" font-size="14" fill="#2E1065" text-anchor="middle">Think<tspan x="552" dy="17" font-size="12" fill="#334155">picks action</tspan></text>
+
+  <rect x="472" y="384" width="160" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="552" y="413" font-size="14" fill="#1E1B4B" text-anchor="middle">Act<tspan x="552" dy="17" font-size="12" fill="#334155">calls a tool</tspan></text>
+
+  <rect x="96" y="384" width="160" height="64" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="176" y="413" font-size="14" fill="#064E3B" text-anchor="middle">Environment<tspan x="176" dy="17" font-size="12" fill="#334155">world + tools</tspan></text>
+
+  <rect x="800" y="144" width="176" height="64" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="888" y="181" font-size="14" fill="#7C2D12" text-anchor="middle">Final answer</text>
+</svg>

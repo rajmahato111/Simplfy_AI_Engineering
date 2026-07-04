@@ -1,76 +1,98 @@
 ---
-title: Tool Use and MCP
+title: "Tool Use and MCP: How an Agent Actually Touches the World"
 slug: tool-use-and-mcp
 type: concept
 area: agents
 difficulty: intermediate
-tags:
-  - agents
-  - tool
-  - use
-  - and
-  - mcp
+tags: [agents, tool-use, mcp, function-calling]
 diagrams:
-  - diagrams/tool-use-and-mcp--overview.svg
-est_minutes: 5
-source_attribution: >-
-  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
-  edition with interview lens. See CREDITS.md.
-last_reviewed: '2026-07-04'
-status: draft
+  - diagrams/tool-use-and-mcp--client-server.svg
+est_minutes: 12
+source_attribution: "Factual basis: AI System Design Guide (MIT) by Om Bharatiya; rewritten and expanded. See CREDITS.md."
+last_reviewed: 2026-07-04
+status: reviewed
 ---
+
 ## The 30-second version
 
-Tools are the "hands" of an agent. The industry has standardized on the Model Context Protocol (MCP), which replaces fragmented custom tool definitions with a unified, local-first communication layer. MCP has matured rapidly: Streamable HTTP transport, OAuth 2.1 auth, and native computer-use tools landed in MCP 2.0 (ratified March 2026). In parallel, Agent-to-Agent (A2A) and other interoperability protocols have emerged to complement MCP's tool-access layer with agent coordination capabilities.
+Tool use is the mechanism that lets a model act instead of only talk. The model is shown a schema describing each available tool, it emits a structured call naming one tool and its arguments, the system executes that call, and the result comes back as an observation the model reasons over next. The Model Context Protocol (MCP) — released by Anthropic in November 2024 and adopted widely since — standardizes the wiring underneath that mechanism: instead of every application writing a bespoke integration for every tool provider, an MCP client (the agent's runtime) talks to any MCP server (a separate process exposing tools, data, and prompt templates over a shared protocol) the same way, regardless of which model or framework is on the other end. What the protocol does *not* solve is judgment: whether an agent picks the right tool and fills in the right arguments depends almost entirely on how well that tool is described. A vague description is the single most common reason a capable model calls the wrong tool, or the right tool with the wrong arguments.
 
 ## The analogy
 
-Think of **Tool Use and MCP** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+Picture a hotel concierge desk and the laminated card of services on it.
+
+A guest doesn't know how to book a car to the airport or arrange dry cleaning — no phone numbers, no standing relationships with local vendors. So they describe what they want to the concierge, who consults a card listing every service the hotel offers: what it does, how to request it, and — critically — what it doesn't cover. "Car service: local trips under 5 miles, 7 a.m. to 11 p.m., does not go to the airport; use Airport Shuttle for that." The guest picks the matching entry, states the request in the shape the card expects, the concierge places the actual call, and relays back exactly what came back — "car confirmed for 6:15, blue sedan" — which the guest then acts on.
+
+For years, every hotel did this differently: one had a phone list, another trained bellhops to relay requests by hand signal, a third had guests wander the lobby hoping someone knew the right extension. What changed the picture was a shared standard: one card format, adopted chain-wide, so any concierge at any property could work with it immediately. That's the shift MCP represents: not a smarter concierge, just an agreed shape for the card and the call, so the same tool plugs into any agent without a bespoke integration each time.
+
+The card's wording is where things actually go wrong or right. An entry that just says "Car service" tells the guest nothing about its range — request an airport run, the driver arrives, discovers it's outside the service area, the trip is wasted. An entry that spells out the boundary and points to the right alternative prevents that failure before it happens. The concierge system was never the weak link; an underspecified card always was.
+
+| Hotel concierge | Tool-use / MCP element |
+|---|---|
+| The guest, who can't call vendors directly | The model, which can't touch the world unassisted |
+| The laminated card listing each service, scope, limits | The tool's schema and description |
+| The guest stating a request in the card's format | The model's structured tool call (name + arguments) |
+| The concierge placing the call | Tool execution — the runtime invoking the real function |
+| "Car confirmed for 6:15, blue sedan" relayed back | The observation returned to the model |
+| Every hotel with its own phone list, hand signals, or wandering | The pre-MCP landscape of incompatible integrations |
+| One card format adopted chain-wide, any property | MCP — one client-server protocol any provider can implement |
+| A card entry that just says "Car service," no scope | An underspecified tool description |
+| Requesting an airport run from a 5-mile-only service | A bad call caused by a bad description — the main failure surface |
+| An entry naming the limits and the right alternative | A well-written description that heads off misuse |
 
 ## How it actually works
 
+![MCP client-server architecture: the agent's MCP client discovers and calls tools exposed by separate MCP servers, each server owning its own tool logic and trust boundary](diagrams/tool-use-and-mcp--client-server.svg)
 
-![Tool Use and MCP overview](diagrams/tool-use-and-mcp--overview.svg)
+Tool use is a three-step cycle, regardless of protocol. **Schema presentation**: the model is shown a description of each tool — a name, typed arguments, what it does. **Intent and extraction**: the model emits a structured call instead of prose. **Execution and contextualization**: something outside the model runs the call, and the real result feeds back as the next observation, not the model's guess.
 
-Tools are the "hands" of an agent. The industry has standardized on the **Model Context Protocol (MCP)**, which replaces fragmented custom tool definitions with a unified, local-first communication layer. MCP has matured rapidly: Streamable HTTP transport, OAuth 2.1 auth, and native computer-use tools landed in MCP 2.0 (ratified March 2026). In parallel, **Agent-to-Agent (A2A)** and other interoperability protocols have emerged to complement MCP's tool-access layer with agent coordination capabilities.
+MCP standardizes the layer that feeds step one and carries out step three. Follow the diagram: the agent's **MCP client** — code inside the runtime — talks to one or more **MCP servers**, each a standalone process owning a set of tools over JSON-RPC, either local `stdio` or HTTP for a remote server. Discovery: the client calls `list_tools` and gets back the schemas that server currently exposes — only tools relevant to the current sub-goal get attached, keeping the prompt lean as connected servers grow. Invocation: the client routes the model's call to the correct server, that server executes the real logic, and the result comes back as an observation.
+
+The payoff is the separation itself. Because each MCP server is its own process, a CRM, a ticketing, and a wiki-search integration can be built, scaled, and secured independently — a malformed call against one server doesn't reach the others. That's the concierge analogy's biggest structural change: not a smarter guest, just a common card format any hotel can plug into the same way.
 
 ## A concrete example
 
-Tools are the "hands" of an agent. The industry has standardized on the Model Context Protocol (MCP), which replaces fragmented custom tool definitions with a unified, local-first communication layer. MCP has matured rapidly: Streamable HTTP transport, OAuth 2.1 auth, and native computer-use tools landed in MCP 2.0 (ratified March 2026). In parallel, Agent-to-Agent (A2A) and other interoperability protocols have emerged to complement MCP's tool-access layer with agent coordination capabilities.
+A support agent is wired to three MCP servers: CRM (6 tools), ticketing (4), wiki-search (2) — 12 tools, roughly 150 tokens per schema, about 1,800 tokens total.
+
+**Without discovery filtering:** every request hardcodes all 12 schemas regardless of relevance. At 50,000 requests a day, that's 90 million tokens a day spent on schemas the model never calls, since most requests only need two or three.
+
+**With MCP-style discovery:** the client attaches only the 2–3 tools relevant to the current sub-goal, cutting overhead to roughly 300–450 tokens per request — an 80% reduction, with no change to what's available when needed.
+
+Separately, the team tested how much *wording* mattered. `search_tickets` originally read: "Searches tickets." Against 50 queries that should have used `search_archive` instead (tickets over 90 days old), the agent misused `search_tickets` — calling it, getting an empty result, then guessing — on 12 of 50, a 24% rate. Rewritten: "Searches active tickets by email or ID; returns at most 20 results; excludes tickets over 90 days old — use search_archive for those." Re-run, misuse dropped to 2 of 50 — 4%. The protocol never changed. The sentence describing the boundary did.
 
 ## The tradeoffs that matter
 
-| Choice | Upside | Cost |
-|--------|--------|------|
-| Simpler design | Faster to ship | Less resilient |
-| Heavier retrieval | Better grounding | More latency |
-| Bigger model | Higher quality | Higher $/query |
+| Approach | Portability | Integration effort | Security boundary | Best for |
+|---|---|---|---|---|
+| Bespoke per-model function calling | Low — tied to one API shape | Low once, repeats per provider | Whatever the app code enforces | A quick prototype, one model, no reuse |
+| MCP (client-server, standard schema) | High — any MCP client, any server | Moderate — write a server once | Clean — own process, containerizable | Tools reused across agents or teams |
+| Hardcoding every schema into every prompt | Orthogonal to protocol choice | Simplest for a few tools | Unaffected | Small, stable toolsets only |
+
+The dimension that matters more than protocol choice: description quality. A terse description is fast to write and reliably ambiguous — it says what a tool does but not its limits, not when to reach for something else instead. A precise one costs more upfront but is what actually determines whether the model routes correctly. MCP standardizes *how* a schema reaches the model; it says nothing about whether that schema is good enough to act on.
 
 ## Where people go wrong
 
-- Skipping evaluation and hoping demos generalize
-- Ignoring latency/cost until production traffic arrives
-- Treating retrieval quality as a generation problem
+1. **Treating MCP as a reliability upgrade.** It standardizes transport and discovery, not judgment. A badly described tool behind an MCP server fails exactly the way a badly described bespoke function does.
+2. **Writing descriptions that say what a tool does but not its boundaries.** Omitting scope, rate limits, and data recency is the single biggest cause of misrouted calls — as `search_tickets` shows, this alone can be the difference between a 24% and a 4% misuse rate.
+3. **Hardcoding every schema into every prompt regardless of relevance.** Beyond a handful of tools, this bloats the prompt and gives the model more chances to pick wrong.
+4. **Running tool execution in the same trust boundary as the model orchestrator.** If a malformed argument can reach more than the one tool it targeted, the blast radius of a bad call is the whole system, not one sandboxed process.
+5. **Trusting a model's structured tool call as already-safe input.** A syntactically valid call can still carry an unsafe argument; validate before executing, like any external input.
 
 ## The interview lens
 
-### Q: How does MCP solve the "Too Many Tools" problem (Schema Overload)?
+Interviewers use this topic to see whether you understand that a protocol is plumbing, not judgment — and whether you'd fix a tool's description before reaching for a bigger model.
 
-**Strong answer:**
-In 2023, giving a model 50 tools would degrade performance because the prompt became too long. MCP solves this through **Dynamic Resource Discovery**. Instead of loading 50 tool schemas into the prompt, the agent sends a `list_resources` call to the MCP server. It then only "attaches" the specific tools relevant to the current `Resource` context. This keeps the prompt lean and the context window focused on reasoning rather than parsing unused schemas.
+A strong sound bite: *"MCP standardizes how a tool gets discovered and called, so I don't rebuild the same integration for every model or framework — but it doesn't make an agent choose the right tool. That comes down to the description: does it say what the tool doesn't cover and where to go instead? A one-sentence fix to a tool's boundary can cut misrouted calls by 6x, with zero change to the model or protocol."*
 
-### Q: Why is it important to separate "Tool Logic" from the "Agent App" using MCP servers?
+Likely follow-ups:
 
-**Strong answer:**
-Separation of concerns. If the tool logic (e.g., a Python scraper) lives in a separate MCP server, I can scale the scraping infrastructure independently of the LLM orchestrator. More importantly, it provides a **Security Sandbox**. If a model tries to perform an injection through a tool argument, it only affects the MCP server process, which can be containerized with zero network access to the core Agent state.
-
-### Q: How do MCP and A2A work together in a production multi-agent system?
-
-**Strong answer:**
-They address **different communication layers**. MCP is the agent-to-tool protocol - it gives any agent standardized access to databases, APIs, and files through MCP servers. A2A is the agent-to-agent protocol - it enables an orchestrator agent (from Vendor X) to delegate a task to a specialist agent (from Vendor Y) without sharing memory or context. In production, I use MCP for every tool connection and A2A when I need cross-vendor agent coordination. For example, a procurement orchestrator built on LangGraph uses MCP to query an inventory database, then uses A2A to delegate compliance checking to a specialized agent hosted by a different team. The key design principle is: MCP within an agent's own tool stack, A2A across organizational or vendor boundaries.
+- How would you debug an agent that keeps calling the wrong tool out of a set of ten?
+- What's the security argument for running tool logic in a separate process from the model orchestrator?
+- How do you decide which tools to attach when an agent has access to dozens across multiple servers?
 
 ## Go deeper
 
-- [Upstream chapter (Tool Use and MCP)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/07-agentic-systems/03-tool-use-and-mcp.md)
-- Related questions in the [question bank](/questions)
-- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)
+- [Agent Fundamentals](./agent-fundamentals.mdx) — where "act" sits in the larger observe-think-act loop this mechanism implements.
+- [Reasoning Loops: ReAct and Beyond](./reasoning-loops-react-and-beyond.mdx) — how a tool call fits into the thought-action-observation cycle.
+- [Agentic Security and Sandboxing](./agentic-security-and-sandboxing.mdx) — the trust-boundary argument for running tools in their own process.
+- Upstream reference: [Tool Use and MCP — AI System Design Guide](https://github.com/ombharatiya/ai-system-design-guide/blob/main/07-agentic-systems/03-tool-use-and-mcp.md) (MIT; see [CREDITS](../../../CREDITS.md)).
