@@ -1,18 +1,50 @@
+import fs from "fs";
+import path from "path";
 import { getContentBySlug, listContentSlugs } from "./content";
 
-/** Canonical reading order; unknown slugs append alphabetically. */
-const READING_ORDER = [
+const CATALOG_FILE = path.join(process.cwd(), "data", "mdx-catalog.json");
+
+type CatalogEntry = {
+  target_mdx: string;
+  skip?: boolean;
+  section: string;
+};
+
+/** Canonical reading order from upstream catalog; polished chapters first within each section. */
+const POLISHED_FIRST = [
   "concepts/retrieval/rag-fundamentals",
   "concepts/retrieval/chunking-strategies",
   "walkthroughs/design-a-production-rag-system",
 ];
 
+function loadCatalogOrder(): string[] {
+  if (!fs.existsSync(CATALOG_FILE)) return [];
+  const raw = JSON.parse(fs.readFileSync(CATALOG_FILE, "utf8")) as CatalogEntry[];
+  return raw.filter((e) => !e.skip).map((e) => e.target_mdx);
+}
+
 export function orderedContentSlugs(): string[] {
-  const all = listContentSlugs();
-  const ordered = READING_ORDER.filter((s) => all.includes(s));
-  for (const slug of all.sort()) {
-    if (!ordered.includes(slug)) ordered.push(slug);
+  const all = new Set(listContentSlugs());
+  const ordered: string[] = [];
+
+  for (const slug of POLISHED_FIRST) {
+    if (all.has(slug)) {
+      ordered.push(slug);
+      all.delete(slug);
+    }
   }
+
+  for (const slug of loadCatalogOrder()) {
+    if (all.has(slug) && !ordered.includes(slug)) {
+      ordered.push(slug);
+      all.delete(slug);
+    }
+  }
+
+  for (const slug of [...all].sort()) {
+    ordered.push(slug);
+  }
+
   return ordered;
 }
 

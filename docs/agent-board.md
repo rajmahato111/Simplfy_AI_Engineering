@@ -8,7 +8,7 @@
 
 | ID | Tool | Branch | Status | Paths (locks) |
 |----|------|--------|--------|---------------|
-| _(none)_ | | | | |
+| T-050 | Cursor | `cursor/mdx-corpus-42a0` | in-review | `content/**`, `scripts/scaffold-mdx.ts`, `data/mdx-catalog.json` |
 
 ---
 
