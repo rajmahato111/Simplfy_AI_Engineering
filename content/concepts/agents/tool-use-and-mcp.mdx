@@ -52,13 +52,13 @@ The architectural payoff is the separation itself. Because each MCP server is it
 
 ## A concrete example
 
-A support agent is wired to three MCP servers: a CRM server (6 tools), a ticketing server (4 tools), and a wiki-search server (2 tools) — 12 tools, roughly 150 tokens per schema once you include the description and argument types, for about 1,800 tokens of schema text in total.
+A support agent is wired to three MCP servers: CRM (6 tools), ticketing (4 tools), wiki-search (2 tools) — 12 tools, roughly 150 tokens per schema, about 1,800 tokens of schema text total.
 
-**Without discovery-based filtering:** every request hardcodes all 12 schemas into the prompt regardless of relevance. At 50,000 requests a day, that's 1,800 tokens of dead weight on requests that only ever need two or three of those tools — 90 million tokens a day spent on schemas the model never calls.
+**Without discovery-based filtering:** every request hardcodes all 12 schemas regardless of relevance. At 50,000 requests a day, that's 90 million tokens a day spent on schemas the model never calls, since most requests only need two or three tools.
 
-**With MCP-style discovery:** the client attaches only the tools relevant to the current sub-goal — typically 2 to 3 of the 12 — cutting the schema overhead to roughly 300–450 tokens per request, an 80% reduction, with no change to which tools are actually available when needed.
+**With MCP-style discovery:** the client attaches only the 2–3 tools relevant to the current sub-goal, cutting schema overhead to roughly 300–450 tokens per request — an 80% reduction, with no change to what's actually available when needed.
 
-Separately, the team tested how much the *wording* of one tool's description mattered. The `search_tickets` tool originally read: "Searches tickets." Run against 50 real queries that should have used the separate `search_archive` tool instead (tickets resolved more than 90 days ago), the agent misused `search_tickets` — calling it, getting an empty result, and then guessing an answer instead of trying the archive tool — on 12 of 50 queries, a 24% misuse rate. The team rewrote the description: "Searches active support tickets by customer email or ticket ID; returns at most 20 results; does not include tickets resolved more than 90 days ago — use search_archive for those." Re-run against the same 50 queries, misuse dropped to 2 of 50 — 4%. The protocol connecting the tool never changed. The sentence describing its boundary did.
+Separately, the team tested how much the *wording* of one description mattered. `search_tickets` originally read: "Searches tickets." Run against 50 queries that should have used `search_archive` instead (tickets resolved over 90 days ago), the agent misused `search_tickets` — calling it, getting an empty result, then guessing — on 12 of 50, a 24% misuse rate. The team rewrote it: "Searches active tickets by email or ID; returns at most 20 results; does not include tickets resolved over 90 days ago — use search_archive for those." Re-run, misuse dropped to 2 of 50 — 4%. The protocol never changed. The sentence describing the boundary did.
 
 ## The tradeoffs that matter
 
@@ -68,7 +68,7 @@ Separately, the team tested how much the *wording* of one tool's description mat
 | MCP (client-server, standard schema) | High — any MCP-aware client can use any server | Moderate — write or point to a server once | Clean — tool logic runs in its own process, containerizable | Tools reused across multiple agents, or owned by a different team |
 | Hardcoding every tool's full schema into every prompt | N/A — orthogonal to protocol choice | Simplest for a handful of tools | Unaffected | Small, stable toolsets that will never grow past a few tools |
 
-The dimension that matters more than protocol choice, and that no protocol can fix for you: description quality. A terse description is fast to write and reliably ambiguous — it says what a tool does but not what it doesn't, not its limits, not when to reach for something else instead. A precise description costs more upfront (and needs updating as the tool's behavior changes) but is what actually determines whether the model routes correctly. MCP standardizes *how* a schema gets to the model; it says nothing about whether that schema is good enough to act on.
+The dimension that matters more than protocol choice: description quality. A terse description is fast to write and reliably ambiguous — it says what a tool does but not its limits, not when to reach for something else instead. A precise one costs more upfront but is what actually determines whether the model routes correctly. MCP standardizes *how* a schema reaches the model; it says nothing about whether that schema is good enough to act on.
 
 ## Where people go wrong
 

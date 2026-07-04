@@ -92,9 +92,9 @@ A strong sound bite: *"I only split a task across agents when the sub-tasks are 
 
 Likely follow-ups:
 
-- How do you stop a supervisor's shared state from ballooning as workers report back? (Summarize before it re-enters shared context; don't append raw traces.)
-- When would you pick a graph-based orchestrator over a straight supervisor loop? (When the task needs conditional branches or has to backtrack to an earlier step on failure — a static chain or single loop can't route around that.)
-- When does it make sense to cross a vendor or team boundary instead of keeping everything in one framework? (When you don't own the specialist agent and can't fold it into your runtime — accept the network hop for vendor neutrality and independent scaling.)
+- How do you stop shared state from ballooning as workers report back? (Summarize before it re-enters shared context; never append raw traces.)
+- When would you pick a graph-based orchestrator over a supervisor loop? (When the task needs conditional branches or must backtrack on failure — a static chain can't route around that.)
+- When does crossing a vendor or team boundary make sense? (When you don't own the specialist agent and can't fold it into your runtime — accept the network hop for vendor neutrality.)
 
 ## Go deeper
 
