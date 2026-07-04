@@ -8,7 +8,7 @@
 
 | ID | Tool | Branch | Status | Paths (locks) |
 |----|------|--------|--------|---------------|
-| T-040–T-043 | Cursor | `cursor/ingest-meta-content-42a0` | `in_review` | `data/*.json`, ingest scripts, meta UI |
+| _(none)_ | | | | |
 
 ---
 
@@ -16,6 +16,7 @@
 
 | PR | Task | Merged |
 |----|------|--------|
+| #18 | T-040–043: Glossary, patterns, 121-question bank ingest | 2026-07-04 |
 | #15 | T-001 Claude: Pilot content batch (retrieval) | 2026-07-04 |
 | #7 | P1 Vercel deploy readiness | 2026-07-04 |
 | #8 | P2 Reader polish (prev/next, SEO, sitemap) | 2026-07-04 |
