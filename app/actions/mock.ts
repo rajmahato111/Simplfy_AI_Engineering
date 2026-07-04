@@ -94,5 +94,3 @@ export async function getInterviewerLine(phaseId: string, questionSlug: string, 
 
   return { line: llm ?? template, mode: llm ? ("llm" as const) : ("stub" as const) };
 }
-
-export type { Question };
