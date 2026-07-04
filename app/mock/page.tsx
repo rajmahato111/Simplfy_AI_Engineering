@@ -1,17 +1,14 @@
-function StubPage({ title, blurb }: { title: string; blurb: string }) {
-  return (
-    <div className="space-y-3">
-      <h1 className="text-2xl font-semibold">{title}</h1>
-      <p className="text-slate-600">{blurb}</p>
-    </div>
-  );
-}
+import { PageHero, ComingSoonPanel } from "@/components/page-hero";
 
 export default function MockPage() {
   return (
-    <StubPage
-      title="Mock Interview"
-      blurb="AI system-design mock with rubric scorecard — PRD E4, Phase P3."
-    />
+    <>
+      <PageHero
+        eyebrow="Interview"
+        title="AI mock interviewer"
+        description="Timed AI system-design mocks with rubric scorecards, follow-up probing, and session replay."
+      />
+      <ComingSoonPanel title="Mock interviewer" phase="PRD E4 · Phase P3" />
+    </>
   );
 }

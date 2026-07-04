@@ -1,17 +1,14 @@
-function StubPage({ title, blurb }: { title: string; blurb: string }) {
-  return (
-    <div className="space-y-3">
-      <h1 className="text-2xl font-semibold">{title}</h1>
-      <p className="text-slate-600">{blurb}</p>
-    </div>
-  );
-}
+import { PageHero, ComingSoonPanel } from "@/components/page-hero";
 
 export default function DashboardPage() {
   return (
-    <StubPage
-      title="Dashboard"
-      blurb="Progress, readiness, and study plan — PRD E8, Phase P1–P2."
-    />
+    <>
+      <PageHero
+        eyebrow="Progress"
+        title="Dashboard"
+        description="Track reading progress, readiness scores, and your personalized study plan."
+      />
+      <ComingSoonPanel title="Dashboard" phase="PRD E8 · Phase P1–P2" />
+    </>
   );
 }

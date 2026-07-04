@@ -1,17 +1,14 @@
-function StubPage({ title, blurb }: { title: string; blurb: string }) {
-  return (
-    <div className="space-y-3">
-      <h1 className="text-2xl font-semibold">{title}</h1>
-      <p className="text-slate-600">{blurb}</p>
-    </div>
-  );
-}
+import { PageHero, ComingSoonPanel } from "@/components/page-hero";
 
 export default function QuestionsPage() {
   return (
-    <StubPage
-      title="Questions"
-      blurb="116-question bank with practice and study modes — PRD E2, Phase P1."
-    />
+    <>
+      <PageHero
+        eyebrow="Interview prep"
+        title="Question bank"
+        description="116 AI system-design questions with practice and study modes — filter by topic, difficulty, and company."
+      />
+      <ComingSoonPanel title="Question bank" phase="PRD E2 · Phase P1" />
+    </>
   );
 }

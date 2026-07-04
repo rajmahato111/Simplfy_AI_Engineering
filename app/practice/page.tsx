@@ -1,17 +1,14 @@
-function StubPage({ title, blurb }: { title: string; blurb: string }) {
-  return (
-    <div className="space-y-3">
-      <h1 className="text-2xl font-semibold">{title}</h1>
-      <p className="text-slate-600">{blurb}</p>
-    </div>
-  );
-}
+import { PageHero, ComingSoonPanel } from "@/components/page-hero";
 
 export default function PracticePage() {
   return (
-    <StubPage
-      title="Practice"
-      blurb="Guided SPIDER walkthroughs with checkpoint feedback — PRD E3, Phase P2."
-    />
+    <>
+      <PageHero
+        eyebrow="Interactive"
+        title="Guided practice"
+        description="Step through SPIDER walkthroughs with checkpoint feedback — the Hello Interview motion, for AI system design."
+      />
+      <ComingSoonPanel title="Guided practice" phase="PRD E3 · Phase P2" />
+    </>
   );
 }
