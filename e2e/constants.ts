@@ -19,7 +19,7 @@ export const NAV_ROUTES = [
   { href: "/search", label: "Search" },
   { href: "/questions", label: "Questions" },
   { href: "/practice", label: "Practice" },
-  { href: "/mock", label: "Mock Interview" },
+  { href: "/mock", label: "Mock" },
   { href: "/tutor", label: "Tutor" },
   { href: "/dashboard", label: "Dashboard" },
 ] as const;

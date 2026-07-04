@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand: #059669;
-  --color-brand-hover: #047857;
-  --color-brand-muted: #ecfdf5;
-  --color-brand-text: #065f46;
+  --color-brand: #2a9d8f;
+  --color-brand-hover: #248578;
+  --color-brand-muted: #e8f5f3;
+  --color-brand-text: #1d6b61;
   --font-sans: var(--font-inter), system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
@@ -115,7 +115,7 @@ body {
 }
 
 .prose blockquote {
-  border-left: 3px solid #059669;
+  border-left: 3px solid #2a9d8f;
   padding: 0.25rem 0 0.25rem 1rem;
   color: #52525b;
   margin: 1.25rem 0;
@@ -124,12 +124,12 @@ body {
 }
 
 .prose a:not([class]) {
-  color: #059669;
+  color: #2a9d8f;
   font-weight: 500;
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
 .prose a:not([class]):hover {
-  color: #047857;
+  color: #248578;
 }
