@@ -5,6 +5,7 @@ import { getQuestionBySlug } from "@/lib/questions";
 import { relatedChaptersForQuestion } from "@/lib/related-chapters";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { QuestionStudyPanel } from "@/components/question-study-panel";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -64,15 +65,6 @@ export default async function QuestionDetailPage({ params }: Props) {
         </section>
       )}
 
-      <section className="mt-8">
-        <h2 className="font-semibold text-zinc-900">What interviewers look for</h2>
-        <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-zinc-700">
-          {q.interviewer_looks_for.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-      </section>
-
       {q.key_insight && (
         <section className="mt-8 rounded-xl border border-brand/20 bg-brand-muted p-6">
           <h2 className="font-semibold text-zinc-900">Key insight</h2>
@@ -91,23 +83,21 @@ export default async function QuestionDetailPage({ params }: Props) {
         </section>
       )}
 
-      <details className="mt-8 rounded-xl border border-brand/20 bg-brand-muted p-6">
+      <details className="mt-8 rounded-xl border border-zinc-200 bg-zinc-50 p-6">
         <summary className="cursor-pointer font-semibold text-zinc-900">
-          Study mode — strong answer covers
+          Interview rubric — what interviewers look for
         </summary>
-        {q.strong_answer_covers.length > 0 ? (
-          <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-zinc-700">
-            {q.strong_answer_covers.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        ) : (
-          <p className="mt-4 text-sm text-zinc-600">See study excerpt below.</p>
-        )}
-        {q.sample_answer_excerpt && (
-          <p className="mt-4 text-sm text-zinc-600 italic">{q.sample_answer_excerpt}</p>
-        )}
+        <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-zinc-700">
+          {q.interviewer_looks_for.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
       </details>
+
+      <QuestionStudyPanel
+        strongAnswerCovers={q.strong_answer_covers}
+        sampleAnswerExcerpt={q.sample_answer_excerpt}
+      />
     </div>
   );
 }

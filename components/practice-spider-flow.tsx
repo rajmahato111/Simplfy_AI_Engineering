@@ -87,7 +87,8 @@ export function PracticeSpiderFlow() {
             Checkpoint score: {feedback.overall}/100
           </h3>
           <p className="mt-1 text-sm text-zinc-600">
-            Rule-based rubric check — full LLM grader ships when the API key is configured.
+            {feedback.mode === "llm" ? "AI rubric grader" : "Rule-based rubric check"} — set{" "}
+            <code className="rounded bg-zinc-100 px-1">ANTHROPIC_API_KEY</code> for LLM grading.
           </p>
           <ul className="mt-4 space-y-3">
             {feedback.phases.map((p) => (

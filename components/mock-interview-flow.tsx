@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState, useTransition } from "react";
-import { completeMockSession } from "@/app/actions/mock";
+import { completeMockSession, getInterviewerLine } from "@/app/actions/mock";
 import { SPIDER_PHASES } from "@/lib/spider-phases";
 import {
   formatElapsed,
@@ -25,19 +25,20 @@ const btnSecondary = cn(
 type Props = {
   sessionId: string;
   question: Question;
+  initialScorecard?: SpiderFeedback | null;
 };
 
-export function MockInterviewFlow({ sessionId, question }: Props) {
+export function MockInterviewFlow({ sessionId, question, initialScorecard }: Props) {
   const [step, setStep] = useState(0);
   const [notes, setNotes] = useState<string[]>(() => SPIDER_PHASES.map(() => ""));
-  const [scorecard, setScorecard] = useState<SpiderFeedback | null>(null);
+  const [scorecard, setScorecard] = useState<SpiderFeedback | null>(initialScorecard ?? null);
+  const [interviewerLine, setInterviewerLine] = useState(() => mockInterviewerPrompt("scope", question));
   const [elapsedMs, setElapsedMs] = useState(0);
   const [pending, startTransition] = useTransition();
   const [ready, setReady] = useState(false);
 
   const phase = SPIDER_PHASES[step];
   const progress = Math.round(((step + 1) / SPIDER_PHASES.length) * 100);
-  const interviewerLine = mockInterviewerPrompt(phase.id, question);
 
   useEffect(() => {
     const stored = readMockSession(sessionId);
@@ -58,6 +59,18 @@ export function MockInterviewFlow({ sessionId, question }: Props) {
     return () => window.clearInterval(id);
   }, [ready, scorecard, sessionId]);
 
+  useEffect(() => {
+    if (scorecard) return;
+    const prior = step > 0 ? notes[step - 1] : undefined;
+    let cancelled = false;
+    void getInterviewerLine(phase.id, question.slug, prior).then((res) => {
+      if (!cancelled) setInterviewerLine(res.line);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [step, question.slug, scorecard, phase.id, notes]);
+
   function persistNotes(next: string[]) {
     const stored = readMockSession(sessionId);
     if (!stored) return;
@@ -66,7 +79,7 @@ export function MockInterviewFlow({ sessionId, question }: Props) {
 
   function finish() {
     startTransition(async () => {
-      const result = await completeMockSession(notes, question.slug);
+      const result = await completeMockSession(sessionId, notes, question.slug);
       setScorecard(result);
       const stored = readMockSession(sessionId);
       if (stored) {
@@ -94,7 +107,7 @@ export function MockInterviewFlow({ sessionId, question }: Props) {
         <p className="mt-1 text-sm text-zinc-600">{question.title}</p>
         <p className="mt-4 text-3xl font-semibold text-brand">{scorecard.overall}/100</p>
         <p className="mt-1 text-sm text-zinc-600">
-          Rule-based rubric — full LLM interviewer and probing ship with the API key.
+          {scorecard.mode === "llm" ? "AI rubric grader" : "Rule-based rubric"} — session saved when signed in with Postgres.
         </p>
         <ul className="mt-6 space-y-3">
           {scorecard.phases.map((p) => (

@@ -6,7 +6,10 @@ test.describe("question detail", () => {
     await expect(
       page.getByRole("heading", { name: /Walk me through the architecture of a production RAG system/i }),
     ).toBeVisible();
-    await expect(page.getByText("What interviewers look for")).toBeVisible();
+    await expect(page.getByText("Interview rubric")).toBeVisible();
     await expect(page.getByText("Q1")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Reveal strong answer" })).toBeVisible();
+    await page.getByRole("button", { name: "Reveal strong answer" }).click();
+    await expect(page.getByText("Strong answer covers")).toBeVisible();
   });
 });

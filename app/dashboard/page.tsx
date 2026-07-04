@@ -2,6 +2,8 @@ import { auth } from "@/auth";
 import { getContentBySlug } from "@/lib/content";
 import { ensureUser, listUserProgress } from "@/lib/progress";
 import { isDbConfigured } from "@/lib/db";
+import { listMyMockSessions } from "@/app/actions/mock";
+import { getQuestionBySlug } from "@/lib/questions";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +14,7 @@ export default async function DashboardPage() {
 
   const user = await ensureUser(session.user.email, session.user.name);
   const progress = user ? await listUserProgress(user.id) : [];
+  const mocks = await listMyMockSessions();
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
@@ -20,40 +23,69 @@ export default async function DashboardPage() {
         Signed in as <strong>{session.user.email}</strong>
         {!isDbConfigured() && (
           <span className="block mt-1 text-sm text-amber-700">
-            Set <code className="rounded bg-amber-50 px-1">DATABASE_URL</code> to persist progress.
+            Set <code className="rounded bg-amber-50 px-1">DATABASE_URL</code> to persist progress and mock history.
           </span>
         )}
       </p>
 
-      {progress.length === 0 ? (
-        <p className="mt-8 text-sm text-zinc-600">
-          No activity yet.{" "}
-          <Link href="/learn" className="font-medium text-brand hover:underline">
-            Start learning →
-          </Link>
-        </p>
-      ) : (
-        <ul className="mt-8 space-y-3">
-          {progress.map((p) => {
-            const doc = getContentBySlug(p.slug);
-            const title = doc?.frontmatter.title ?? p.slug;
-            return (
-              <li key={p.id}>
-                <Link
-                  href={`/learn/${p.slug}`}
-                  className="flex items-center justify-between rounded-xl border border-zinc-200 bg-white px-4 py-3 shadow-sm hover:border-brand/30"
-                >
-                  <span className="font-medium text-zinc-900">{title}</span>
-                  <div className="flex gap-2">
-                    {p.bookmarked && <Badge>Bookmarked</Badge>}
-                    {p.completed && <Badge className="capitalize">Done</Badge>}
-                  </div>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+      {mocks.length > 0 && (
+        <section className="mt-10">
+          <h2 className="text-lg font-semibold text-zinc-900">Mock interviews</h2>
+          <ul className="mt-4 space-y-3">
+            {mocks.map((m) => {
+              const q = getQuestionBySlug(m.questionSlug);
+              const title = q?.title ?? m.questionSlug;
+              return (
+                <li key={m.id}>
+                  <Link
+                    href={`/mock/${m.id}?question=${encodeURIComponent(m.questionSlug)}`}
+                    className="flex items-center justify-between rounded-xl border border-zinc-200 bg-white px-4 py-3 shadow-sm hover:border-brand/30"
+                  >
+                    <span className="font-medium text-zinc-900 line-clamp-2">{title}</span>
+                    <div className="ml-3 flex shrink-0 gap-2">
+                      {m.overall != null && <Badge>{m.overall}/100</Badge>}
+                      {m.completed ? <Badge className="capitalize">Done</Badge> : <Badge>In progress</Badge>}
+                    </div>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
       )}
+
+      <section className="mt-10">
+        <h2 className="text-lg font-semibold text-zinc-900">Learning progress</h2>
+        {progress.length === 0 ? (
+          <p className="mt-4 text-sm text-zinc-600">
+            No chapter activity yet.{" "}
+            <Link href="/learn" className="font-medium text-brand hover:underline">
+              Start learning →
+            </Link>
+          </p>
+        ) : (
+          <ul className="mt-4 space-y-3">
+            {progress.map((p) => {
+              const doc = getContentBySlug(p.slug);
+              const title = doc?.frontmatter.title ?? p.slug;
+              return (
+                <li key={p.id}>
+                  <Link
+                    href={`/learn/${p.slug}`}
+                    className="flex items-center justify-between rounded-xl border border-zinc-200 bg-white px-4 py-3 shadow-sm hover:border-brand/30"
+                  >
+                    <span className="font-medium text-zinc-900">{title}</span>
+                    <div className="flex gap-2">
+                      {p.bookmarked && <Badge>Bookmarked</Badge>}
+                      {p.completed && <Badge className="capitalize">Done</Badge>}
+                    </div>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </section>
     </div>
   );
 }
