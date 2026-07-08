@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="752" viewBox="0 0 1000 752" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN (8px grid)
+Canvas 1000x752. Title center (500,44). Subtitle center (500,68).
+
+Main column (gates, yellow queue/pipeline), x=64 w=320 (64..384):
+  R1 Latency budget            y=88  h=64 (88..152)  c=(224,120)
+  R2 Data residency/compliance y=200 h=64 (200..264) c=(224,232)
+  R3 Context length            y=312 h=64 (312..376) c=(224,344)
+  R4 Tool-use quality          y=424 h=64 (424..488) c=(224,456)
+  R5 Cost ceiling              y=536 h=64 (536..600) c=(224,568)
+  R6 Final pick (purple, wide) x=64 w=864 (64..928) y=648 h=80 (648..728) c=(496,688)
+
+Side column (eliminations, red guardrail), x=448 w=480 (448..928):
+  E1 next to R1  y=88  h=64 (88..152)  c=(688,120)
+  E2 next to R2  y=200 h=64 (200..264) c=(688,232)
+  E3 next to R3  y=312 h=64 (312..376) c=(688,344)
+  E4 next to R4  y=424 h=64 (424..488) c=(688,456)
+  E5 next to R5  y=536 h=64 (536..600) c=(688,568)
+
+Arrows (#475569, one L-bend max; all pure vertical/horizontal, no bend needed):
+  Main chain: R1->R2 (224,152)->(224,198); R2->R3 (224,264)->(224,310);
+              R3->R4 (224,376)->(224,422); R4->R5 (224,488)->(224,534);
+              R5->R6 (224,600) down to (224,646) then right to (496,646): one L-bend polyline into wide R6 top edge
+  Side taps (straight horizontal, no bend): R1->E1 (384,120)->(446,120); R2->E2 (384,232)->(446,232);
+              R3->E3 (384,344)->(446,344); R4->E4 (384,456)->(446,456); R5->E5 (384,568)->(446,568)
+-->
+  <rect width="1000" height="752" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="500" y="44" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">Model selection as a sequence of gates, not a leaderboard lookup</text>
+  <text x="500" y="68" font-size="12" fill="#64748B" text-anchor="middle">Apply top to bottom — each gate narrows the candidate pool before the next one runs</text>
+
+  <!-- main chain arrows -->
+  <line x1="224" y1="152" x2="224" y2="198" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="224" y1="264" x2="224" y2="310" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="224" y1="376" x2="224" y2="422" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="224" y1="488" x2="224" y2="534" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <polyline points="224,600 224,646 496,646" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- side taps -->
+  <line x1="384" y1="120" x2="446" y2="120" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="384" y1="232" x2="446" y2="232" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="384" y1="344" x2="446" y2="344" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="384" y1="456" x2="446" y2="456" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="384" y1="568" x2="446" y2="568" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- R1 -->
+  <rect x="64" y="88" width="320" height="64" rx="10" fill="#FEFCE8" stroke="#CA8A04" stroke-width="1.5"/>
+  <text x="224" y="113" font-size="14" fill="#713F12" text-anchor="middle">Latency budget<tspan x="224" dy="17">interactive vs. async?</tspan></text>
+  <!-- E1 -->
+  <rect x="448" y="88" width="480" height="64" rx="10" fill="#FEF2F2" stroke="#DC2626" stroke-width="1.5"/>
+  <text x="688" y="113" font-size="14" fill="#7F1D1D" text-anchor="middle">Drops long-thinking tiers<tspan x="688" dy="17">if p95 must clear ~2s</tspan></text>
+
+  <!-- R2 -->
+  <rect x="64" y="200" width="320" height="64" rx="10" fill="#FEFCE8" stroke="#CA8A04" stroke-width="1.5"/>
+  <text x="224" y="225" font-size="14" fill="#713F12" text-anchor="middle">Data residency<tspan x="224" dy="17">on-prem / in-region required?</tspan></text>
+  <!-- E2 -->
+  <rect x="448" y="200" width="480" height="64" rx="10" fill="#FEF2F2" stroke="#DC2626" stroke-width="1.5"/>
+  <text x="688" y="225" font-size="14" fill="#7F1D1D" text-anchor="middle">Drops out-of-region APIs<tspan x="688" dy="17">self-host or VPC-only option remains</tspan></text>
+
+  <!-- R3 -->
+  <rect x="64" y="312" width="320" height="64" rx="10" fill="#FEFCE8" stroke="#CA8A04" stroke-width="1.5"/>
+  <text x="224" y="337" font-size="14" fill="#713F12" text-anchor="middle">Context length<tspan x="224" dy="17">how much must fit per call?</tspan></text>
+  <!-- E3 -->
+  <rect x="448" y="312" width="480" height="64" rx="10" fill="#FEF2F2" stroke="#DC2626" stroke-width="1.5"/>
+  <text x="688" y="337" font-size="14" fill="#7F1D1D" text-anchor="middle">Drops short-context models<tspan x="688" dy="17">below your working-set size</tspan></text>
+
+  <!-- R4 -->
+  <rect x="64" y="424" width="320" height="64" rx="10" fill="#FEFCE8" stroke="#CA8A04" stroke-width="1.5"/>
+  <text x="224" y="449" font-size="14" fill="#713F12" text-anchor="middle">Tool-use quality<tspan x="224" dy="17">how reliable must calls be?</tspan></text>
+  <!-- E4 -->
+  <rect x="448" y="424" width="480" height="64" rx="10" fill="#FEF2F2" stroke="#DC2626" stroke-width="1.5"/>
+  <text x="688" y="449" font-size="14" fill="#7F1D1D" text-anchor="middle">Drops weak function-callers<tspan x="688" dy="17">agentic tool loops need precision</tspan></text>
+
+  <!-- R5 -->
+  <rect x="64" y="536" width="320" height="64" rx="10" fill="#FEFCE8" stroke="#CA8A04" stroke-width="1.5"/>
+  <text x="224" y="561" font-size="14" fill="#713F12" text-anchor="middle">Cost ceiling<tspan x="224" dy="17">$ / request at your volume</tspan></text>
+  <!-- E5 -->
+  <rect x="448" y="536" width="480" height="64" rx="10" fill="#FEF2F2" stroke="#DC2626" stroke-width="1.5"/>
+  <text x="688" y="561" font-size="14" fill="#7F1D1D" text-anchor="middle">Drops frontier tier<tspan x="688" dy="17">if it blows the per-request budget</tspan></text>
+
+  <!-- R6 final -->
+  <rect x="64" y="648" width="864" height="80" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="496" y="681" font-size="15" fill="#2E1065" text-anchor="middle">Smallest model that clears every gate<tspan x="496" dy="19">— not the smartest one available</tspan></text>
+</svg>

@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1140" height="460" viewBox="0 0 1140 460" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN
+Canvas 1140x460. Title (570,40).
+Row 1 y=120 h=64 (prefill phase, runs once):
+  A Prompt text   x=40  w=130  (orange)
+  B Tokenizer     x=234 w=130  (yellow)
+  C Prefill       x=428 w=200  (violet)  center x=528
+  caption (334,104) "Runs once, in parallel, per request"
+  arrows A->B (170,152)-(232,152); B->C (364,152)-(426,152)
+Row 2 y=232 h=72 (decode phase, loops):
+  D KV Cache      x=438 w=180  (green)   center x=528 (aligned under C)
+  E Decode step   x=682 w=230  (violet)  center x=797
+  caption (797,208) "Repeats once per output token"
+  arrow C->D vertical (528,184)-(528,230)
+  arrow D->E "reads cache"   y=252 (618,252)-(680,252)
+  arrow E->D "appends token" y=284 (682,284)-(620,284)
+  self-loop on E: (712,232)-(712,192)-(852,192)-(852,230) label (797,178)
+Row 3 y=340 h=64 (once, after loop ends):
+  F Detokenizer   x=722 w=150  (yellow) center x=797 (aligned under E)
+  G Output text   x=936 w=150  (orange)
+  arrow E->F vertical (797,304)-(797,338) label "on stop condition" (807,325)
+  arrow F->G horizontal (872,372)-(934,372)
+-->
+  <rect width="1140" height="460" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="570" y="40" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">One prompt, two phases: prefill once, decode in a loop</text>
+
+  <!-- row 1 caption -->
+  <text x="334" y="104" font-size="12" fill="#64748B" text-anchor="middle">Runs once, in parallel, per request</text>
+
+  <!-- Row 1 -->
+  <rect x="40" y="120" width="130" height="64" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="105" y="157" font-size="14" fill="#7C2D12" text-anchor="middle">Prompt text</text>
+
+  <line x1="170" y1="152" x2="232" y2="152" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="234" y="120" width="130" height="64" rx="10" fill="#FEFCE8" stroke="#CA8A04" stroke-width="1.5"/>
+  <text x="299" y="157" font-size="14" fill="#713F12" text-anchor="middle">Tokenizer</text>
+
+  <line x1="364" y1="152" x2="426" y2="152" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="428" y="120" width="200" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="528" y="147" font-size="14" fill="#2E1065" text-anchor="middle">Prefill</text>
+  <text x="528" y="165" font-size="12" fill="#2E1065" text-anchor="middle">(forward pass, full prompt)</text>
+
+  <!-- C -> D -->
+  <line x1="528" y1="184" x2="528" y2="230" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Row 2 -->
+  <rect x="438" y="232" width="180" height="72" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="528" y="262" font-size="14" fill="#064E3B" text-anchor="middle">KV Cache</text>
+  <text x="528" y="280" font-size="12" fill="#064E3B" text-anchor="middle">(keys &amp; values so far)</text>
+
+  <rect x="682" y="232" width="230" height="72" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="797" y="262" font-size="14" fill="#2E1065" text-anchor="middle">Decode step</text>
+  <text x="797" y="280" font-size="12" fill="#2E1065" text-anchor="middle">(forward pass + sample, 1 token)</text>
+
+  <!-- D <-> E read/write -->
+  <line x1="618" y1="252" x2="680" y2="252" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="622" y="234" width="76" height="16" fill="#ffffff"/>
+  <text x="649" y="246" font-size="11" fill="#475569" text-anchor="middle">reads cache</text>
+
+  <line x1="682" y1="284" x2="620" y2="284" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="612" y="288" width="90" height="16" fill="#ffffff"/>
+  <text x="649" y="300" font-size="11" fill="#475569" text-anchor="middle">appends token</text>
+
+  <!-- self-loop on E -->
+  <polyline points="712,232 712,192 852,192 852,230" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="672" y="168" width="250" height="18" fill="#ffffff"/>
+  <text x="797" y="182" font-size="11" fill="#475569" text-anchor="middle">repeat until stop token / max tokens</text>
+
+  <!-- E -> F -->
+  <line x1="797" y1="304" x2="797" y2="338" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="807" y="325" font-size="11" fill="#64748B">on stop condition</text>
+
+  <!-- Row 3 -->
+  <rect x="722" y="340" width="150" height="64" rx="10" fill="#FEFCE8" stroke="#CA8A04" stroke-width="1.5"/>
+  <text x="797" y="377" font-size="14" fill="#713F12" text-anchor="middle">Detokenizer</text>
+
+  <line x1="872" y1="372" x2="934" y2="372" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="936" y="340" width="150" height="64" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="1011" y="377" font-size="14" fill="#7C2D12" text-anchor="middle">Output text</text>
+</svg>
