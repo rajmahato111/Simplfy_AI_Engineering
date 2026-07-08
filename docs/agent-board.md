@@ -8,7 +8,15 @@
 
 | ID | Tool | Branch | Status | Paths (locks) |
 |----|------|--------|--------|---------------|
-| _(none — T-030–T-032 ready for PR)_ | | | | |
+| — | — | — | — | (none currently active) |
+
+---
+
+## Open PRs (awaiting human review/merge)
+
+| PR | Task | Opened |
+|----|------|--------|
+| **#31** | Claude T-060–062: Foundations + Models cluster (10 rewritten chapters, reviewer-fixed) | 2026-07-08 |
 
 ---
 
@@ -32,5 +40,5 @@
 
 | ID | Tool | Task |
 |----|------|------|
-| T-040+ | Claude Code | Interview-prep meta prose review (Phase 2 of content-review-plan.md) |
-| T-052+ | Cursor | Remaining MDX rewrites (Foundations/Inference/Prompting/etc.) |
+| T-070+ | Claude Code | Training + Inference clusters (Phase 4 remainder, 17 chapters) |
+| T-052+ | Cursor | Remaining MDX rewrites (Prompting/Evals/Frameworks/Tool-use/etc.) |

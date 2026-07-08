@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="500" viewBox="0 0 1080 500" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN
+Canvas 1080x500. Title (540,40).
+Two dashed panels, y=64 h=300:
+  Left  "Benchmark evaluation"   x=32  w=460 (32-492)
+  Right "Production evaluation"  x=556 w=460 (556-1016)   [64px gap: 492-556]
+Each panel: 3 stacked boxes, vertical arrows between, centered in panel.
+  Left  center x=262: L1 y=100 h=56 "Fixed public test set" (orange)
+                       L2 y=184 h=56 "Model" (violet)
+                       L3 y=268 h=56 "Benchmark score (e.g. 88% MMLU)" (green)
+  Right center x=786:  R1 y=100 h=56 "Your real queries" (orange)
+                        R2 y=184 h=56 "Model" (violet)
+                        R3 y=268 h=56 "Task success, cost, latency on your workload" (green)
+Bottom annotation row (no arrows, informational): label (540,388)
+  3 guardrail-red boxes y=402 h=48, centered under both panels (total span 214-834):
+  "Contamination" x=214 w=180 ; "Saturation" x=434 w=180 ; "Gaming" x=654 w=180
+-->
+  <rect width="1080" height="500" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="540" y="40" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">Two different pipelines produce two different numbers</text>
+
+  <!-- LEFT PANEL -->
+  <rect x="32" y="64" width="460" height="300" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="48" y="86" font-size="12" fill="#64748B">Benchmark evaluation</text>
+
+  <rect x="142" y="100" width="240" height="56" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="262" y="133" font-size="14" fill="#7C2D12" text-anchor="middle">Fixed public test set</text>
+
+  <line x1="262" y1="156" x2="262" y2="182" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="142" y="184" width="240" height="56" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="262" y="217" font-size="14" fill="#2E1065" text-anchor="middle">Model</text>
+
+  <line x1="262" y1="240" x2="262" y2="266" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="142" y="268" width="240" height="56" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="262" y="294" font-size="13" fill="#064E3B" text-anchor="middle">Benchmark score</text>
+  <text x="262" y="312" font-size="12" fill="#064E3B" text-anchor="middle">(e.g. 88% on MMLU)</text>
+
+  <!-- RIGHT PANEL -->
+  <rect x="556" y="64" width="460" height="300" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="572" y="86" font-size="12" fill="#64748B">Production evaluation</text>
+
+  <rect x="666" y="100" width="240" height="56" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="786" y="133" font-size="14" fill="#7C2D12" text-anchor="middle">Your real queries</text>
+
+  <line x1="786" y1="156" x2="786" y2="182" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="666" y="184" width="240" height="56" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="786" y="217" font-size="14" fill="#2E1065" text-anchor="middle">Model</text>
+
+  <line x1="786" y1="240" x2="786" y2="266" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="666" y="268" width="240" height="56" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="786" y="288" font-size="13" fill="#064E3B" text-anchor="middle">Task success, cost,</text>
+  <text x="786" y="306" font-size="13" fill="#064E3B" text-anchor="middle">latency on your workload</text>
+
+  <!-- bottom annotation -->
+  <text x="540" y="388" font-size="12" fill="#64748B" text-anchor="middle">Why the two numbers diverge</text>
+
+  <rect x="214" y="402" width="180" height="48" rx="8" fill="#FEF2F2" stroke="#DC2626" stroke-width="1.5"/>
+  <text x="304" y="431" font-size="13" fill="#7F1D1D" text-anchor="middle">Contamination</text>
+
+  <rect x="434" y="402" width="180" height="48" rx="8" fill="#FEF2F2" stroke="#DC2626" stroke-width="1.5"/>
+  <text x="524" y="431" font-size="13" fill="#7F1D1D" text-anchor="middle">Saturation</text>
+
+  <rect x="654" y="402" width="180" height="48" rx="8" fill="#FEF2F2" stroke="#DC2626" stroke-width="1.5"/>
+  <text x="744" y="431" font-size="13" fill="#7F1D1D" text-anchor="middle">Gaming</text>
+</svg>

@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="620" viewBox="0 0 1080 620" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN
+Canvas 1200x620. Title (600,40).
+Root "A model": x=40,y=308,w=140,h=64 (violet), center (110,340)
+Vertical trunk at x=212 from y=148 (row1 center) to y=532 (row4 center), no arrowhead (connector).
+Root -> trunk: horizontal (180,340)-(212,340), no arrowhead (connector).
+4 branch arrows, trunk(212,rowCenterY) -> tag left edge (242,rowCenterY), each WITH arrowhead:
+  Row1 Openness        center y=148  tag x=244,y=128,w=160,h=40
+  Row2 Architecture     center y=276  tag x=244,y=256,w=160,h=40
+  Row3 Reasoning mode   center y=404  tag x=244,y=384,w=160,h=40
+  Row4 Size tier        center y=532  tag x=244,y=512,w=160,h=40
+Rows 1-3: tag -> 2 stacked leaves (220 wide, x=468), via 1-bend arrows
+  (vertical from tag-right-edge x=404 to leaf's y, then horizontal into leaf at x=466->468)
+  Row1 leaves: Closed/frontier y=104 h=36 ; Open-weight y=156 h=36
+  Row2 leaves: Dense y=232 h=36 ; Mixture-of-experts y=284 h=36
+  Row3 leaves: Standard y=360 h=36 ; Reasoning (thinking) y=412 h=36
+Row4: tag -> Small -> Mid -> Large/Frontier, straight horizontal chain, all center y=532
+  Small x=468 w=140 ; Mid x=672 w=140 ; Large/Frontier x=876 w=160
+-->
+  <rect width="1080" height="620" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="540" y="40" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">Four independent axes for classifying any model</text>
+
+  <!-- root -->
+  <rect x="40" y="308" width="140" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="110" y="346" font-size="14" fill="#2E1065" text-anchor="middle">A model</text>
+
+  <!-- root -> trunk (connector, no marker) -->
+  <line x1="180" y1="340" x2="212" y2="340" stroke="#475569" stroke-width="1.5"/>
+  <!-- vertical trunk (connector, no marker) -->
+  <line x1="212" y1="148" x2="212" y2="532" stroke="#475569" stroke-width="1.5"/>
+
+  <!-- branch arrows: trunk -> each tag -->
+  <line x1="212" y1="148" x2="242" y2="148" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="212" y1="276" x2="242" y2="276" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="212" y1="404" x2="242" y2="404" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="212" y1="532" x2="242" y2="532" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Row 1: Openness -->
+  <rect x="244" y="128" width="160" height="40" rx="8" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <text x="324" y="153" font-size="13" fill="#334155" text-anchor="middle">Openness</text>
+
+  <polyline points="404,148 404,122 466,122" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="468" y="104" width="220" height="36" rx="8" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="578" y="127" font-size="13" fill="#2E1065" text-anchor="middle">Closed / frontier</text>
+
+  <polyline points="404,148 404,174 466,174" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="468" y="156" width="220" height="36" rx="8" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="578" y="179" font-size="13" fill="#2E1065" text-anchor="middle">Open-weight</text>
+
+  <!-- Row 2: Architecture -->
+  <rect x="244" y="256" width="160" height="40" rx="8" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <text x="324" y="281" font-size="13" fill="#334155" text-anchor="middle">Architecture</text>
+
+  <polyline points="404,276 404,250 466,250" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="468" y="232" width="220" height="36" rx="8" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="578" y="255" font-size="13" fill="#2E1065" text-anchor="middle">Dense</text>
+
+  <polyline points="404,276 404,302 466,302" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="468" y="284" width="220" height="36" rx="8" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="578" y="307" font-size="13" fill="#2E1065" text-anchor="middle">Mixture-of-experts</text>
+
+  <!-- Row 3: Reasoning mode -->
+  <rect x="244" y="384" width="160" height="40" rx="8" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <text x="324" y="409" font-size="13" fill="#334155" text-anchor="middle">Reasoning mode</text>
+
+  <polyline points="404,404 404,378 466,378" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="468" y="360" width="220" height="36" rx="8" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="578" y="383" font-size="13" fill="#2E1065" text-anchor="middle">Standard</text>
+
+  <polyline points="404,404 404,430 466,430" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="468" y="412" width="220" height="36" rx="8" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="578" y="435" font-size="13" fill="#2E1065" text-anchor="middle">Reasoning (thinking)</text>
+
+  <!-- Row 4: Size tier -->
+  <rect x="244" y="512" width="160" height="40" rx="8" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <text x="324" y="537" font-size="13" fill="#334155" text-anchor="middle">Size tier</text>
+
+  <line x1="404" y1="532" x2="466" y2="532" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="468" y="512" width="140" height="40" rx="8" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="538" y="537" font-size="13" fill="#2E1065" text-anchor="middle">Small</text>
+
+  <line x1="608" y1="532" x2="670" y2="532" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="672" y="512" width="140" height="40" rx="8" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="742" y="537" font-size="13" fill="#2E1065" text-anchor="middle">Mid</text>
+
+  <line x1="812" y1="532" x2="874" y2="532" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="876" y="512" width="160" height="40" rx="8" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="956" y="537" font-size="13" fill="#2E1065" text-anchor="middle">Large / frontier</text>
+</svg>

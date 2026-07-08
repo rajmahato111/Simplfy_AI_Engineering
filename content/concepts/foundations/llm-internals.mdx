@@ -1,115 +1,90 @@
 ---
-title: LLM Internals
+title: "LLM Internals: What a Language Model Actually Is"
 slug: llm-internals
 type: concept
 area: foundations
 difficulty: beginner
-tags:
-  - foundations
-  - llm
-  - internals
+tags: [foundations, llm-internals, next-token-prediction, transformers]
 diagrams:
-  - diagrams/llm-internals--overview.svg
-est_minutes: 5
-source_attribution: >-
-  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
-  edition with interview lens. See CREDITS.md.
-last_reviewed: '2026-07-04'
-status: draft
+  - diagrams/llm-internals--train-vs-infer.svg
+est_minutes: 10
+source_attribution: "Factual basis: AI System Design Guide (MIT) by Om Bharatiya; rewritten and expanded. See CREDITS.md."
+last_reviewed: 2026-07-05
+status: reviewed
 ---
+
 ## The 30-second version
 
-The architectural core of modern LLMs: transformers, MoE, attention math, RoPE, GQA, KV cache, and the inference-optimal scaling shift driving 2026 model design.
+A large language model is a fixed set of numbers — its weights — arranged into a function that takes in a sequence of tokens and outputs a probability distribution over what token comes next. Training is where those numbers get set: the model reads huge amounts of text, keeps guessing the next token, and gets nudged, guess by guess, toward better predictions. Inference is everything that happens afterward: the weights are frozen, and every request — yours included — is just one forward pass through that fixed function, producing a distribution over the next token, sampling from it, and doing it again. The mechanism is simple to state and easy to underestimate: getting good at "what token comes next" across a big enough slice of human writing forces the model to build internal machinery for grammar, facts, arithmetic, and multi-step reasoning, because none of those are optional if you actually want to predict well. The interesting part isn't the objective — it's what a model has to become internally to get that objective right at scale.
 
 ## The analogy
 
-Think of **LLM Internals** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+Picture a career meteorologist forecasting tomorrow's weather.
+
+Her actual output, every morning, is narrow: a temperature, a precipitation chance, a wind direction — one forecast, for one day, given today's conditions. Described only by that output, you'd call the job "guessing tomorrow from today," which sounds trivial. It isn't. To produce that one number reliably, she has spent decades absorbing how pressure systems form, how fronts move, how ocean temperature shifts patterns months later. None of that structure was handed to her as a rulebook — it built up gradually, from an enormous number of "here's today, here's what actually happened next" examples, each one adjusting her intuition slightly. That accumulated structure settles once she's lived through enough winters and summers to be reliable; she doesn't relearn meteorology every morning. What she does each morning is apply that already-settled intuition fresh, to today's actual conditions, and produce one forecast — then, the next day, using yesterday's outcome as part of today's input.
+
+A language model works the same way, with tokens instead of weather. Predicting one next token, given everything so far, looks narrow the same way "tomorrow's forecast" looks narrow. But hitting that target reliably, across billions of contexts during training, is what forces a model to build internal structure for syntax, factual association, arithmetic, and the shape of an argument — the same way accurate forecasting forces a meteorologist to build internal structure for atmospheric physics, whether or not "physics" was ever the stated goal. And exactly like the forecaster, a language model's accumulated structure — its weights — is fixed after training. Every request afterward is one fresh application of that structure to new input, not a chance to relearn anything.
+
+| Meteorologist | LLM element |
+|---|---|
+| Years of "today's conditions → tomorrow's actual weather" examples | Training data: text with the actual next token attached |
+| Gradually adjusted intuition after each forecast miss | Gradient updates to the weights during training |
+| Settled forecasting skill, not relearned each morning | Frozen weights after training completes |
+| One forecast for one day, given today's conditions | One forward pass producing a probability distribution over the next token |
+| Applying fixed skill to fresh conditions, tomorrow and the next day | Inference: the same frozen weights applied to every new request |
+| Yesterday's actual outcome feeding into today's forecast | The previously generated token feeding back in as input for the next one |
+| "Just predicting tomorrow" undersells decades of atmospheric intuition | "Just predicting the next token" undersells the structure next-token accuracy forces the model to build |
 
 ## How it actually works
 
+![Training happens once and produces frozen weights; every inference request runs those same frozen weights forward, one token at a time, in a loop that feeds each sampled token back in as input for the next](diagrams/llm-internals--train-vs-infer.svg)
 
-![LLM Internals overview](diagrams/llm-internals--overview.svg)
+Follow the diagram top to bottom. The top box is training, and it only happens once — or rather, once per model version, since a new model means a new training run. A training corpus, text gathered and filtered at enormous scale, feeds an iterative loop: the model looks at a chunk of text, predicts the next token, compares that prediction to what the token actually was, and nudges every weight slightly toward making the correct token more likely. Repeat that billions of times across a corpus of trillions of tokens, and the nudges accumulate into weights that encode a genuinely useful model of language — not because anyone programmed grammar or facts in directly, but because predicting well at that scale requires building something that behaves as if it knows them.
 
-The architectural core of modern LLMs: transformers, MoE, attention math, RoPE, GQA, KV cache, and the inference-optimal scaling shift driving 2026 model design.
+When training ends, the weights are frozen. That's the artifact that ships: not a program with explicit rules, but a fixed set of numbers — for a mid-size model, tens of billions of them, organized into the matrices making up each transformer layer (see [Transformer Architecture](./transformer-architecture.mdx)). Nothing about those numbers changes again unless someone deliberately runs a new training or fine-tuning job.
 
-This chapter covers the core concepts behind large language models. Understanding these internals is essential for making informed architectural decisions about AI systems. For practical implications of these architectural choices, see [Inference Optimization](../04-inference-optimization/) (KV cache, PagedAttention), [Model Taxonomy](../02-model-landscape/01-model-taxonomy.md) (MoE models in production), and [Glossary](../GLOSSARY.md) for definitions of MoE, RoPE, ALiBi, GQA, MLA.
+Inference is the loop at the bottom, and it runs every time anyone sends a prompt. The prompt gets broken into the same kind of units the model trained on (see [Tokenization Deep Dive](./tokenization-deep-dive.mdx)), and the frozen weights process that token sequence in a single forward pass — the same weights, unmodified, for every request from every user. That forward pass ends in a probability distribution over the entire vocabulary: given everything so far, how likely is each possible next token? The model samples one token, appends it to the sequence, and runs the whole forward pass again with the now slightly longer input — one new token per pass, until it samples an end-of-sequence marker or hits a length limit. That's autoregressive generation: each output token comes from running the entire model again on everything generated so far, including its own previous output.
 
 ## A concrete example
 
-The architectural core of modern LLMs: transformers, MoE, attention math, RoPE, GQA, KV cache, and the inference-optimal scaling shift driving 2026 model design.
+Take a 7-billion-parameter model and the prompt "The capital of France is". A widely used rule of thumb for inference cost is roughly 2 floating-point operations (FLOPs) per parameter per token processed, so one forward pass over this five-token prompt costs approximately 2 × 7,000,000,000 × 5 ≈ 70 billion FLOPs, producing a probability distribution over a roughly 128,000-token vocabulary. Say "Paris" comes out on top at 91% probability, "the" at 3% — the model samples "Paris," appends it, and reruns the now six-token forward pass to decide what comes next, maybe a period at 74% probability. Each token costs its own full forward pass; generating a 50-token answer means roughly 50 forward passes, not one.
+
+Compare that to what it took to get those weights in the first place. Training a 7B model on 1 trillion tokens, using the common approximation of about 6 FLOPs per parameter per training token (forward plus backward pass), costs roughly 6 × 7,000,000,000 × 1,000,000,000,000 ≈ 4.2 × 10²² FLOPs — on the order of 600 billion times more compute than that single five-token forward pass. That gap is the entire point of the training/inference split: training is a massive, one-time cost spread across weeks on thousands of GPUs; inference is a comparatively tiny, repeatable cost paid over and over, every time anyone sends a prompt, for as long as the model stays in production.
 
 ## The tradeoffs that matter
 
-| Choice | Upside | Cost |
-|--------|--------|------|
-| Simpler design | Faster to ship | Less resilient |
-| Heavier retrieval | Better grounding | More latency |
-| Bigger model | Higher quality | Higher $/query |
+| Design choice | What you gain | What it costs |
+|---|---|---|
+| More parameters (bigger model) | Better predictions, more capacity to encode nuance | Higher $/token, more GPU memory just to hold the weights, higher latency per token |
+| Frozen weights at inference | Cheap, reproducible, safe to serve to millions of users on identical hardware | No in-conversation learning — anything the model needs to "remember" must come from the context window or an external memory system, not new weights |
+| Committing to one token before seeing the next | Trivial to parallelize during training; simple, well-understood objective | No lookahead — the model can start a sentence a smarter plan would have avoided, and only "notice" after committing |
+| Sampling from the distribution instead of always taking the top token | Variety, less repetitive output, useful for open-ended tasks | Non-determinism — the same prompt can produce different answers, which complicates testing and reproducibility |
+
+The training/inference split shapes system design more than any other property here: because inference reuses frozen weights, the same model serves arbitrarily many users in parallel without any of them affecting each other's results — a property that would disappear entirely if the model updated its own weights mid-conversation.
 
 ## Where people go wrong
 
-- Skipping evaluation and hoping demos generalize
-- Ignoring latency/cost until production traffic arrives
-- Treating retrieval quality as a generation problem
+1. **Treating "next-token prediction" as proof the model isn't really reasoning.** The objective is simple to state; what it takes to hit that objective across a diverse enough corpus is not. Dismissing the mechanism because the training signal is simple confuses the target with the machinery built to hit it.
+2. **Assuming the model looks facts up somewhere.** There's no database inside a language model, only weights encoding statistical association — which is exactly why a model can state a wrong fact with the same fluent confidence as a right one.
+3. **Believing the model learns from your conversation.** Weights don't change during inference. "The model remembered what I said five messages ago" is the context window carrying that text forward, not new learning.
+4. **Equating parameter count with capability.** A larger model trained on worse or less data can lose to a smaller, better-trained one.
+5. **Forgetting that every generated token re-runs the whole forward pass.** A 500-token response is roughly 500 forward passes, which is why output tokens are typically priced higher than input tokens on most APIs.
 
 ## The interview lens
 
-### Q: Explain why transformer attention is O(n²) and what alternatives exist.
+Interviewers use this topic to check whether you can separate the training-time and inference-time costs of a system, and whether you understand generation as a genuine loop, not a single lookup.
 
-**Strong answer:**
-Attention computes pairwise similarities between all tokens. For sequence length n:
-- QK^T is [n, d] × [d, n] = n² multiplications per head
-- Storage for attention weights: n² floats
+A strong sound bite: *"Predicting the next token is the training objective, not a description of what the model becomes to satisfy it — I care about that distinction because it explains why the model can hallucinate fluently and reason well using the same underlying mechanism, and why every generated token, not just the first one, costs a full forward pass through frozen weights."*
 
-Alternatives:
-- Sparse attention (Longformer): O(n) with local + global patterns
-- Linear attention (Performer): O(n) using random feature approximation
-- Flash Attention: Still O(n²) compute but O(n) memory via kernel fusion
-- State-space models (Mamba): O(n) fully linear
+Likely follow-ups:
 
-The tradeoff: n² is necessary for full long-range dependencies, but most tasks do not need all pairwise interactions.
-
-### Q: What is the KV cache and why does it matter for serving?
-
-**Strong answer:**
-During autoregressive generation, we generate one token at a time. Without caching, we would recompute K and V for all previous tokens on each step.
-
-The KV cache stores K and V from previous positions. On each new token:
-1. Compute Q, K, V only for the new position
-2. Concatenate new K, V to cached K, V
-3. Compute attention with full K, V
-
-This reduces per-token complexity from O(n) to O(1) for K and V computation.
-
-**The cost:** Memory scales linearly with sequence length. For Llama 70B at 8K context, KV cache is ~21 GB per request. This limits batch size and requires techniques like PagedAttention.
-
-### Q: Why do modern LLMs use Pre-LN instead of Post-LN?
-
-**Strong answer:**
-Pre-LN places normalization before each sublayer rather than after. This creates a more direct path for gradients through residual connections.
-
-With Post-LN, gradients must pass through the normalization, which can cause instability at the start of training. Post-LN requires learning rate warmup and careful initialization.
-
-Pre-LN enables training very deep models (100+ layers) without special initialization. The tradeoff is slightly lower final performance, but in practice, the training stability is worth it.
-
-### Q: What is the difference between MHA, MQA, and GQA?
-
-**Strong answer:**
-All three are multi-head attention variants that differ in how K and V heads are shared:
-
-- **MHA (Multi-Head Attention)**: Each query head has its own K and V heads. N:N ratio.
-- **MQA (Multi-Query Attention)**: All query heads share a single K and V head. N:1 ratio.
-- **GQA (Grouped-Query Attention)**: Groups of query heads share K and V heads. N:G ratio (typical G=8).
-
-Memory impact for KV cache:
-- MHA: Full size
-- MQA: 1/N size (but quality degrades)
-- GQA: 1/G size (best tradeoff)
-
-Llama 2 70B uses GQA with 8 KV heads for 64 query heads, reducing KV cache by 8x with minimal quality loss.
+- Why is output-token pricing usually higher than input-token pricing given both go through the same model?
+- What actually changes between one model version and the next, mechanically?
+- If weights are frozen at inference, how does a model appear to "learn" within a single long conversation?
 
 ## Go deeper
 
-- [Upstream chapter (LLM Internals)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/01-foundations/01-llm-internals.md)
-- Related questions in the [question bank](/questions)
-- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)
+- [Transformer Architecture](./transformer-architecture.mdx) — the actual layer stack that turns tokens into the next-token distribution described here.
+- [Tokenization Deep Dive](./tokenization-deep-dive.mdx) — how the prompt in the worked example above becomes tokens before any of this runs.
+- [Attention Mechanisms](./attention-mechanisms.mdx) — the specific computation inside each forward pass that lets a token weigh relevant context.
+- Upstream reference: [LLM Internals — AI System Design Guide](https://github.com/ombharatiya/ai-system-design-guide/blob/main/01-foundations/01-llm-internals.md) (MIT; see [CREDITS](../../../CREDITS.md)).

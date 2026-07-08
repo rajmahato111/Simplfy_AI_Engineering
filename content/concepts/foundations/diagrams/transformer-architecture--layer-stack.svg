@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="900" viewBox="0 0 1000 900" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN (8px grid, 24px padding)
+Canvas 1000x900. Title center (500,44).
+
+Embeddings (green): x=400 y=90 w=200 h=64 -> 400..600, 90..154, c=(500,122)
+  "Token + Position" / "Embeddings"
+  Arrow down: (500,154)->(500,188)
+
+Transformer block container (dashed): x=120 y=190 w=760 h=320 -> 120..880, 190..510
+  Caption (136,212) "Transformer block x N, vertical line is the residual stream"
+  Spine: vertical line x=500 from (500,190) to (500,510), stroke-width 3, slate.
+
+  Attention sublayer box (indigo): x=640 y=230 w=220 h=64 -> 640..860, 230..294, c=(750,262)
+    "LayerNorm +" / "Self-Attention"
+    read tap  y=246: arrow (500,246)->(638,246) [into box left edge, upper]
+    add-back  y=278: arrow (638,278)->(502,278) [out of box left edge, lower, into circle]
+    circle "+" at (500,278) r=14
+
+  Feedforward sublayer box (indigo): x=640 y=390 w=220 h=64 -> 640..860, 390..454, c=(750,422)
+    "LayerNorm +" / "Feedforward"
+    read tap  y=406: arrow (500,406)->(638,406)
+    add-back  y=438: arrow (638,438)->(502,438) [into circle]
+    circle "+" at (500,438) r=14
+
+  Arrow: container bottom (500,510)->(500,558) into Output Norm
+
+Output Norm (indigo): x=400 y=560 w=200 h=64 -> 560..624, c=(500,592)
+  Arrow: (500,624)->(500,654)
+
+LM Head (indigo): x=400 y=656 w=200 h=64 -> 656..720, c=(500,688)
+  "LM Head" / "(-> vocabulary)"
+  Arrow: (500,720)->(500,782)
+
+Logits (purple, LLM output): x=360 y=784 w=280 h=64 -> 784..848, c=(500,816)
+  "Logits" / "(next-token distribution)"
+-->
+  <rect width="1000" height="900" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="500" y="44" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">The residual stream runs straight through; each sublayer only adds to it</text>
+
+  <!-- Embeddings -->
+  <rect x="400" y="90" width="200" height="64" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="500" y="119" font-size="14" fill="#064E3B" text-anchor="middle">Token + Position<tspan x="500" dy="17">Embeddings</tspan></text>
+  <line x1="500" y1="154" x2="500" y2="188" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Transformer block container -->
+  <rect x="120" y="190" width="760" height="320" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="136" y="212" font-size="12" fill="#64748B">Transformer block &#215; N — the vertical line is the residual stream</text>
+
+  <!-- spine -->
+  <line x1="500" y1="190" x2="500" y2="510" stroke="#475569" stroke-width="3"/>
+
+  <!-- attention sublayer -->
+  <line x1="500" y1="246" x2="638" y2="246" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="638" y1="278" x2="502" y2="278" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="640" y="230" width="220" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="750" y="259" font-size="14" fill="#1E1B4B" text-anchor="middle">LayerNorm +<tspan x="750" dy="17">Self-Attention</tspan></text>
+  <circle cx="500" cy="278" r="14" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+  <text x="500" y="283" font-size="16" fill="#475569" text-anchor="middle">+</text>
+
+  <!-- feedforward sublayer -->
+  <line x1="500" y1="406" x2="638" y2="406" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="638" y1="438" x2="502" y2="438" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="640" y="390" width="220" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="750" y="419" font-size="14" fill="#1E1B4B" text-anchor="middle">LayerNorm +<tspan x="750" dy="17">Feedforward</tspan></text>
+  <circle cx="500" cy="438" r="14" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+  <text x="500" y="443" font-size="16" fill="#475569" text-anchor="middle">+</text>
+
+  <!-- out of block -->
+  <line x1="500" y1="510" x2="500" y2="558" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- output norm -->
+  <rect x="400" y="560" width="200" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="500" y="598" font-size="14" fill="#1E1B4B" text-anchor="middle">Output Norm</text>
+  <line x1="500" y1="624" x2="500" y2="654" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- lm head -->
+  <rect x="400" y="656" width="200" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="500" y="685" font-size="14" fill="#1E1B4B" text-anchor="middle">LM Head<tspan x="500" dy="17" font-size="12">(&#8594; vocabulary)</tspan></text>
+  <line x1="500" y1="720" x2="500" y2="782" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- logits -->
+  <rect x="360" y="784" width="280" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="500" y="813" font-size="14" fill="#2E1065" text-anchor="middle">Logits<tspan x="500" dy="17" font-size="12">(next-token distribution)</tspan></text>
+</svg>
