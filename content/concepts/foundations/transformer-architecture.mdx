@@ -79,7 +79,7 @@ Depth versus latency is the tradeoff worth leading with: within one layer, seque
 
 Interviewers use this topic to check whether you understand the architecture as composable pieces, not a black box you can only gesture at.
 
-A strong sound bite: *"The residual stream is the part people skip past, but it's the reason 100-layer models are trainable at all — every sublayer adds to the stream instead of replacing it, so a signal from layer one is still directly reachable at layer 100. And the reason this beat recurrence isn't that attention is smarter than a hidden state, it's that every position in a layer computes in parallel, while a recurrent network has to finish position one before it can start position two."*
+A strong sound bite: *"The residual stream is the part people skip past, but it's the reason 100-layer models are trainable at all — every sublayer adds to the stream instead of replacing it, so a signal from layer one is still reachable at layer 100. And this beat recurrence not because attention is smarter than a hidden state, but because every position in a layer computes in parallel, while a recurrent network has to finish position one before it can start position two."*
 
 Likely follow-ups:
 
