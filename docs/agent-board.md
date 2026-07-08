@@ -8,7 +8,15 @@
 
 | ID | Tool | Branch | Status | Paths (locks) |
 |----|------|--------|--------|---------------|
-| T-060–T-062 | Claude Code | `claude/t040-foundations-models-cluster` | `in_progress` | `content/concepts/foundations/**`, `content/concepts/models/**` (10 chapters) |
+| — | — | — | — | (none currently active) |
+
+---
+
+## Open PRs (awaiting human review/merge)
+
+| PR | Task | Opened |
+|----|------|--------|
+| **#31** | Claude T-060–062: Foundations + Models cluster (10 rewritten chapters, reviewer-fixed) | 2026-07-08 |
 
 ---
 
