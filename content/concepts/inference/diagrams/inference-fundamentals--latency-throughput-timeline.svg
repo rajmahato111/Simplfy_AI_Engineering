@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="440" viewBox="0 0 1200 440" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN
+Canvas 1200x440. Title (600,32).
+Row 1 y=88 h=64 (main flow, center y=120):
+  A Client request   x=40  w=150 (orange)   center=115
+  B Scheduler queue   x=254 w=150 (yellow)   center=329
+  C Prefill           x=468 w=140 (violet)   center=538
+  D Decode loop       x=672 w=190 (violet)   center=767
+  E Response          x=926 w=150 (orange)   center=1001
+  arrows: A-B (190,120)-(252,120); B-C (404,120)-(466,120);
+          C-D (608,120)-(670,120); D-E (862,120)-(924,120)
+  self-loop on D: 722,88 -> 722,60 -> 812,60 -> 812,88, label (767,50)
+Row 2 y=192 brackets (below row1, 40px gap):
+  TTFT bracket x=254..608, ticks at 184-200, label (431,214)
+  TPOT bracket x=672..862, ticks at 184-200, label (767,214)
+Row 3 y=250 h=160 dashed container x=40 w=1120 (fleet view):
+  caption (56,270)
+  lane boxes y=290 h=56: lane1 x=72 w=320 center=232
+                          lane2 x=424 w=320 center=584
+                          lane3 x=776 w=320 center=936
+  note text (600,384)
+-->
+  <rect width="1200" height="440" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="600" y="32" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">One request's latency vs. the fleet's throughput</text>
+
+  <!-- Row 1: main flow -->
+  <rect x="40" y="88" width="150" height="64" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="115" y="125" font-size="14" fill="#7C2D12" text-anchor="middle">Client request</text>
+
+  <line x1="190" y1="120" x2="252" y2="120" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="254" y="88" width="150" height="64" rx="10" fill="#FEFCE8" stroke="#CA8A04" stroke-width="1.5"/>
+  <text x="329" y="125" font-size="14" fill="#713F12" text-anchor="middle">Scheduler queue</text>
+
+  <line x1="404" y1="120" x2="466" y2="120" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="468" y="88" width="140" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="538" y="115" font-size="14" fill="#2E1065" text-anchor="middle">Prefill</text>
+  <text x="538" y="133" font-size="12" fill="#2E1065" text-anchor="middle">(compute-bound)</text>
+
+  <line x1="608" y1="120" x2="670" y2="120" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="672" y="88" width="190" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="767" y="115" font-size="14" fill="#2E1065" text-anchor="middle">Decode loop</text>
+  <text x="767" y="133" font-size="12" fill="#2E1065" text-anchor="middle">(memory-bound)</text>
+
+  <!-- self-loop on Decode loop -->
+  <polyline points="722,88 722,60 812,60 812,88" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="662" y="42" width="210" height="16" fill="#ffffff"/>
+  <text x="767" y="54" font-size="11" fill="#475569" text-anchor="middle">repeat, one token per pass</text>
+
+  <line x1="862" y1="120" x2="924" y2="120" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="926" y="88" width="150" height="64" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="1001" y="125" font-size="14" fill="#7C2D12" text-anchor="middle">Response streamed</text>
+
+  <!-- Row 2: TTFT / TPOT brackets -->
+  <line x1="254" y1="184" x2="254" y2="200" stroke="#64748B" stroke-width="1.5"/>
+  <line x1="608" y1="184" x2="608" y2="200" stroke="#64748B" stroke-width="1.5"/>
+  <line x1="254" y1="192" x2="608" y2="192" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="331" y="204" width="200" height="18" fill="#ffffff"/>
+  <text x="431" y="218" font-size="12" fill="#475569" text-anchor="middle">TTFT — time to first token</text>
+
+  <line x1="672" y1="184" x2="672" y2="200" stroke="#64748B" stroke-width="1.5"/>
+  <line x1="862" y1="184" x2="862" y2="200" stroke="#64748B" stroke-width="1.5"/>
+  <line x1="672" y1="192" x2="862" y2="192" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="687" y="204" width="160" height="18" fill="#ffffff"/>
+  <text x="767" y="218" font-size="12" fill="#475569" text-anchor="middle">TPOT — per output token</text>
+
+  <!-- Row 3: fleet / throughput container -->
+  <rect x="40" y="250" width="1120" height="160" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="56" y="270" font-size="12" fill="#64748B">Fleet view — many requests share one GPU pool</text>
+
+  <rect x="72" y="290" width="320" height="56" rx="10" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <text x="232" y="323" font-size="14" fill="#334155" text-anchor="middle">Request A — decode</text>
+
+  <rect x="424" y="290" width="320" height="56" rx="10" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <text x="584" y="323" font-size="14" fill="#334155" text-anchor="middle">Request B — decode</text>
+
+  <rect x="776" y="290" width="320" height="56" rx="10" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <text x="936" y="323" font-size="14" fill="#334155" text-anchor="middle">Request C — decode</text>
+
+  <text x="600" y="384" font-size="12" fill="#475569" text-anchor="middle">Throughput = tokens/second summed across every concurrent lane</text>
+</svg>
