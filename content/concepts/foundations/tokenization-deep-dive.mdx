@@ -10,7 +10,7 @@ diagrams:
 est_minutes: 10
 source_attribution: "Factual basis: AI System Design Guide (MIT) by Om Bharatiya; rewritten and expanded. See CREDITS.md."
 last_reviewed: 2026-07-05
-status: draft
+status: reviewed
 ---
 
 ## The 30-second version
@@ -47,7 +47,7 @@ The callout below the diagram is the detail that trips people up most: token bou
 
 ## A concrete example
 
-Take the sentence "The unbelievable strawberry farm was enormous." — 8 words, 47 characters including spaces. A typical BPE tokenizer doesn't produce 8 tokens; it produces something closer to 11: `The`, ` unbel`, `iev`, `able`, ` straw`, `berry`, ` farm`, ` was`, ` enorm`, `ous`, `.` — short common words like "The," "farm," and "was" survive as single tokens, while "unbelievable" costs 3 tokens and "enormous" costs 2. That's a token-to-word ratio of about 1.4 for this sentence, close to the commonly cited English rule of thumb of roughly 1.3 tokens per word, or about 4 characters per token.
+Take the sentence "The unbelievable strawberry farm was enormous." — 6 words, 46 characters including spaces. A typical BPE tokenizer doesn't produce 6 tokens; it produces something closer to 11: `The`, ` unbel`, `iev`, `able`, ` straw`, `berry`, ` farm`, ` was`, ` enorm`, `ous`, `.` — short common words like "The," "farm," and "was" survive as single tokens, while "unbelievable" costs 3 tokens and "enormous" costs 2. That's a token-to-word ratio of about 1.83 for this sentence — well above the commonly cited English average of roughly 1.3 tokens per word, because three of its six words are long, low-frequency ones that get carved into multiple pieces. A sentence built from short, common words instead lands much closer to one token per word; the average blends sentences like both.
 
 Now translate the same sentence's meaning into Hindi and run it through the same English-trained tokenizer. Where the English version cost 11 tokens, the Hindi equivalent commonly costs 2–4x more tokens for the same meaning, because the vocabulary's merge rules were shaped by English character sequences that don't occur in Devanagari script. Scale that up: a 1,000-word English support document costs roughly 1,300 tokens to embed or send to a model. The same document's meaning translated into Hindi, tokenized by an English-centric vocabulary, can cost 3,000–4,000 tokens — which matters twice over, because it eats more of a fixed context window and it costs more dollars, since API pricing is per token, not per word or per unit of meaning.
 

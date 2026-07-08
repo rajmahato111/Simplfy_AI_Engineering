@@ -10,7 +10,7 @@ diagrams:
 est_minutes: 11
 source_attribution: "Factual basis: AI System Design Guide (MIT) by Om Bharatiya; rewritten and expanded. See CREDITS.md."
 last_reviewed: 2026-07-05
-status: draft
+status: reviewed
 ---
 
 ## The 30-second version
@@ -48,7 +48,7 @@ Real transformers run this several times in parallel, called **multi-head attent
 
 ## A concrete example
 
-Take the sentence "The trophy didn't fit in the suitcase because it was too big," and focus on how "it" gets its updated representation. Say the model uses a key dimension of 64 per head. "It"'s query gets scored against every other token's key — including "trophy" and "suitcase," the two candidates "it" could plausibly refer to. Suppose the raw dot products come out as 9.2 for "trophy," 3.1 for "suitcase," and mostly small values elsewhere; dividing by the square root of 64 (which is 8) brings those down to about 1.15 and 0.39. Softmax over the full set of scaled scores turns that gap into a decisive weighting — roughly 71% of the output blend pulled from "trophy"'s value vector, about 9% from "suitcase," and 20% spread thinly across the rest. "It"'s new representation is that weighted blend, exactly the disambiguation the sentence requires.
+Take the sentence "The trophy didn't fit in the suitcase because it was too big," and focus on how "it" gets its updated representation. Say the model uses a key dimension of 64 per head. "It"'s query gets scored against every other token's key — including "trophy" and "suitcase," the two candidates "it" could plausibly refer to. Suppose the raw dot products come out as 9.2 for "trophy," 3.1 for "suitcase," and around 0.8 for a typical token elsewhere in the sentence; dividing by the square root of 64 (which is 8) brings those down to about 1.15, 0.39, and 0.10. Softmax over the full set of scaled scores turns that gap into a decisive weighting — roughly 55% of the output blend pulled from "trophy"'s value vector, about 26% from "suitcase," and the remaining 19% spread thinly across the rest. "It"'s new representation is that weighted blend, exactly the disambiguation the sentence requires.
 
 Now scale to sequence length. A 2,000-token input means one query gets scored against 2,000 keys, so a single attention layer computes roughly 2,000 × 2,000 = 4,000,000 pairwise scores per head. With 32 heads, that's about 128 million scores in that one layer; across 32 stacked layers, roughly 4.1 billion pairwise score computations for one forward pass. Double the sequence length to 4,000 tokens and that number doesn't double — it quadruples, to roughly 16.4 billion — precisely why context length is one of the most expensive dials to turn in a transformer.
 

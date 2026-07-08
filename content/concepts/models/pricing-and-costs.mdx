@@ -10,7 +10,7 @@ diagrams:
 est_minutes: 11
 source_attribution: "Factual basis: AI System Design Guide (MIT) by Om Bharatiya; rewritten and expanded. See CREDITS.md."
 last_reviewed: 2026-07-05
-status: draft
+status: reviewed
 ---
 
 ## The 30-second version
@@ -41,7 +41,7 @@ The price sheet never mentions any of this. "$0.05 a page" is true for exactly o
 
 The diagram prices one real request two different ways on the same rate card — $3.00 per million input tokens, $15.00 per million output tokens, a typical 5x input/output split for a mid-tier frontier model. Follow the top row for the first time a prefix is used, the bottom row for a repeat within the cache window.
 
-**Top row — cache miss.** The request is a 2,000-token system prompt plus retrieved context, plus a 100-token user question: 2,100 input tokens at the standard $3.00/M rate. Because this is the first time the provider has seen this exact prefix, it also charges a one-time cache-write fee on the cacheable portion — typically 1.25x to 2x the standard input rate, depending on the TTL you request (a 5-minute cache is cheaper to write than a 1-hour one). The 400-token response bills at $15.00/M. Total: $0.0198 — more than the naive "$3.00 in, $15.00 out" math suggests, because that math forgets the write fee exists.
+**Top row — cache miss.** The request is a 2,000-token system prompt plus retrieved context, plus a 100-token user question. Because this is the first time the provider has seen this exact prefix, the 2,000 cacheable tokens bill at a one-time cache-write rate — typically 1.25x to 2x the standard input rate, depending on the TTL you request (a 5-minute cache is cheaper to write than a 1-hour one) — replacing the standard rate for that portion, not stacking on top of it. The 100 tokens that aren't part of the reusable prefix bill at the standard $3.00/M rate, and the 400-token response bills at $15.00/M. Total: $0.0138 — more than the naive "$3.00 in, $15.00 out" math suggests, because that math forgets the write fee exists.
 
 **Bottom row — cache hit.** The identical prefix, requested again inside the cache window, prices the 2,000 cached tokens at roughly 10% of standard input — $0.30/M — while the 100 fresh tokens that change every request still cost the full $3.00/M. Output is unchanged. Total: $0.0069 — barely a third of the cache-miss price for the same amount of generation work.
 
@@ -54,10 +54,10 @@ The batch API — not a third row, but real and stackable with caching — trade
 Take a support-bot endpoint doing 50,000 requests a day, each built from the 2,000-token prefix in the diagram (product docs plus system prompt) plus a 100-token question, answered in 400 tokens.
 
 - **Naive sticker estimate**, ignoring caching entirely: 2,100 × $3.00/M + 400 × $15.00/M = **$0.0123/request** → 50,000 × $0.0123 = **$615/day**, about **$18,450/month**.
-- **Reality with a 5-minute TTL and steady traffic:** roughly 85% of requests land inside the cache window (a hit at $0.0069) and 15% miss — TTL lapsed, or first call of a session (a miss at $0.0198, write fee included). Blended: 0.85 × $0.0069 + 0.15 × $0.0198 ≈ **$0.00884/request** → **$442/day**, about **$13,250/month** — roughly **28% below** the naive estimate, with no change to model, prompt, or traffic.
+- **Reality with a 5-minute TTL and steady traffic:** roughly 85% of requests land inside the cache window (a hit at $0.0069) and 15% miss — TTL lapsed, or first call of a session (a miss at $0.0138, write fee included). Blended: 0.85 × $0.0069 + 0.15 × $0.0138 ≈ **$0.00794/request** → **$397/day**, about **$11,900/month** — roughly **35% below** the naive estimate, with no change to model, prompt, or traffic.
 - **A second lever, stacked separately:** the same team reclassifies 2 million support tickets nightly for routing — 500 input, 50 output tokens each, no shared prefix worth caching. Real-time: (500 × $3.00 + 50 × $15.00) / 1,000,000 = $0.00225/ticket → $4,500. On the batch API overnight at 50% off: **$2,250** — half the bill, because a ticket classified at 2 a.m. doesn't need a sub-second response.
 
-Same model, same rate card, three real costs — $18,450/month, $13,250/month, and $2,250-instead-of-$4,500 — none of it visible in the headline $3.00/$15.00 price.
+Same model, same rate card, three real costs — $18,450/month, $11,900/month, and $2,250-instead-of-$4,500 — none of it visible in the headline $3.00/$15.00 price.
 
 ## The tradeoffs that matter
 

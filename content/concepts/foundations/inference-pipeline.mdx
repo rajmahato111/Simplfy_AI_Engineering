@@ -10,7 +10,7 @@ diagrams:
 est_minutes: 11
 source_attribution: "Factual basis: AI System Design Guide (MIT) by Om Bharatiya; rewritten and expanded. See CREDITS.md."
 last_reviewed: 2026-07-05
-status: draft
+status: reviewed
 ---
 
 ## The 30-second version
@@ -45,7 +45,7 @@ Follow the diagram left to right, then around the loop. The prompt is tokenized,
 
 **Decode** then runs in a loop. Each iteration does one forward pass for a single new token, attending over the entire cache built so far, samples a token, appends its key/value to the cache, and checks a stop condition (an end-of-sequence token, a max-token limit, or a configured stop string). Each step computes one new token's worth of work but must read the *entire* growing cache from GPU memory to do it, so decode is memory-bound — the bottleneck is memory bandwidth, not compute, and GPU cores sit relatively idle waiting on data. That's why batching many requests' decode steps together helps throughput so much: it keeps those idle compute cycles busy while the memory read happens anyway.
 
-Sampling has two common knobs. **Temperature** rescales the logits before the softmax that turns them into probabilities: low temperature sharpens the distribution toward the top candidates (0 is greedy — always the highest-probability token); high temperature flattens it, giving lower-probability tokens a real chance. **Top-p (nucleus) sampling** truncates the candidate pool to the smallest set of tokens whose cumulative probability exceeds `p`, so a confident distribution considers few tokens and an uncertain one considers many. The two compose: temperature reshapes the distribution, top-p decides how much of the reshaped tail is eligible.
+Sampling has two common knobs. **Temperature** rescales the logits before the softmax that turns them into probabilities: low temperature sharpens the distribution toward the top candidates (0 is greedy — always the highest-probability token); high temperature flattens it, giving lower-probability tokens a real chance. **Top-p (nucleus) sampling** truncates the candidate pool to the smallest set of tokens whose cumulative probability exceeds `p`, so a confident distribution considers few tokens and an uncertain one considers many. The two compose: temperature adjusts how sharply the model prefers its top guesses, and top-p then draws the line for how far down that adjusted ranking sampling is allowed to reach.
 
 One production optimization worth knowing: **speculative decoding**. A small, fast "draft" model proposes several tokens ahead; the large "target" model verifies all of them in a single forward pass instead of one-at-a-time. When the draft guesses right — often, on predictable text — you get several tokens for close to the cost of one target-model step: a real 2–3x decode speedup without changing the output distribution.
 
@@ -57,7 +57,7 @@ Take a 1,500-token prompt served by a 70B-parameter model on H100-class hardware
 
 **Decode throughput and total latency.** A 70B model on an H100 typically decodes in the 30–50 tokens/second range per request; take 40 as the mid-point. Generating 350 output tokens then takes 350 / 40 = 8.75 s. Total latency ≈ TTFT + decode time ≈ 150 ms + 8.75 s ≈ **8.9 seconds** — notice how little of that total the prefill phase contributed, even at 4x a typical prompt length. That asymmetry is normal: prefill usually dominates TTFT, decode usually dominates total latency.
 
-**KV cache size.** The formula is `2 × layers × kv_heads × head_dim × bytes_per_value`, per token. For a Llama-70B-shaped model (80 layers, 64 heads, 128-dim heads, FP16 = 2 bytes): `2 × 80 × 64 × 128 × 2 = 2.62 MB` per token. At a 4,096-token context, that's `2.62 MB × 4,096 ≈ 10.5 GB` for a *single* request — so 8 concurrent requests at that context length need roughly 84 GB just for cache, on top of the model's own weights. KV cache, not weights, is often the binding constraint on concurrency.
+**KV cache size.** The formula is `2 × layers × kv_heads × head_dim × bytes_per_value`, per token — `kv_heads` here meaning however many key/value heads the architecture actually keeps, which can be far fewer than the query-head count (see the [attention chapter](./attention-mechanisms.mdx) on grouped-query attention). Using the full 64 query heads as a worst-case, MHA-equivalent stand-in for a Llama-70B-shaped model (80 layers, 64 heads, 128-dim heads, FP16 = 2 bytes): `2 × 80 × 64 × 128 × 2 = 2.62 MB` per token. At a 4,096-token context, that's `2.62 MB × 4,096 ≈ 10.5 GB` for a *single* request — so 8 concurrent requests at that context length need roughly 84 GB just for cache, on top of the model's own weights. A real GQA deployment with 8 KV heads instead of 64 cuts that by 8x; KV cache, not weights, is still often the binding constraint on concurrency either way.
 
 ## The tradeoffs that matter
 

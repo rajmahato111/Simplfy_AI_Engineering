@@ -42,13 +42,13 @@ Arrows (#475569, one L-bend max; these are pure horizontal, no bend needed):
   <line x1="608" y1="156" x2="670" y2="156" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="64" y="124" width="280" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
-  <text x="204" y="149" font-size="13" fill="#1E1B4B" text-anchor="middle">Input: 2,100 tok<tspan x="204" dy="17">$3.00/M + $3.75/M write</tspan></text>
+  <text x="204" y="149" font-size="13" fill="#1E1B4B" text-anchor="middle">2,000 @ write + 100 fresh<tspan x="204" dy="17">$3.75/M + $3.00/M</tspan></text>
 
   <rect x="408" y="124" width="200" height="64" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
   <text x="508" y="149" font-size="14" fill="#7C2D12" text-anchor="middle">Output: 400 tok<tspan x="508" dy="17">$15.00 /M</tspan></text>
 
   <rect x="672" y="124" width="320" height="64" rx="10" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
-  <text x="832" y="149" font-size="13" fill="#334155" text-anchor="middle">$0.0063 + $0.0075 + $0.0060<tspan x="832" dy="17">= $0.0198 / request</tspan></text>
+  <text x="832" y="149" font-size="13" fill="#334155" text-anchor="middle">$0.0075 + $0.0003 + $0.0060<tspan x="832" dy="17">= $0.0138 / request</tspan></text>
 
   <!-- container bottom -->
   <rect x="32" y="268" width="992" height="140" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
