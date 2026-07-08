@@ -78,11 +78,11 @@ None of this makes open-weight strictly better — the closed frontier model may
 
 ## Where people go wrong
 
-1. **Assuming "open-weight" means "free to use however you want."** Check the actual license — Apache 2.0 is permissive; a custom "modified" term can restrict commercial use even though the weights are downloadable.
+1. **Assuming "open-weight" means "free to use however you want."** Check the license — Apache 2.0 is permissive; a custom "modified" term can restrict commercial use even though the weights are downloadable.
 2. **Assuming bigger total parameter count always wins.** A well-routed MoE model with a modest active-parameter count regularly beats a larger dense model on both cost and latency for the same task.
 3. **Turning on reasoning mode for every request "to be safe."** You pay the latency and token tax even on questions a standard model answers correctly in one pass — route by difficulty instead (see [Capability Assessment](./capability-assessment.mdx)).
-4. **Picking a size tier off a marketing name rather than your own budget.** "Mini," "flash," and "nano" naming isn't standardized across providers — check the actual latency and cost numbers.
-5. **Conflating mixture-of-experts with multi-agent orchestration.** MoE routing happens inside one model's forward pass, per token; it is not the same idea as dispatching a task across multiple independent agent calls, even though both involve "routing to the right specialist."
+4. **Picking a size tier off a marketing name rather than your own budget.** "Mini," "flash," and "nano" naming isn't standardized across providers.
+5. **Conflating mixture-of-experts with multi-agent orchestration.** MoE routing happens inside one model's forward pass, per token; it is not dispatching a task across multiple independent agent calls, even though both involve "routing to a specialist."
 
 ## The interview lens
 
@@ -92,9 +92,9 @@ A strong sound bite: *"I don't ask whether a model is 'good' — I ask where it 
 
 Likely follow-ups:
 
-- Why does mixture-of-experts save compute but not memory? (Only a subset of experts run per token, but every expert still has to be resident in GPU memory in case the router picks it.)
-- What's the actual risk in treating an open-weight model as "free"? (License terms can restrict commercial use or redistribution even when weights are downloadable — read the license, not just the price.)
-- When is a reasoning model worth its latency multiplier? (When the task is genuinely multi-step — math, debugging, planning — not for questions a standard model already answers correctly in one pass.)
+- Why does mixture-of-experts save compute but not memory? (Only a subset of experts run per token, but every expert still has to sit resident in GPU memory in case the router picks it.)
+- What's the actual risk in treating an open-weight model as "free"? (License terms can restrict commercial use or redistribution even when weights are downloadable.)
+- When is a reasoning model worth its latency multiplier? (Genuinely multi-step tasks — math, debugging, planning — not questions a standard model already answers correctly in one pass.)
 
 ## Go deeper
 

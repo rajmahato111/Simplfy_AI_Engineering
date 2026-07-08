@@ -1,156 +1,94 @@
 ---
-title: Transformer Architecture
+title: "Transformer Architecture: How the Layers Stack Together"
 slug: transformer-architecture
 type: concept
 area: foundations
-difficulty: beginner
-tags:
-  - foundations
-  - transformer
-  - architecture
+difficulty: intermediate
+tags: [foundations, transformer-architecture, residual-connections, decoder-only, parallelization]
 diagrams:
-  - diagrams/transformer-architecture--overview.svg
-est_minutes: 5
-source_attribution: >-
-  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
-  edition with interview lens. See CREDITS.md.
-last_reviewed: '2026-07-04'
+  - diagrams/transformer-architecture--layer-stack.svg
+est_minutes: 11
+source_attribution: "Factual basis: AI System Design Guide (MIT) by Om Bharatiya; rewritten and expanded. See CREDITS.md."
+last_reviewed: 2026-07-05
 status: draft
 ---
+
 ## The 30-second version
 
-This chapter provides a comprehensive view of the complete transformer architecture, bringing together the components from previous chapters into a unified understanding.
+A transformer is a stack of identical blocks, and every block does two things in sequence: an attention sublayer, which lets each position gather relevant context from anywhere else in the sequence (see [Attention Mechanisms](./attention-mechanisms.mdx)), and a feedforward sublayer, which processes each position's representation independently, with no cross-position looking at all. Both sit inside a residual connection — each adds its computed update to what came in, rather than replacing it — so a signal from the first layer is still directly present at the last, not diluted by dozens of transformations in between. Stack enough blocks, run a final normalization, and project to vocabulary size, and you have the next-token distribution described in [LLM Internals](./llm-internals.mdx). Two architecture families use this differently: encoder-decoder splits the work into a source-reading stack and a writing stack connected by cross-attention, while decoder-only — what nearly every current chat model uses — does both in one stack. The reason this design displaced recurrent networks isn't attention's cleverness alone; it's that every position inside one block processes at the same time, in parallel, while a recurrent network must finish position 1 before it can even start position 2.
 
 ## The analogy
 
-Think of **Transformer Architecture** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+Picture a manuscript circulated through a fixed sequence of editing desks, always in the same order.
+
+At each desk, the editor does two things, in order. First, they reread the entire manuscript as it stands — not just the page in front of them, every page — cross-referencing freely: page 12 relates to page 47, this pronoun on page 30 needs page 3's context. That full read happens once per desk and produces margin notes about which other pages this page's meaning depends on, and how strongly. Second, the editor turns to private desk work: taking the notes on *this* page and refining them into a cleaner annotation, without looking at any other page again — the same routine, applied to every page independently, with no fresh cross-manuscript read required.
+
+The detail that makes the stack work: no editor erases anything. Every desk's output is "everything the manuscript already had, plus this desk's new annotation, layered on top." Page one's original text is still sitting there, untouched, underneath forty desks' worth of notes by the time the manuscript reaches the end. That's what makes running it through a hundred desks survivable instead of catastrophic: a note added at desk eighty doesn't have to fight its way back through seventy-nine desks of rewriting to influence page one, because page one's original content is still right there, one layer down. When the manuscript clears the last desk, one final specialist reads the last page's accumulated notes and drafts what comes next.
+
+Some manuscripts split the job into two teams instead of one stack: a source-reading team that cross-references freely within a fixed reference document, and a drafting team that writes the output, checking what it's written so far plus one look back at the source team's document. Most current chat and generation systems skip the second team entirely — one drafting team, writing forward-only, rereading only its own output so far.
+
+This is also why the desk stack replaced a single editor reading front to back, carrying nothing forward but a running summary: that editor cannot start page 500 until finishing pages 1 through 499, in order — reading grows exactly as slow as the manuscript is long. The desk stack does every page's cross-referencing simultaneously, at every desk — a hundred pages get annotated in the time it takes to read one page once, because page 40 never waits on page 39.
+
+| Editorial desk stack | Transformer element |
+|---|---|
+| A fixed sequence of editing desks | Stacked transformer blocks (layers) |
+| Rereading the whole manuscript, cross-referencing freely | The attention sublayer within a block |
+| Private per-page editing, applied identically to every page independently | The feedforward sublayer within a block |
+| Never erasing — each desk adds a new layer of notes on top of what's already there | The residual connection: a block's output is its input plus its computed update |
+| A final specialist reading the last page's notes to draft what comes next | The output projection (language model head), producing next-token logits |
+| Two teams: a source-reading team, and a writing team that also checks the source | Encoder-decoder architecture, connected by cross-attention |
+| One drafting team, writing forward and rereading only its own output | Decoder-only architecture — what most current models use |
+| One editor reading 500 pages strictly in order vs. a hundred pages cross-referenced at once, at every desk | A recurrent network's sequential steps vs. a transformer block's parallel per-position processing |
 
 ## How it actually works
 
+![Token and position embeddings enter a transformer block repeated N times; inside each block a residual stream runs straight through while attention and a feedforward network each read from it and add their output back in, before a final norm and language model head produce the next-token logits](diagrams/transformer-architecture--layer-stack.svg)
 
-![Transformer Architecture overview](diagrams/transformer-architecture--overview.svg)
+Follow the diagram top to bottom. Token and position information first combine into a single vector per position — the residual stream's starting value, the vertical line running through the block. Inside the block, the stream is read (not consumed) by the attention sublayer, which computes its update and adds it back at the "+" marker — never overwritten, only added to. The same pattern repeats for the feedforward sublayer lower in the block: read the stream, compute a position-independent transformation, add the result back in. This block — attention-then-add, feedforward-then-add — repeats N times, from a few dozen layers in a mid-size model to over a hundred in the largest frontier models. A normalization applied *before* each sublayer, rather than after the addition, keeps the numbers well-scaled without disturbing the accumulated stream — the "pre-norm" convention nearly all current models use because it keeps very deep stacks trainable.
 
-This chapter provides a comprehensive view of the complete transformer architecture, bringing together the components from previous chapters into a unified understanding.
+After the last block, one final normalization is applied, and a learned projection — the language model head — maps each position's final vector to a score for every vocabulary entry. Those scores are the logits that become the distribution [LLM Internals](./llm-internals.mdx) describes being sampled from.
+
+The encoder-decoder split matters for architecture, not for this per-block mechanism: an encoder stack runs the pattern above with unrestricted, bidirectional attention over a fixed source, while a decoder stack runs it with causal attention over what it's generating, plus one cross-attention sublayer per block that looks at the encoder's output. Decoder-only models drop the encoder and cross-attention entirely — source and instructions just sit earlier in the same sequence the model already attends over.
 
 ## A concrete example
 
-This chapter provides a comprehensive view of the complete transformer architecture, bringing together the components from previous chapters into a unified understanding.
+Take a decoder-only model with 32 layers and a model dimension of 4,096 — architecturally close to a well-known 7-billion-parameter open model. Using the standard approximation for a dense transformer's parameter count, roughly 12 × layers × dimension², the block stack alone accounts for about 12 × 32 × 4,096² ≈ 6.44 billion parameters, consistent with that model's actual size once the embedding table is added in. Nearly two-thirds of that sits in the feedforward sublayers, not attention — worth remembering before treating "the attention mechanism" as the whole model.
+
+Now the parallelization point, concretely. Processing a 2,048-token prompt, this model's attention and feedforward computations for all 2,048 positions in a given layer run as one batched matrix multiplication — the GPU doesn't process position 1, then 2, then 3; it processes all 2,048 at once, limited only by available parallel compute. A recurrent network of comparable size cannot do this over that same prompt: position 2's computation needs position 1's actual output, not just its shape, so all 2,048 steps must run in sequence regardless of available hardware. At even 1 millisecond per sequential step, that's roughly 2 seconds just to finish reading the prompt, before generation starts — versus a transformer's prefill, dominated by parallel matrix multiplication, finishing in a fraction of that time on the same hardware.
 
 ## The tradeoffs that matter
 
-| Choice | Upside | Cost |
-|--------|--------|------|
-| Simpler design | Faster to ship | Less resilient |
-| Heavier retrieval | Better grounding | More latency |
-| Bigger model | Higher quality | Higher $/query |
+| Design choice | What you gain | What it costs |
+|---|---|---|
+| Residual connections around every sublayer | Very deep stacks (dozens to 100+ layers) stay trainable | Negligible extra compute for the addition itself |
+| More layers (depth) | More sequential composition — each layer builds on the last one's refinement | Layers can't parallelize with each other; latency per token grows roughly with depth |
+| Encoder-decoder split | Unrestricted, bidirectional attention over a fixed source | Two stacks to train and serve, plus a cross-attention sublayer to keep synchronized |
+| Decoder-only, single stack | One architecture, one set of weights, source handled by prompting alone | No bidirectional read of the source — everything goes through causal attention |
+
+Depth versus latency is the tradeoff worth leading with: within one layer, sequence length barely affects wall-clock time, since positions parallelize; across layers, it matters directly, since layer 20 cannot start until layer 19 has finished.
 
 ## Where people go wrong
 
-- Skipping evaluation and hoping demos generalize
-- Ignoring latency/cost until production traffic arrives
-- Treating retrieval quality as a generation problem
+1. **Treating "transformer" and "attention" as synonyms.** The feedforward sublayer typically holds close to two-thirds of a dense transformer's parameters — it isn't a footnote to attention.
+2. **Assuming more layers is a free win.** Layers can't parallelize with each other the way positions within a layer do — doubling layer count roughly doubles the sequential compute a generated token waits through.
+3. **Treating residual connections as a minor detail.** Without them, a signal would have to survive dozens of transformations with nothing preserving the original values; stacks this deep would be effectively untrainable, not just slower.
+4. **Assuming encoder-decoder is the only correct architecture for source-conditioned tasks.** Decoder-only models handle translation and retrieval-augmented answers today by placing the source directly in the prompt.
+5. **Assuming causal masking makes the prompt invisible to generation.** It doesn't — the first generated token sits after the whole prompt, so it attends causally back across all of it. The mask blocks a position from seeing what comes *after* it, not what came before.
 
 ## The interview lens
 
-### Q: Walk me through the forward pass of a transformer.
+Interviewers use this topic to check whether you understand the architecture as composable pieces, not a black box you can only gesture at.
 
-**Strong answer:**
-For a decoder-only model generating text:
+A strong sound bite: *"The residual stream is the part people skip past, but it's the reason 100-layer models are trainable at all — every sublayer adds to the stream instead of replacing it, so a signal from layer one is still directly reachable at layer 100. And the reason this beat recurrence isn't that attention is smarter than a hidden state, it's that every position in a layer computes in parallel, while a recurrent network has to finish position one before it can start position two."*
 
-1. **Tokenization:** Convert input text to token IDs
+Likely follow-ups:
 
-2. **Embedding:** Look up token embeddings from the embedding table
-
-3. **For each transformer layer:**
-   - Apply RMSNorm to input
-   - Compute Q, K, V projections
-   - Apply RoPE to Q and K for position
-   - For generation: append new K, V to KV cache
-   - Compute attention (masked, so each position only sees previous)
-   - Project attention output and add residual
-   - Apply RMSNorm
-   - Pass through SwiGLU feed-forward network
-   - Add residual
-
-4. **Output norm:** Apply final RMSNorm
-
-5. **LM head:** Project to vocabulary size to get logits
-
-6. **Sample:** Select next token from logits using temperature/top-p
-
-For generation, repeat steps 3-6 for each new token, reusing the KV cache from previous positions.
-
-### Q: What is the difference between pre-norm and post-norm?
-
-**Strong answer:**
-The difference is where layer normalization is applied relative to sublayers (attention, FFN):
-
-**Post-norm (original transformer):**
-```
-x = LayerNorm(x + Sublayer(x))
-```
-Normalize after adding residual.
-
-**Pre-norm (modern transformers):**
-```
-x = x + Sublayer(LayerNorm(x))
-```
-Normalize before the sublayer.
-
-Pre-norm is preferred because:
-1. Gradients flow more directly through residual connections
-2. Training is more stable, especially for deep models
-3. Less sensitive to initialization and learning rate
-4. No need for learning rate warmup
-
-The cost is slightly lower final performance in some benchmarks, but the training stability is worth it for large models.
-
-### Q: Explain GQA and why it matters for serving.
-
-**Strong answer:**
-Grouped Query Attention (GQA) shares Key and Value heads across groups of Query heads.
-
-Standard Multi-Head Attention: 64 query heads, 64 KV heads (1:1)
-GQA: 64 query heads, 8 KV heads (8:1)
-
-Implementation: Each KV head is used by 8 query heads via repetition.
-
-**Why it matters:**
-The KV cache stores K and V for all positions during generation. For Llama 70B at 8K context:
-- MHA: 2.6 MB/token * 8K = 21 GB per request
-- GQA (8:1): ~2.6 GB per request
-
-8x reduction enables:
-- Larger batch sizes (more concurrent users)
-- Longer contexts
-- Lower GPU memory requirements
-
-Quality impact: Minimal. Research shows GQA achieves 99%+ of MHA quality.
-
-### Q: What changed between GPT-2 and Llama 2?
-
-**Strong answer:**
-Key architecture improvements:
-
-| Component | GPT-2 | Llama 2 |
-|-----------|-------|---------|
-| Norm | Post-LayerNorm | Pre-RMSNorm |
-| Position | Learned absolute | RoPE (rotary) |
-| Activation | GELU | SwiGLU |
-| Attention | MHA | GQA (for 70B) |
-| Bias | Present | Removed |
-
-Impact:
-- RMSNorm: Faster and equally effective
-- RoPE: Better length extrapolation
-- SwiGLU: ~1% quality improvement
-- GQA: 8x smaller KV cache for serving
-- No bias: Fewer parameters, no quality loss
-
-These changes enable training larger models more stably and serving them more efficiently.
+- Why does pre-norm placement matter for training stability at large depth?
+- If depth doesn't parallelize across layers, what does that imply about generation latency as models get deeper?
 
 ## Go deeper
 
-- [Upstream chapter (Transformer Architecture)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/01-foundations/04-transformer-architecture.md)
-- Related questions in the [question bank](/questions)
-- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)
+- [Attention Mechanisms](./attention-mechanisms.mdx) — the exact computation running inside each block's attention sublayer.
+- [LLM Internals](./llm-internals.mdx) — where this layer stack sits inside the larger training and inference picture.
+- [Model Taxonomy](../models/model-taxonomy.mdx) — how encoder-only, decoder-only, and encoder-decoder choices map onto real, named model families.
+- Upstream reference: [Transformer Architecture — AI System Design Guide](https://github.com/ombharatiya/ai-system-design-guide/blob/main/01-foundations/04-transformer-architecture.md) (MIT; see [CREDITS](../../../CREDITS.md)).
