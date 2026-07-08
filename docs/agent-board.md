@@ -8,7 +8,7 @@
 
 | ID | Tool | Branch | Status | Paths (locks) |
 |----|------|--------|--------|---------------|
-| _(none — T-030–T-032 ready for PR)_ | | | | |
+| T-060–T-062 | Claude Code | `claude/t040-foundations-models-cluster` | `in_progress` | `content/concepts/foundations/**`, `content/concepts/models/**` (10 chapters) |
 
 ---
 
@@ -32,5 +32,5 @@
 
 | ID | Tool | Task |
 |----|------|------|
-| T-040+ | Claude Code | Interview-prep meta prose review (Phase 2 of content-review-plan.md) |
-| T-052+ | Cursor | Remaining MDX rewrites (Foundations/Inference/Prompting/etc.) |
+| T-070+ | Claude Code | Training + Inference clusters (Phase 4 remainder, 17 chapters) |
+| T-052+ | Cursor | Remaining MDX rewrites (Prompting/Evals/Frameworks/Tool-use/etc.) |
