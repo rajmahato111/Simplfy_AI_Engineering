@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="312" viewBox="0 0 1040 312" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN (8px grid, 24px padding)
+Canvas 1040x312. Title center (520,44).
+
+Main row (y=96..160, center=128), 4 boxes, green data-store role:
+  Box1 "BF16 (16-bit)" x=24  y=96 w=200 h=64 -> 24..224
+  Box2 "FP8 (8-bit)"   x=288 y=96 w=200 h=64 -> 288..488
+  Box3 "NF4 (4-bit)"   x=552 y=96 w=200 h=64 -> 552..752
+  Box4 "2-bit"         x=816 y=96 w=200 h=64 -> 816..1016
+
+Arrows (straight horizontal, 0 bends), each labeled "quantize" (12px, white backing):
+  Box1(224,128)->Box2(288,128)  label center (256,120)
+  Box2(488,128)->Box3(552,128)  label center (520,120)
+  Box3(752,128)->Box4(816,128)  label center (784,120)
+
+Annotation (red guardrail role - protective exception), below Box3:
+  x=552 y=224 w=200 h=64 -> 552..752, 224..288
+  "AWQ: ~1% salient" / "weights kept precise"
+  Arrow: Box3(652,160) -> Annotation(652,224) vertical, 0 bends [Box3 center x = 552+100=652]
+-->
+  <rect width="1040" height="312" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="520" y="44" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">Precision ladder: same 8B model, four storage costs</text>
+
+  <!-- Box1: BF16 -->
+  <rect x="24" y="96" width="200" height="64" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="124" y="123" font-size="14" fill="#064E3B" text-anchor="middle">BF16 (16-bit)<tspan x="124" dy="17" font-size="12">16 GB &#183; baseline</tspan></text>
+
+  <!-- Box2: FP8 -->
+  <rect x="288" y="96" width="200" height="64" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="388" y="123" font-size="14" fill="#064E3B" text-anchor="middle">FP8 (8-bit)<tspan x="388" dy="17" font-size="12">8 GB &#183; ~half</tspan></text>
+
+  <!-- Box3: NF4 -->
+  <rect x="552" y="96" width="200" height="64" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="652" y="123" font-size="14" fill="#064E3B" text-anchor="middle">NF4 (4-bit)<tspan x="652" dy="17" font-size="12">4 GB &#183; ~quarter</tspan></text>
+
+  <!-- Box4: 2-bit -->
+  <rect x="816" y="96" width="200" height="64" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="916" y="123" font-size="14" fill="#064E3B" text-anchor="middle">2-bit<tspan x="916" dy="17" font-size="12">2 GB &#183; research-only</tspan></text>
+
+  <!-- Arrows with labels -->
+  <line x1="224" y1="128" x2="288" y2="128" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="222" y="111" width="68" height="16" fill="#ffffff"/>
+  <text x="256" y="123" font-size="12" fill="#475569" text-anchor="middle">quantize</text>
+
+  <line x1="488" y1="128" x2="552" y2="128" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="486" y="111" width="68" height="16" fill="#ffffff"/>
+  <text x="520" y="123" font-size="12" fill="#475569" text-anchor="middle">quantize</text>
+
+  <line x1="752" y1="128" x2="816" y2="128" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="750" y="111" width="68" height="16" fill="#ffffff"/>
+  <text x="784" y="123" font-size="12" fill="#475569" text-anchor="middle">quantize</text>
+
+  <!-- Arrow down to annotation -->
+  <line x1="652" y1="160" x2="652" y2="224" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Annotation: AWQ salience -->
+  <rect x="552" y="224" width="200" height="64" rx="10" fill="#FEF2F2" stroke="#DC2626" stroke-width="1.5"/>
+  <text x="652" y="251" font-size="14" fill="#7F1D1D" text-anchor="middle">AWQ: ~1% salient<tspan x="652" dy="17" font-size="12">weights kept precise</tspan></text>
+</svg>

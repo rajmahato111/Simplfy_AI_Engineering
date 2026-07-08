@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1112" height="384" viewBox="0 0 1112 384" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN (8px grid, 24px padding)
+Canvas 1112x384. Title center (556,44).
+
+Row 1 (y=96..160, center=128):
+  Node1 "Raw corpus"            x=24  y=96 w=208 h=64 -> 24..232   (green data store)
+  Node2 "Mixture & curriculum"  x=296 y=96 w=208 h=64 -> 296..504  (yellow pipeline)
+  SubA  "Bulk phase"            x=584 y=96 w=216 h=64 -> 584..800  (indigo service) [inside container]
+
+Container "Pretraining run": x=568 y=72 w=248 h=208 -> 568..816, 72..280. caption (584,94).
+  SubA (above) and SubB below:
+  SubB "Cooling phase"          x=584 y=192 w=216 h=64 -> 584..800, 192..256 (yellow pipeline)
+
+Row for Node4 (y=192..256, center=224):
+  Node4 "Pretrained base model" x=880 y=192 w=208 h=64 -> 880..1088 (purple LLM)
+
+Arrows (straight, 0 bends):
+  Node1(232,128) -> Node2(296,128)
+  Node2(504,128) -> SubA(584,128)
+  SubA(692,160) -> SubB(692,192)        [vertical, SubA/SubB share center x=692]
+  SubB(800,224) -> Node4(880,224)
+
+Note (neutral, no arrow, standalone like reference "batch note"):
+  x=296 y=312 w=584 h=48 -> 296..880, 312..360
+  "Stability: checkpoint every N steps," / "roll back on loss spikes"
+-->
+  <rect width="1112" height="384" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="556" y="44" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">Pretraining: raw corpus to base model</text>
+
+  <!-- Node1: Raw corpus -->
+  <rect x="24" y="96" width="208" height="64" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="128" y="123" font-size="14" fill="#064E3B" text-anchor="middle">Raw corpus<tspan x="128" dy="17" font-size="12">web &#183; code &#183; books</tspan></text>
+
+  <!-- Node2: Mixture & curriculum -->
+  <rect x="296" y="96" width="208" height="64" rx="10" fill="#FEFCE8" stroke="#CA8A04" stroke-width="1.5"/>
+  <text x="400" y="123" font-size="14" fill="#713F12" text-anchor="middle">Mixture &amp;<tspan x="400" dy="17" font-size="12">curriculum order</tspan></text>
+
+  <!-- Arrows Node1->Node2, Node2->SubA -->
+  <line x1="232" y1="128" x2="296" y2="128" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="504" y1="128" x2="584" y2="128" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Container: Pretraining run -->
+  <rect x="568" y="72" width="248" height="208" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="584" y="94" font-size="12" fill="#64748B">Pretraining run</text>
+
+  <!-- SubA: Bulk phase -->
+  <rect x="584" y="96" width="216" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="692" y="123" font-size="14" fill="#1E1B4B" text-anchor="middle">Bulk phase<tspan x="692" dy="17" font-size="12">~98% of tokens</tspan></text>
+
+  <!-- vertical arrow SubA -> SubB -->
+  <line x1="692" y1="160" x2="692" y2="192" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- SubB: Cooling phase -->
+  <rect x="584" y="192" width="216" height="64" rx="10" fill="#FEFCE8" stroke="#CA8A04" stroke-width="1.5"/>
+  <text x="692" y="219" font-size="14" fill="#713F12" text-anchor="middle">Cooling phase<tspan x="692" dy="17" font-size="12">curated, ~2%</tspan></text>
+
+  <!-- arrow SubB -> Node4 -->
+  <line x1="800" y1="224" x2="880" y2="224" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Node4: Pretrained base model -->
+  <rect x="880" y="192" width="208" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="984" y="219" font-size="14" fill="#2E1065" text-anchor="middle">Pretrained<tspan x="984" dy="17" font-size="12">base model</tspan></text>
+
+  <!-- Note: stability -->
+  <rect x="296" y="312" width="584" height="48" rx="10" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <text x="588" y="331" font-size="12" fill="#334155" text-anchor="middle">Stability: checkpoint every N steps,<tspan x="588" dy="16">roll back on loss spikes</tspan></text>
+</svg>

@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="832" height="392" viewBox="0 0 832 392" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN (8px grid, 24px padding)
+Canvas 832x392. Title center (416,44).
+
+Left node (tall, spans both branch rows so arrows leave at native height, 0 bends):
+  "Pretrained base model" x=24 y=96 w=208 h=192 -> 24..232, 96..288 (purple LLM)
+
+Branch rows:
+  Top    "Continued pretraining"  x=296 y=96  w=232 h=64 -> 296..528, 96..160  center=128 (yellow pipeline)
+  Bottom "Supervised SFT"         x=296 y=224 w=232 h=64 -> 296..528, 224..288 center=256 (yellow pipeline)
+
+Right node (tall, spans both rows, receives both arrows at native height, 0 bends):
+  "Fine-tuned model" x=600 y=96 w=208 h=192 -> 600..808, 96..288 (purple LLM)
+
+Arrows (straight horizontal, 0 bends):
+  Left(232,128)  -> Top(296,128)
+  Left(232,256)  -> Bottom(296,256)
+  Top(528,128)   -> Right(600,128)
+  Bottom(528,256)-> Right(600,256)
+
+Note (neutral, standalone, no arrow):
+  x=248 y=320 w=352 h=48 -> 248..600, 320..368
+  "Rehearsal: 5-10% original" / "data mixed into both"
+-->
+  <rect width="832" height="392" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="416" y="44" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">Two ways to close the gap, one merge point</text>
+
+  <!-- Left node: Pretrained base model -->
+  <rect x="24" y="96" width="208" height="192" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="128" y="185" font-size="14" fill="#2E1065" text-anchor="middle">Pretrained<tspan x="128" dy="17">base model</tspan></text>
+
+  <!-- Branch top: Continued pretraining -->
+  <rect x="296" y="96" width="232" height="64" rx="10" fill="#FEFCE8" stroke="#CA8A04" stroke-width="1.5"/>
+  <text x="412" y="123" font-size="14" fill="#713F12" text-anchor="middle">Continued pretraining<tspan x="412" dy="17" font-size="12">raw domain text</tspan></text>
+
+  <!-- Branch bottom: SFT -->
+  <rect x="296" y="224" width="232" height="64" rx="10" fill="#FEFCE8" stroke="#CA8A04" stroke-width="1.5"/>
+  <text x="412" y="251" font-size="14" fill="#713F12" text-anchor="middle">Supervised SFT<tspan x="412" dy="17" font-size="12">prompt &#8594; response pairs</tspan></text>
+
+  <!-- Right node: Fine-tuned model -->
+  <rect x="600" y="96" width="208" height="192" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="704" y="185" font-size="14" fill="#2E1065" text-anchor="middle">Fine-tuned<tspan x="704" dy="17">model</tspan></text>
+
+  <!-- Arrows -->
+  <line x1="232" y1="128" x2="296" y2="128" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="232" y1="256" x2="296" y2="256" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="528" y1="128" x2="600" y2="128" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="528" y1="256" x2="600" y2="256" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Note: rehearsal -->
+  <rect x="248" y="320" width="352" height="48" rx="10" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <text x="424" y="339" font-size="12" fill="#334155" text-anchor="middle">Rehearsal: 5&#8211;10% original<tspan x="424" dy="16">data mixed into both</tspan></text>
+</svg>
