@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN
+Canvas 1200x600. Title (600,32).
+Row1 y=88 h=56 (88-144, center y=116):
+  Client       x=40  w=160 (orange) center=120
+  arrow (200,116)-(258,116)
+  Gateway      x=260 w=260 (indigo) center=390
+  arrow (520,116)-(578,116)
+  GPU pool     x=580 w=180 (indigo) center=670
+  arrow GPU pool -> container: (670,144)-(670,174)
+
+Dashed container x=64 y=176 w=1000 h=232 (176-408)
+  caption (80,200) "Inside the GPU pool: two ways to split a model"
+  Row2 (Tensor parallel) sub-label (180,220); boxes y=232 h=64 (232-296):
+    GPU1 x=180 w=200 (violet) center=280
+    arrow (380,264)-(462,264) label (421,250)
+    GPU2 x=464 w=200 (violet) center=564
+  Row3 (Pipeline parallel) sub-label (180,316); boxes y=328 h=64 (328-392):
+    GPUA x=180 w=200 (violet) center=280
+    arrow (380,360)-(462,360) label (421,346)
+    GPUB x=464 w=200 (violet) center=564
+  arrow container bottom -> scheduler: (564,408)-(564,428)
+
+Scheduler   x=364 y=430 w=400 h=56 (yellow) center=564
+  arrow (564,486)-(564,500)
+Autoscaler  x=364 y=502 w=400 h=56 (yellow) center=564
+
+Loop back: autoscaler right-mid (764,530) -> (1136,530) -> (1136,116) -> (762,116) [GPU pool right edge]
+  label near top segment (950,106)
+-->
+  <rect width="1200" height="600" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="600" y="32" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">One request enters the gateway; the pool splits work, then autoscales on cache pressure</text>
+
+  <!-- Row1 -->
+  <rect x="40" y="88" width="160" height="56" rx="10" fill="#FFF7ED" stroke="#EA580C" stroke-width="1.5"/>
+  <text x="120" y="121" font-size="14" fill="#7C2D12" text-anchor="middle">Client requests</text>
+
+  <line x1="200" y1="116" x2="258" y2="116" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="260" y="88" width="260" height="56" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="390" y="110" font-size="14" fill="#1E1B4B" text-anchor="middle">Inference gateway</text>
+  <text x="390" y="128" font-size="12" fill="#1E1B4B" text-anchor="middle">auth · routing · rate limits</text>
+
+  <line x1="520" y1="116" x2="578" y2="116" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="580" y="88" width="180" height="56" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="670" y="121" font-size="14" fill="#1E1B4B" text-anchor="middle">GPU pool</text>
+
+  <line x1="670" y1="144" x2="670" y2="174" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Dashed group container -->
+  <rect x="64" y="176" width="1000" height="232" rx="12" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6,5"/>
+  <text x="80" y="200" font-size="12" fill="#64748B">Inside the GPU pool — two ways to split a model across GPUs</text>
+
+  <!-- Row 2: Tensor parallel -->
+  <text x="180" y="222" font-size="12" fill="#64748B">Tensor parallel — fits one node</text>
+  <rect x="180" y="232" width="200" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="280" y="260" font-size="14" fill="#2E1065" text-anchor="middle">TP: GPU 1</text>
+  <text x="280" y="278" font-size="12" fill="#2E1065" text-anchor="middle">half of every layer</text>
+
+  <line x1="380" y1="264" x2="462" y2="264" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="386" y="240" width="270" height="18" fill="#ffffff"/>
+  <text x="421" y="254" font-size="11" fill="#475569">synced every layer (NVLink)</text>
+
+  <rect x="464" y="232" width="200" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="564" y="260" font-size="14" fill="#2E1065" text-anchor="middle">TP: GPU 2</text>
+  <text x="564" y="278" font-size="12" fill="#2E1065" text-anchor="middle">half of every layer</text>
+
+  <!-- Row 3: Pipeline parallel -->
+  <text x="180" y="318" font-size="12" fill="#64748B">Pipeline parallel — spans nodes</text>
+  <rect x="180" y="328" width="200" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="280" y="356" font-size="14" fill="#2E1065" text-anchor="middle">PP: GPU A</text>
+  <text x="280" y="374" font-size="12" fill="#2E1065" text-anchor="middle">layers 1–40</text>
+
+  <line x1="380" y1="360" x2="462" y2="360" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="392" y="336" width="250" height="18" fill="#ffffff"/>
+  <text x="421" y="350" font-size="11" fill="#475569">one hop between stages</text>
+
+  <rect x="464" y="328" width="200" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="564" y="356" font-size="14" fill="#2E1065" text-anchor="middle">PP: GPU B</text>
+  <text x="564" y="374" font-size="12" fill="#2E1065" text-anchor="middle">layers 41–80</text>
+
+  <!-- container -> scheduler -->
+  <line x1="564" y1="408" x2="564" y2="428" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="364" y="430" width="400" height="56" rx="10" fill="#FEFCE8" stroke="#CA8A04" stroke-width="1.5"/>
+  <text x="564" y="453" font-size="14" fill="#713F12" text-anchor="middle">Continuous batching scheduler</text>
+  <text x="564" y="471" font-size="12" fill="#713F12" text-anchor="middle">fair-share across tenants</text>
+
+  <line x1="564" y1="486" x2="564" y2="500" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="364" y="502" width="400" height="56" rx="10" fill="#FEFCE8" stroke="#CA8A04" stroke-width="1.5"/>
+  <text x="564" y="525" font-size="14" fill="#713F12" text-anchor="middle">Autoscaler</text>
+  <text x="564" y="543" font-size="12" fill="#713F12" text-anchor="middle">scales on KV-cache occupancy</text>
+
+  <!-- loop back to GPU pool -->
+  <polyline points="764,530 1136,530 1136,116 762,116" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="856" y="98" width="200" height="18" fill="#ffffff"/>
+  <text x="956" y="112" font-size="11" fill="#475569" text-anchor="middle">scales replicas up/down</text>
+</svg>

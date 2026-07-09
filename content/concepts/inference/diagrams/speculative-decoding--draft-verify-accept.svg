@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="480" viewBox="0 0 1200 480" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN
+Canvas 1200x480. Title (600,32).
+Row A y=80 h=64 (bottom=144):
+  A1 Context so far       x=40  w=170 (neutral)  center=(125,112)
+  arrow (210,112)-(258,112)
+  A2 Draft model (small)  x=260 w=220 (violet)   center=(370,112)
+  arrow (480,112)-(528,112)
+  A3 Target model (large) x=530 w=260 (violet)   center=(660,112)
+
+Vertical arrow A3 -> t3: (660,144)-(660,302), label at x=684 y=210/226
+
+Row C (token outcomes) y=304 h=64 (bottom=368):
+  t1 x=230 w=140 accept  (green)  center=300
+  t2 x=410 w=140 accept  (green)  center=480
+  t3 x=590 w=140 reject  (red)    center=660 (aligned under A3)
+  t4 x=770 w=140 discard (neutral) center=840
+  t5 x=950 w=140 correction (green) center=1020
+  arrows: t1->t2 (370,336)-(408,336); t2->t3 (550,336)-(588,336);
+          t3->t4 (730,336)-(768,336); t4->t5 (910,336)-(948,336)
+
+Loop back (next round): t5 bottom-mid (1020,368) -> (1020,430) -> (125,430) -> (125,146)
+  label at (572,412) white-backed
+-->
+  <rect width="1200" height="480" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="600" y="32" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">One speculative round: draft, verify, accept until the first reject</text>
+
+  <!-- Row A -->
+  <rect x="40" y="80" width="170" height="64" rx="10" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <text x="125" y="117" font-size="14" fill="#334155" text-anchor="middle">Context so far</text>
+
+  <line x1="210" y1="112" x2="258" y2="112" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="260" y="80" width="220" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="370" y="109" font-size="14" fill="#2E1065" text-anchor="middle">Draft model (small)</text>
+  <text x="370" y="127" font-size="12" fill="#2E1065" text-anchor="middle">drafts K=4 tokens</text>
+
+  <line x1="480" y1="112" x2="528" y2="112" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="530" y="80" width="260" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="660" y="109" font-size="14" fill="#2E1065" text-anchor="middle">Target model (large)</text>
+  <text x="660" y="127" font-size="12" fill="#2E1065" text-anchor="middle">verifies all 4 in one pass</text>
+
+  <!-- vertical verify arrow -->
+  <line x1="660" y1="144" x2="660" y2="302" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="686" y="198" width="280" height="18" fill="#ffffff"/>
+  <text x="690" y="212" font-size="11" fill="#475569">compare draft vs. target</text>
+  <rect x="686" y="216" width="280" height="18" fill="#ffffff"/>
+  <text x="690" y="230" font-size="11" fill="#475569">probability at each position</text>
+
+  <!-- Row C: token outcomes -->
+  <rect x="230" y="304" width="140" height="64" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="300" y="341" font-size="14" fill="#064E3B" text-anchor="middle">t1 — accept</text>
+
+  <line x1="370" y1="336" x2="408" y2="336" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="410" y="304" width="140" height="64" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="480" y="341" font-size="14" fill="#064E3B" text-anchor="middle">t2 — accept</text>
+
+  <line x1="550" y1="336" x2="588" y2="336" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="590" y="304" width="140" height="64" rx="10" fill="#FEF2F2" stroke="#DC2626" stroke-width="1.5"/>
+  <text x="660" y="341" font-size="14" fill="#7F1D1D" text-anchor="middle">t3 — reject</text>
+
+  <line x1="730" y1="336" x2="768" y2="336" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="770" y="304" width="140" height="64" rx="10" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <text x="840" y="341" font-size="14" fill="#334155" text-anchor="middle">rest discarded</text>
+
+  <line x1="910" y1="336" x2="948" y2="336" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="950" y="304" width="140" height="64" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="1020" y="332" font-size="14" fill="#064E3B" text-anchor="middle">Correction</text>
+  <text x="1020" y="350" font-size="12" fill="#064E3B" text-anchor="middle">token (from target)</text>
+
+  <!-- loop back to next round -->
+  <polyline points="1020,368 1020,430 125,430 125,146" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="452" y="404" width="360" height="18" fill="#ffffff"/>
+  <text x="632" y="418" font-size="11" fill="#475569" text-anchor="middle">next round starts from accepted prefix: context + t1 + t2 + correction</text>
+</svg>
