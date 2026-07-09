@@ -9,8 +9,8 @@ diagrams:
   - diagrams/lora-qlora-peft--frozen-base-adapter.svg
 est_minutes: 13
 source_attribution: "Factual basis: AI System Design Guide (MIT) by Om Bharatiya; rewritten and expanded. See CREDITS.md."
-last_reviewed: '2026-07-04'
-status: draft
+last_reviewed: 2026-07-09
+status: reviewed
 ---
 
 ## The 30-second version
@@ -56,7 +56,7 @@ Take a 7B-parameter model with hidden dimension d = 4,096, targeting just the qu
 
 A LoRA adapter at rank r = 16 replaces each matrix with A (16 × 4,096 = 65,536 params) and B (4,096 × 16 = 65,536 params): 131,072 trainable parameters per matrix, × 64 matrices = **8,388,608 ≈ 8.39M** trainable parameters — 8.39M / 1.074B ≈ **0.78%** of what full fine-tuning would touch, comfortably under the "less than 1%" rule of thumb.
 
-**VRAM.** Standard mixed-precision training with the Adam optimizer needs roughly 16 bytes of state per trainable parameter (a bf16 copy of the weight, a bf16 gradient, and fp32 optimizer moments), before activations. Full fine-tuning: 7×10⁹ × 16 bytes ≈ **112 GB** — beyond a single 80 GB datacenter GPU before you've loaded a single activation. QLoRA: the 7B frozen base needs no optimizer state at all (it never updates) and stores at 4-bit ≈ 7×10⁹ × 0.5 bytes = **3.5 GB**; only the 8.39M adapter parameters carry the 16-bytes/param overhead — 8.39×10⁶ × 16 bytes ≈ **134 MB**. Base plus adapter state: 3.5 GB + 0.134 GB ≈ **3.6 GB** — small enough, even with activation memory on top, to fit comfortably on a single 24 GB consumer GPU.
+**VRAM.** Standard mixed-precision training with the Adam optimizer needs roughly 16 bytes of state per trainable parameter (a bf16 working copy of the weight, a bf16 gradient, two fp32 optimizer moments, and an fp32 master copy of the weight), before activations. Full fine-tuning: 7×10⁹ × 16 bytes ≈ **112 GB** — beyond a single 80 GB datacenter GPU before you've loaded a single activation. QLoRA: the 7B frozen base needs no optimizer state at all (it never updates) and stores at 4-bit ≈ 7×10⁹ × 0.5 bytes = **3.5 GB**; only the 8.39M adapter parameters carry the 16-bytes/param overhead — 8.39×10⁶ × 16 bytes ≈ **134 MB**. Base plus adapter state: 3.5 GB + 0.134 GB ≈ **3.6 GB** — small enough, even with activation memory on top, to fit comfortably on a single 24 GB consumer GPU.
 
 **Scaling.** Set α = 2r = 32, giving a scaling factor α/r = 32/16 = 2. Raise the rank later to r = 64 with α = 2r = 128, and the scaling factor is still 128/64 = 2 — the same effective update magnitude, so the learning rate you already tuned still applies without retuning.
 
@@ -86,7 +86,7 @@ A strong sound bite: *"LoRA's real advantage isn't just that training is cheaper
 
 Likely follow-ups:
 
-- Walk me through why the trainable parameter count in LoRA scales with rank and hidden dimension, not with the number of layers.
+- Walk me through why a single LoRA adapter costs 2 × d × r parameters rather than d², and what happens to the total as you target more matrices across more layers.
 - When would you reach for full-parameter fine-tuning instead of LoRA, even knowing it costs more?
 - How does QLoRA keep training stable while the base model sits in 4-bit precision?
 

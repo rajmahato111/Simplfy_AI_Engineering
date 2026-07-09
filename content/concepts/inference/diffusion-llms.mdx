@@ -9,8 +9,8 @@ diagrams:
   - diagrams/diffusion-llms--bricklayer-vs-sculptor.svg
 est_minutes: 13
 source_attribution: "Factual basis: AI System Design Guide (MIT) by Om Bharatiya; rewritten and expanded. See CREDITS.md."
-last_reviewed: 2026-07-08
-status: draft
+last_reviewed: 2026-07-09
+status: reviewed
 ---
 
 ## The 30-second version
@@ -81,7 +81,7 @@ Same model, same task, same hardware — a 4x range in how much speedup you actu
 ## Where people go wrong
 
 1. **Quoting a vendor's tokens-per-second number as quality-invariant.** It's a function of the unmasking schedule chosen for that specific benchmark, almost always the aggressive end of the dial.
-2. **Treating diffusion as a frontier-quality replacement.** The gap on knowledge-heavy and long-chain reasoning tasks is real and, as of 2026, no diffusion model is frontier-class on those axes.
+2. **Treating diffusion as a frontier-quality replacement.** The gap on knowledge-heavy and long-chain reasoning tasks is real and, as of 2026, no diffusion model plays at the frontier on those axes.
 3. **Forgetting the caching gap.** Autoregressive serving has years of KV-cache and long-context optimization behind it that pure diffusion's ecosystem hasn't matched, which matters a lot for long conversational context.
 4. **Assuming "faster" always means "cheaper."** The steps-per-token cost model only nets out favorably at some sequence lengths and unmasking settings — it needs checking on your actual workload, not assumed from a headline figure.
 5. **Not distinguishing pure diffusion from block/hybrid systems when reading a benchmark claim.** The two have meaningfully different caching and long-context behavior, and a claim about one doesn't transfer cleanly to the other.

@@ -10,7 +10,7 @@ diagrams:
 est_minutes: 13
 source_attribution: "Factual basis: AI System Design Guide (MIT) by Om Bharatiya; rewritten and expanded. See CREDITS.md."
 last_reviewed: 2026-07-09
-status: draft
+status: reviewed
 ---
 
 ## The 30-second version
@@ -57,9 +57,9 @@ A GPU holds 8 concurrent decode slots, and each decode step — one token advanc
 
 **Static batching.** Requests are grouped into 5 batches of 8, and each batch doesn't retire until its slowest member — always the 300-token request — finishes. Each batch therefore takes 300 steps × 20 ms = 6,000 ms, and the 5 batches run one after another (only 8 slots exist): 5 × 6,000 ms = **30,000 ms (30 seconds)** wall-clock for all 40 requests. Throughput = 3,250 tokens / 30 s ≈ **108.3 tokens/sec**.
 
-**Continuous batching.** Assume the queue always has a waiting request ready to fill any slot that frees up — true here, since demand (40 requests) comfortably exceeds capacity (8 slots) until the very end. Every decode step can then keep all 8 slots doing useful work, so the number of steps needed is close to the total token count divided by the slot count: 3,250 / 8 = 406.25, round up to 407 steps. Wall-clock = 407 × 20 ms = **8,140 ms (≈8.14 seconds)**. Throughput = 3,250 / 8.14 ≈ **399.3 tokens/sec**.
+**Continuous batching.** A first instinct: if a waiting request refills any slot the moment it frees, the step count should approach the total token count divided by the slot count — 3,250 / 8 = 406.25, about 407 steps, or ≈8.1 seconds. Treat that as an *unattainable floor*, not a forecast: a 300-token request is indivisible — it occupies one slot for 300 consecutive steps — so the scheduler can never pack slots perfectly around the long requests. Simulating the actual schedule: in plain FIFO arrival order (seven shorts, then a long, repeating), the last long request doesn't get a slot until around step 300, and the workload takes **600 steps = 12.0 s** (throughput ≈ 271 tokens/sec); with the luckiest possible admission order — all five long requests seated at step 0 — it takes **450 steps = 9.0 s** (≈ 361 tokens/sec).
 
-**The comparison:** 30 s versus 8.14 s to clear the identical 40-request workload — continuous batching finishes **≈3.7x faster**, on the same GPU, same 8 slots, same fixed per-step cost. The gap gets wider, not narrower, the more the output-length distribution varies — a workload where every request happened to be exactly the same length would show static and continuous batching converging, which is exactly why real, mixed-length traffic is what makes this technique matter in production.
+**The comparison:** 30 s versus 9–12 s to clear the identical 40-request workload — continuous batching finishes **≈2.5–3.3x faster** depending on admission order, on the same GPU, same 8 slots, same fixed per-step cost. The gap gets wider, not narrower, the more the output-length distribution varies — a workload where every request happened to be exactly the same length would show static and continuous batching converging, which is exactly why real, mixed-length traffic is what makes this technique matter in production.
 
 ## The tradeoffs that matter
 

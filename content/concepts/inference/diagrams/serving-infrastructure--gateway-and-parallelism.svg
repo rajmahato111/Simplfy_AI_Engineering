@@ -14,11 +14,11 @@ Dashed container x=64 y=176 w=1000 h=232 (176-408)
   caption (80,200) "Inside the GPU pool: two ways to split a model"
   Row2 (Tensor parallel) sub-label (180,220); boxes y=232 h=64 (232-296):
     GPU1 x=180 w=200 (violet) center=280
-    arrow (380,264)-(462,264) label (421,250)
+    arrow (380,264)-(462,264) label centered (421,254) "NVLink sync", backing rect 385-457
     GPU2 x=464 w=200 (violet) center=564
   Row3 (Pipeline parallel) sub-label (180,316); boxes y=328 h=64 (328-392):
     GPUA x=180 w=200 (violet) center=280
-    arrow (380,360)-(462,360) label (421,346)
+    arrow (380,360)-(462,360) label centered (421,350) "one hop", backing rect 385-457
     GPUB x=464 w=200 (violet) center=564
   arrow container bottom -> scheduler: (564,408)-(564,428)
 
@@ -64,8 +64,8 @@ Loop back: autoscaler right-mid (764,530) -> (1136,530) -> (1136,116) -> (762,11
   <text x="280" y="278" font-size="12" fill="#2E1065" text-anchor="middle">half of every layer</text>
 
   <line x1="380" y1="264" x2="462" y2="264" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <rect x="386" y="240" width="270" height="18" fill="#ffffff"/>
-  <text x="421" y="254" font-size="11" fill="#475569">synced every layer (NVLink)</text>
+  <rect x="385" y="240" width="72" height="18" fill="#ffffff"/>
+  <text x="421" y="254" font-size="11" fill="#475569" text-anchor="middle">NVLink sync</text>
 
   <rect x="464" y="232" width="200" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
   <text x="564" y="260" font-size="14" fill="#2E1065" text-anchor="middle">TP: GPU 2</text>
@@ -78,8 +78,8 @@ Loop back: autoscaler right-mid (764,530) -> (1136,530) -> (1136,116) -> (762,11
   <text x="280" y="374" font-size="12" fill="#2E1065" text-anchor="middle">layers 1–40</text>
 
   <line x1="380" y1="360" x2="462" y2="360" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <rect x="392" y="336" width="250" height="18" fill="#ffffff"/>
-  <text x="421" y="350" font-size="11" fill="#475569">one hop between stages</text>
+  <rect x="385" y="336" width="72" height="18" fill="#ffffff"/>
+  <text x="421" y="350" font-size="11" fill="#475569" text-anchor="middle">one hop</text>
 
   <rect x="464" y="328" width="200" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
   <text x="564" y="356" font-size="14" fill="#2E1065" text-anchor="middle">PP: GPU B</text>

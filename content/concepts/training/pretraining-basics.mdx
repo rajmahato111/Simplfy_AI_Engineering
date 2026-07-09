@@ -9,8 +9,8 @@ diagrams:
   - diagrams/pretraining-basics--curriculum-to-base-model.svg
 est_minutes: 12
 source_attribution: "Factual basis: AI System Design Guide (MIT) by Om Bharatiya; rewritten and expanded. See CREDITS.md."
-last_reviewed: '2026-07-04'
-status: draft
+last_reviewed: 2026-07-09
+status: reviewed
 ---
 
 ## The 30-second version
@@ -55,7 +55,7 @@ Take an 8-billion-parameter (8B) model as the running example.
 
 **What frontier teams actually do.** Instead of 160B tokens, an 8B model gets trained on something like **15 trillion (15T) tokens** — 15,000B / 160B ≈ **93.75x** more tokens than the training-optimal point. Compute scales roughly linearly with tokens at a fixed parameter count, so the total training compute for that run is also about 93.75x higher: 93.75 × 7.68×10²¹ ≈ **7.2×10²³ FLOPs** — a training run that costs nearly two orders of magnitude more than "efficient" would suggest.
 
-**Where the data goes.** Using a representative mixture — 55% web, 18% code, 8% books, 9% academic/reference, 10% synthetic (55+18+8+9+10 = 100) — 15T tokens splits into roughly 8.25T web, 2.7T code, 1.2T books, 1.35T academic, and 1.5T synthetic tokens. A 2% cooling phase at the end of that run is 0.02 × 15T = **300B tokens** of curated data — twice the entire training-optimal token budget of the 160B-token run above, spent on quality alone.
+**Where the data goes.** Using a representative mixture — 55% web, 18% code, 8% books, 9% academic/reference, 10% synthetic (55+18+8+9+10 = 100) — 15T tokens splits into roughly 8.25T web, 2.7T code, 1.2T books, 1.35T academic, and 1.5T synthetic tokens. A 2% cooling phase at the end of that run is 0.02 × 15T = **300B tokens** of curated data — nearly twice the entire training-optimal token budget of the 160B-token run above, spent on quality alone.
 
 **Why anyone would pay for that.** The payoff shows up at inference, not training. A standard approximation puts inference cost at about 2 × parameters FLOPs per generated token. For the 8B model: 2 × 8×10⁹ = **16 gigaFLOPs (GFLOPs) per token**. For a hypothetical 70B model trained to similar quality the training-optimal way: 2 × 70×10⁹ = **140 GFLOPs per token** — 140/16 = **8.75x** more compute per token than the overtrained 8B model. Training cost is paid once; a model queried billions of times over its production life pays its per-token inference cost on every single one of those calls, so an 8B model that costs 93.75x more to *train* than the textbook-optimal point can still be far cheaper over its lifetime.
 

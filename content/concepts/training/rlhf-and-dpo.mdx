@@ -9,8 +9,8 @@ diagrams:
   - diagrams/rlhf-and-dpo--reward-model-vs-direct.svg
 est_minutes: 13
 source_attribution: "Factual basis: AI System Design Guide (MIT) by Om Bharatiya; rewritten and expanded. See CREDITS.md."
-last_reviewed: '2026-07-08'
-status: draft
+last_reviewed: 2026-07-09
+status: reviewed
 ---
 
 ## The 30-second version
@@ -55,7 +55,7 @@ Static preference data also has a shelf life — once the policy improves past w
 
 Say your team is aligning a 7B-parameter support-chat model with 8,000 human-labeled preference pairs at roughly $3.50 each — about **$28,000** for the dataset, before any GPU time.
 
-**Memory, side by side.** Both approaches need a frozen reference copy of the 7B model plus the trainable policy — each about 14 GB in bf16 (7 × 10⁹ params × 2 bytes). DPO's footprint for weights alone: 2 × 14 GB = **28 GB**. RLHF's PPO loop adds a reward model and a value network, both roughly 7B-scale: 4 × 14 GB = **56 GB**, before gradients or optimizer state for the two models that actually train — roughly half the hardware footprint, which is why teams without dedicated RL infrastructure default to DPO.
+**Memory, side by side.** Both approaches need a frozen reference copy of the 7B model plus the trainable policy — each about 14 GB in bf16 (7 × 10⁹ params × 2 bytes). DPO's footprint for weights alone: 2 × 14 GB = **28 GB**. RLHF's PPO loop adds a reward model and a value network, both roughly 7B-scale: 4 × 14 GB = **56 GB**, before gradients or optimizer state for the two models that actually train — double DPO's weight footprint, which is why teams without dedicated RL infrastructure default to DPO.
 
 **The DPO loss, worked through.** Take one pair partway through training. The chosen response's log-probability has risen from the reference's −12.4 to −9.8 (+2.6 nats). The rejected response's has fallen from −11.0 to −13.5 (−2.5 nats). DPO's loss compares the *difference* of these two gaps, scaled by β = 0.1:
 

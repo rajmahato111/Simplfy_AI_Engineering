@@ -10,7 +10,7 @@ diagrams:
 est_minutes: 13
 source_attribution: "Factual basis: AI System Design Guide (MIT) by Om Bharatiya; rewritten and expanded. See CREDITS.md."
 last_reviewed: 2026-07-09
-status: draft
+status: reviewed
 ---
 
 ## The 30-second version
@@ -55,7 +55,7 @@ The bottom row is the other lever, and it doesn't touch attention math at all �
 
 **Shared-prefix caching across requests.** A deployment's system prompt plus tool schema runs 4,000 tokens, identical across every call. In one hour, 500 requests share that exact prefix. Without prefix caching: 500 × 4,000 = **2,000,000 redundant prefill tokens** recomputed, and 500 separate full copies of that prefix's KV cache stored in memory. With prefix caching: that 4,000-token segment is computed and stored once, and each of the 500 requests attaches only its own unique continuation — cutting both the compute and the memory tied up in that shared segment by very close to 500x.
 
-**API pricing break-even.** Say standard input tokens cost $3.00 per million, cached reads cost $0.30 per million (a 90% discount), and writing a segment into the cache carries a 25% premium over the standard rate — $3.75 per million. For that same 4,000-token prefix: writing it into the cache costs 4,000 × $3.75 / 1,000,000 = **$0.015**. Each subsequent cached read costs 4,000 × $0.30 / 1,000,000 = **$0.0012**, versus 4,000 × $3.00 / 1,000,000 = $0.012 paid at full price with no caching at all. Setting total cost equal — $0.015 + $0.0012n (with caching) versus $0.012n (without) — solves to n ≈ 1.39: caching has already paid for itself by roughly the **second reuse** of that prefix. A prefix reused only once, or not reused at all, is a net loss once the write premium is counted — caching is a bet on reuse, not a free discount.
+**API pricing break-even.** Say standard input tokens cost $3.00 per million, cached reads cost $0.30 per million (a 90% discount), and writing a segment into the cache carries a 25% premium over the standard rate — $3.75 per million. For that same 4,000-token prefix: writing it into the cache costs 4,000 × $3.75 / 1,000,000 = **$0.015**. Each subsequent cached read costs 4,000 × $0.30 / 1,000,000 = **$0.0012**, versus 4,000 × $3.00 / 1,000,000 = $0.012 paid at full price with no caching at all. Comparing like with like over N total calls — $0.015 + $0.0012 × (N − 1) with caching, versus $0.012 × N without — the two sides cross at N ≈ 1.28. Put differently: the write premium's *extra* cost over a normal call is just $0.003, and every reuse saves $0.0108, so caching has already paid for itself on the **first reuse** of that prefix. A prefix never reused at all is a net loss once the write premium is counted — caching is a bet on reuse, not a free discount.
 
 ## The tradeoffs that matter
 

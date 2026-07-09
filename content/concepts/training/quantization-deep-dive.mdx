@@ -9,8 +9,8 @@ diagrams:
   - diagrams/quantization-deep-dive--precision-ladder.svg
 est_minutes: 13
 source_attribution: "Factual basis: AI System Design Guide (MIT) by Om Bharatiya; rewritten and expanded. See CREDITS.md."
-last_reviewed: '2026-07-04'
-status: draft
+last_reviewed: 2026-07-09
+status: reviewed
 ---
 
 ## The 30-second version
@@ -47,7 +47,7 @@ Follow the diagram's ladder left to right. A quantizer maps a wide range of valu
 
 The step from FP8 to 4-bit is where the interesting engineering lives. **NF4** (NormalFloat4) doesn't use a uniform grid. Trained weight values cluster tightly around zero in something close to a normal distribution, so NF4 places its 16 representable values so each bin captures an equal share of probability mass under that distribution — dense resolution where values actually are, coarser resolution at the rare extremes, instead of wasting levels on values that almost never occur.
 
-Two competing methods decide *which* weights get quantized how aggressively. **GPTQ** quantizes layer by layer, choosing each layer's quantized values to minimize squared reconstruction error against the original weights — an error-driven approach that doesn't look at how the model actually uses those weights. **AWQ** (Activation-aware Weight Quantization), the diagram's protected branch off the 4-bit tier, instead runs a small calibration pass, observes which weights see the largest activations in practice, and treats that small salient fraction — commonly cited around 1% — as too important to compress, keeping just those at higher precision while quantizing the rest normally. Because it optimizes for what the model actually uses rather than a generic reconstruction metric, AWQ tends to hold up better at aggressive bit-widths (3-bit) and on smaller models.
+Two competing methods decide *which* weights get quantized how aggressively. **GPTQ** quantizes layer by layer, choosing each layer's quantized values to minimize the layer's *output* error over a small calibration set, guided by second-order information about which weights that output is most sensitive to. **AWQ** (Activation-aware Weight Quantization), the diagram's protected branch off the 4-bit tier, starts from a different observation: a small salient fraction of weights — commonly cited around 1% — sees disproportionately large activations in practice, and protecting just that fraction (in the shipped implementation, by rescaling salient channels before quantization so they lose far less to rounding) preserves most of the model's quality. Because it explicitly targets the weights the model leans on hardest, AWQ tends to hold up better at aggressive bit-widths (3-bit) and on smaller models.
 
 Deployment format is a separate decision from bit-width. **GGUF**, from llama.cpp, is single-file, portable, and runs on CPU with optional GPU offload, trading some throughput for reach across hardware. **EXL2** is GPU-only, tuned specifically for NVIDIA hardware, and is typically fastest if your entire deployment lives there and doesn't need portability.
 

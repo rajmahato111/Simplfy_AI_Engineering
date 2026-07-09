@@ -10,7 +10,7 @@ diagrams:
 est_minutes: 12
 source_attribution: "Factual basis: AI System Design Guide (MIT) by Om Bharatiya; rewritten and expanded. See CREDITS.md."
 last_reviewed: 2026-07-09
-status: draft
+status: reviewed
 ---
 
 ## The 30-second version
@@ -53,9 +53,9 @@ The payoff shows up directly in [batching](./batching-strategies.mdx): continuou
 
 **Waste, before and after.** A naive allocator reserves a contiguous block sized for an 8,192-token maximum sequence length for every request, regardless of how long the response turns out to be. A request that generates only 400 tokens before hitting a stop condition still holds its full 8,192-token reservation — 7,792 tokens' worth of memory, or **95.1%** of that request's reserved space, sitting unused for the entire time it's alive. Averaged across a realistic mix of request lengths, naive contiguous allocation typically wastes somewhere in the 60–80% range; Paged Attention's fixed 16-token blocks mean a request only ever wastes, at most, a fraction of one final partially-filled block — pushing overall waste under roughly 4%.
 
-**Concurrency, worked through.** Take a GPU with 80 GB of memory available for KV cache after weights, and requests that need up to 8,192 tokens of context. At 192 KB/token (a GQA-sized model — see [KV Cache and Context Caching](./kv-cache-and-context-caching.mdx) for that figure's derivation), a full 8,192-token reservation costs 192 KB × 8,192 ≈ **1.5 GB per request**, reserved whether or not the request ever gets close to using it. A naive allocator sizing for the worst case fits 80 GB / 1.5 GB ≈ **53 requests**, purely by reservation, regardless of their real lengths. Now say the realistic average completed length is only 1,200 tokens: real usage per request is 192 KB × 1,200 ≈ 225 MB, and a block-based allocator claiming memory as needed — with negligible per-block waste — fits roughly 80 GB / 225 MB ≈ **355 requests** in the same 80 GB. That's better than a **6.6x** increase in concurrent requests, from the identical hardware, purely from not reserving memory a request was never going to use.
+**Concurrency, worked through.** Take a GPU with 80 GB of memory available for KV cache after weights, and requests that need up to 8,192 tokens of context. At 192 KB/token (a GQA-sized model — see [KV Cache and Context Caching](./kv-cache-and-context-caching.mdx) for that figure's derivation), a full 8,192-token reservation costs 192 KB × 8,192 ≈ **1.5 GB per request**, reserved whether or not the request ever gets close to using it. A naive allocator sizing for the worst case fits 80 GB / 1.5 GB ≈ **53 requests**, purely by reservation, regardless of their real lengths. Now say the realistic average completed length is only 1,200 tokens: real usage per request is 192 KB × 1,200 ≈ 225 MB, and a block-based allocator claiming memory as needed — with negligible per-block waste — fits roughly 80 GB / 225 MB ≈ **364 requests** in the same 80 GB (sanity check, unit-free: 8,192 / 1,200 ≈ 6.8). That's a **≈6.8x** increase in concurrent requests, from the identical hardware, purely from not reserving memory a request was never going to use.
 
-**Prefix sharing, worked through.** 100 concurrent requests share an identical 2,000-token system prompt. Stored separately, that's 100 × 2,000 × 192 KB ≈ 37.5 GB just for 100 copies of the same information. Shared via copy-on-write, it's stored once — 2,000 × 192 KB ≈ 375 MB — freeing roughly **37 GB** for other requests' unique content on the same GPU.
+**Prefix sharing, worked through.** 100 concurrent requests share an identical 2,000-token system prompt. Stored separately, that's 100 × 2,000 × 192 KB ≈ 36.6 GB just for 100 copies of the same information. Shared via copy-on-write, it's stored once — 2,000 × 192 KB ≈ 375 MB — freeing roughly **36 GB** for other requests' unique content on the same GPU.
 
 ## The tradeoffs that matter
 

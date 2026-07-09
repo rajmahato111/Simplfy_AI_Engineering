@@ -9,8 +9,8 @@ diagrams:
   - diagrams/fine-tuning-strategies--branch-and-merge.svg
 est_minutes: 12
 source_attribution: "Factual basis: AI System Design Guide (MIT) by Om Bharatiya; rewritten and expanded. See CREDITS.md."
-last_reviewed: '2026-07-04'
-status: draft
+last_reviewed: 2026-07-09
+status: reviewed
 ---
 
 ## The 30-second version
@@ -61,7 +61,7 @@ Say you're building a customer-support agent that must reply in a strict JSON sc
 
 **Building the fine-tuning set.** You collect 2,000 golden (prompt, response) pairs, hand-reviewed by three senior support engineers, averaging 350 input tokens and 180 output tokens each. You add 150 general-purpose examples — 150 / (2,000 + 150) = 150/2,150 ≈ **7%** of the final set — drawn from broad instruction-following data, specifically as rehearsal so the model doesn't lose the ability to handle an off-topic question gracefully.
 
-**The run.** 2,150 examples for 3 epochs at learning rate 2e-5: (2,000 × 530 tokens/example) × 3 epochs ≈ **3.18M tokens** processed across the whole job — small enough to finish on a single 8-GPU node in a few hours, nowhere near the scale of the pretraining run in the previous chapter.
+**The run.** 2,150 examples for 3 epochs at learning rate 2e-5: (2,150 × 530 tokens/example) × 3 epochs ≈ **3.42M tokens** processed across the whole job — small enough to finish on a single 8-GPU node in a few hours, nowhere near the scale of the pretraining run in the previous chapter.
 
 **The result.** JSON-schema compliance goes from 92% (prompted) to 99.6% (fine-tuned), and the system prompt shrinks from 1,200 tokens to about 80, because the format is now in the weights instead of re-explained every call. At 50,000 requests/day, that's 50,000 × (1,200 − 80) = **56,000,000 fewer input tokens per day** — a savings that compounds every single day the model stays in production, versus a one-time training cost paid once.
 
