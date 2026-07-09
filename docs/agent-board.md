@@ -8,7 +8,7 @@
 
 | ID | Tool | Branch | Status | Paths (locks) |
 |----|------|--------|--------|---------------|
-| T-070–T-073 | Claude Code | `claude/t070-training-inference-cluster` | `in_progress` | `content/concepts/training/**`, `content/concepts/inference/**` (17 chapters) |
+| T-070–T-073 | Claude Code | `claude/t070-training-inference-cluster` | `pr-open` | `content/concepts/training/**`, `content/concepts/inference/**` (17 chapters) |
 
 ---
 
