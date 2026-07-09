@@ -8,7 +8,7 @@
 
 | ID | Tool | Branch | Status | Paths (locks) |
 |----|------|--------|--------|---------------|
-| T-070–T-073 | Claude Code | `claude/t070-training-inference-cluster` | `pr-open` | `content/concepts/training/**`, `content/concepts/inference/**` (17 chapters) |
+| — | — | — | — | (none currently active) |
 
 ---
 
@@ -16,6 +16,7 @@
 
 | PR | Task | Merged |
 |----|------|--------|
+| **#32** | Claude T-070–073: Training + Inference cluster (17 rewritten chapters, reviewer-fixed) — Phase 4 complete | 2026-07-09 |
 | **#31** | Claude T-060–062: Foundations + Models cluster (10 rewritten chapters, reviewer-fixed) | 2026-07-08 |
 | **#30** | Claude T-030–032: Agents cluster (12 rewritten chapters, reviewer-fixed) + unrelated e2e/nav-label CI fix | 2026-07-04 |
 | **#27** | Claude T-020–022: RAG cluster (13 hand-written chapters) | 2026-07-04 |
