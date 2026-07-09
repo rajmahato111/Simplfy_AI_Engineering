@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="392" viewBox="0 0 1200 392" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN
+Canvas 1200x392. Title (600,32).
+Row A (levers pulled) y=72 h=64, bottom=136, center=104:
+  L1 x=24  w=240  "Naive serving"
+  L2 x=328 w=240  "+ Continuous batching"
+  L3 x=632 w=240  "+ Quantization (Q4)"
+  L4 x=936 w=240  "+ Autoscaling"
+  arrows: (264,104)-(326,104); (568,104)-(630,104); (872,104)-(934,104)
+
+Vertical arrows Row A bottom (136) -> Row B top (264):
+  x=144 (L1 center), x=448 (L2 center), x=752 (L3 center), x=1056 (L4 center)
+
+Row B (resulting cost) y=264 h=64, bottom=328, center=296:
+  C1 x=24  w=240  "$43.40 / M tokens"           (under L1)
+  C2 x=328 w=544  "$5.34 / M tokens"             (under L2+L3, combined effect)
+  C3 x=936 w=240  "$4.85 / M tokens"             (under L4)
+  arrows: (264,296)-(326,296); (872,296)-(934,296)
+
+Footer caption centered (600,360).
+-->
+  <rect width="1200" height="392" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="600" y="32" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">Four levers, same GPU: cost per million tokens falls at each stage</text>
+  <text x="600" y="52" font-size="12" fill="#64748B" text-anchor="middle">Same hardware and model throughout — only the software and fleet shape change</text>
+
+  <!-- Row A: levers pulled -->
+  <rect x="24" y="72" width="240" height="64" rx="10" fill="#FEFCE8" stroke="#CA8A04" stroke-width="1.5"/>
+  <text x="144" y="98" font-size="14" fill="#713F12" text-anchor="middle">Naive serving</text>
+  <text x="144" y="116" font-size="12" fill="#713F12" text-anchor="middle">1 req/GPU, mostly idle</text>
+
+  <line x1="264" y1="104" x2="326" y2="104" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="328" y="72" width="240" height="64" rx="10" fill="#FEFCE8" stroke="#CA8A04" stroke-width="1.5"/>
+  <text x="448" y="98" font-size="14" fill="#713F12" text-anchor="middle">+ Continuous batching</text>
+  <text x="448" y="116" font-size="12" fill="#713F12" text-anchor="middle">fills idle decode compute</text>
+
+  <line x1="568" y1="104" x2="630" y2="104" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="632" y="72" width="240" height="64" rx="10" fill="#FEFCE8" stroke="#CA8A04" stroke-width="1.5"/>
+  <text x="752" y="98" font-size="14" fill="#713F12" text-anchor="middle">+ Quantization (Q4)</text>
+  <text x="752" y="116" font-size="12" fill="#713F12" text-anchor="middle">frees VRAM for concurrency</text>
+
+  <line x1="872" y1="104" x2="934" y2="104" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="936" y="72" width="240" height="64" rx="10" fill="#FEFCE8" stroke="#CA8A04" stroke-width="1.5"/>
+  <text x="1056" y="98" font-size="14" fill="#713F12" text-anchor="middle">+ Autoscaling</text>
+  <text x="1056" y="116" font-size="12" fill="#713F12" text-anchor="middle">drops GPUs overnight</text>
+
+  <!-- vertical connectors -->
+  <line x1="144" y1="136" x2="144" y2="262" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="448" y1="136" x2="448" y2="262" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="752" y1="136" x2="752" y2="262" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="1056" y1="136" x2="1056" y2="262" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Row B: resulting cost -->
+  <rect x="24" y="264" width="240" height="64" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="144" y="290" font-size="14" fill="#064E3B" text-anchor="middle">Naive serving</text>
+  <text x="144" y="308" font-size="12" fill="#064E3B" text-anchor="middle">$43.40 / M tokens</text>
+
+  <line x1="264" y1="296" x2="326" y2="296" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="328" y="264" width="544" height="64" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="600" y="290" font-size="14" fill="#064E3B" text-anchor="middle">Continuous batching + Q4 quantization, combined</text>
+  <text x="600" y="308" font-size="12" fill="#064E3B" text-anchor="middle">$5.34 / M tokens</text>
+
+  <line x1="872" y1="296" x2="934" y2="296" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="936" y="264" width="240" height="64" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="1056" y="290" font-size="14" fill="#064E3B" text-anchor="middle">Autoscaled fleet</text>
+  <text x="1056" y="308" font-size="12" fill="#064E3B" text-anchor="middle">$4.85 / M tokens</text>
+
+  <text x="600" y="360" font-size="12" fill="#64748B" text-anchor="middle">$43.40 → $4.85 per million tokens — roughly a 9x reduction, naive to fully optimized</text>
+</svg>

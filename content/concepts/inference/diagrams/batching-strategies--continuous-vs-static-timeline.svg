@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="576" viewBox="0 0 1200 576" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN
+Canvas 1200x576. Title (600,32).
+Container A "static" x=40 y=72 w=1120 h=220 (72-292)
+  caption (56,92)
+  lanes (bar h=32), x from 104 to 1000 (896 wide), label column text-anchor end x=92
+  lane y: L1=112 L2=156 L3=200 L4=244  (pitch44, bottom L4=276, container bottom292)
+  L1: single bar 104-1000 indigo "Request A - long generation"
+  L2,L3,L4: colored 104-234 (130w) indigo "Request B/C/D"; idle 234-1000 (766w) neutral "idle - slot wasted"
+  right margin note x=1080 centered, y=130/144 "retires"/"together"
+Container B "continuous" x=40 y=316 w=1120 h=220 (316-536)
+  caption (56,336)
+  lane y: L1=356 L2=400 L3=444 L4=488 (pitch44, bottom L4=520, container bottom536)
+  L1: single bar 104-1000 indigo (unchanged, still the long request)
+  L2: one indigo bar 104-1000, divider @234, labels "Request B"@169 "Request E"@617
+  L3: one indigo bar 104-1000, dividers @234,@534, labels "Request C"@169 "Request F"@384 "Request G"@767
+  L4: one indigo bar 104-1000, divider @234, labels "Request D"@169 "Request H"@617
+  right margin note x=1080, y=374/388 "refilled"/"immediately"
+Bottom: time axis arrow (104,552)-(220,552), label "time" (232,556)
+  scale note text-anchor end (1160,552)
+-->
+  <rect width="1200" height="576" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="600" y="32" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">Static batching leaves slots idle; continuous batching refills them immediately</text>
+
+  <!-- Container A: static batching -->
+  <rect x="40" y="72" width="1120" height="220" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="56" y="92" font-size="12" fill="#64748B">Static batching — the whole batch waits for its slowest member</text>
+
+  <text x="92" y="132" font-size="12" fill="#334155" text-anchor="end">Slot 1</text>
+  <rect x="104" y="112" width="896" height="32" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="552" y="132" font-size="13" fill="#1E1B4B" text-anchor="middle">Request A — long generation</text>
+
+  <text x="92" y="176" font-size="12" fill="#334155" text-anchor="end">Slot 2</text>
+  <rect x="104" y="156" width="130" height="32" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="169" y="176" font-size="12" fill="#1E1B4B" text-anchor="middle">Request B</text>
+  <rect x="234" y="156" width="766" height="32" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <text x="617" y="176" font-size="13" fill="#334155" text-anchor="middle">idle — slot wasted</text>
+
+  <text x="92" y="220" font-size="12" fill="#334155" text-anchor="end">Slot 3</text>
+  <rect x="104" y="200" width="130" height="32" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="169" y="220" font-size="12" fill="#1E1B4B" text-anchor="middle">Request C</text>
+  <rect x="234" y="200" width="766" height="32" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <text x="617" y="220" font-size="13" fill="#334155" text-anchor="middle">idle — slot wasted</text>
+
+  <text x="92" y="264" font-size="12" fill="#334155" text-anchor="end">Slot 4</text>
+  <rect x="104" y="244" width="130" height="32" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="169" y="264" font-size="12" fill="#1E1B4B" text-anchor="middle">Request D</text>
+  <rect x="234" y="244" width="766" height="32" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <text x="617" y="264" font-size="13" fill="#334155" text-anchor="middle">idle — slot wasted</text>
+
+  <rect x="1004" y="118" width="150" height="34" fill="#ffffff"/>
+  <text x="1080" y="130" font-size="11" fill="#64748B" text-anchor="middle">retires</text>
+  <text x="1080" y="144" font-size="11" fill="#64748B" text-anchor="middle">together</text>
+
+  <!-- Container B: continuous batching -->
+  <rect x="40" y="316" width="1120" height="220" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="56" y="336" font-size="12" fill="#64748B">Continuous batching — a finished slot is refilled from the queue immediately</text>
+
+  <text x="92" y="376" font-size="12" fill="#334155" text-anchor="end">Slot 1</text>
+  <rect x="104" y="356" width="896" height="32" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="552" y="376" font-size="13" fill="#1E1B4B" text-anchor="middle">Request A — long generation</text>
+
+  <text x="92" y="420" font-size="12" fill="#334155" text-anchor="end">Slot 2</text>
+  <rect x="104" y="400" width="896" height="32" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <line x1="234" y1="400" x2="234" y2="432" stroke="#ffffff" stroke-width="2"/>
+  <text x="169" y="420" font-size="12" fill="#1E1B4B" text-anchor="middle">Request B</text>
+  <text x="617" y="420" font-size="12" fill="#1E1B4B" text-anchor="middle">Request E</text>
+
+  <text x="92" y="464" font-size="12" fill="#334155" text-anchor="end">Slot 3</text>
+  <rect x="104" y="444" width="896" height="32" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <line x1="234" y1="444" x2="234" y2="476" stroke="#ffffff" stroke-width="2"/>
+  <line x1="534" y1="444" x2="534" y2="476" stroke="#ffffff" stroke-width="2"/>
+  <text x="169" y="464" font-size="12" fill="#1E1B4B" text-anchor="middle">Request C</text>
+  <text x="384" y="464" font-size="12" fill="#1E1B4B" text-anchor="middle">Request F</text>
+  <text x="767" y="464" font-size="12" fill="#1E1B4B" text-anchor="middle">Request G</text>
+
+  <text x="92" y="508" font-size="12" fill="#334155" text-anchor="end">Slot 4</text>
+  <rect x="104" y="488" width="896" height="32" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <line x1="234" y1="488" x2="234" y2="520" stroke="#ffffff" stroke-width="2"/>
+  <text x="169" y="508" font-size="12" fill="#1E1B4B" text-anchor="middle">Request D</text>
+  <text x="617" y="508" font-size="12" fill="#1E1B4B" text-anchor="middle">Request H</text>
+
+  <rect x="1004" y="362" width="150" height="34" fill="#ffffff"/>
+  <text x="1080" y="374" font-size="11" fill="#64748B" text-anchor="middle">refilled</text>
+  <text x="1080" y="388" font-size="11" fill="#64748B" text-anchor="middle">immediately</text>
+
+  <!-- time axis -->
+  <line x1="104" y1="552" x2="216" y2="552" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="230" y="556" font-size="12" fill="#475569">time</text>
+  <text x="1160" y="556" font-size="11" fill="#64748B" text-anchor="end" font-style="italic">(segment widths are illustrative, not to scale)</text>
+</svg>

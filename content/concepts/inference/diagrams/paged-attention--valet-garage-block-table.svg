@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="440" viewBox="0 0 1200 440" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN
+Canvas 1200x440. Title (600,32).
+
+Logical sequence container: x=24 y=80 w=260 h=280 (80 to 360), caption (40,72)
+  4 stacked blocks, x=48 w=212 h=56, gap=16, pitch=72:
+   LB0 y=96 "Block 0 (tok 0-15)"
+   LB1 y=168 "Block 1 (tok 16-31)"
+   LB2 y=240 "Block 2 (tok 32-47)"
+   LB3 y=312 "Block 3 (tok 48-63)"
+  arrow: container right edge (284,220) -> block table left edge (346,220), single arrow, 0 bends
+
+Block table: x=348 y=180 w=200 h=80, center=(448,220)
+  arrow: block table right edge (548,220) -> physical container left edge (610,220), single arrow, 0 bends
+
+Physical VRAM container: x=612 y=80 w=564 h=200 (80 to 280), caption (628,72)
+  4 columns x 2 rows, box w=120 h=56, col pitch=140, row pitch=88:
+  col x: 624, 764, 904, 1044  row y: 104, 192
+  Row1 (y=104): free, Blk0, free, Blk3
+  Row2 (y=192): Blk2, free, Blk1, free
+
+Footer caption centered (600,400).
+-->
+  <rect width="1200" height="440" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="600" y="32" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">One request's sequence, in fixed-size blocks scattered across physical memory</text>
+
+  <!-- Logical sequence container -->
+  <rect x="24" y="80" width="260" height="280" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="40" y="72" font-size="12" fill="#64748B">LOGICAL SEQUENCE — WHAT THE MODEL READS</text>
+
+  <rect x="48" y="96" width="212" height="56" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="154" y="129" font-size="13" fill="#1E1B4B" text-anchor="middle">Block 0 (tok 0–15)</text>
+
+  <rect x="48" y="168" width="212" height="56" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="154" y="201" font-size="13" fill="#1E1B4B" text-anchor="middle">Block 1 (tok 16–31)</text>
+
+  <rect x="48" y="240" width="212" height="56" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="154" y="273" font-size="13" fill="#1E1B4B" text-anchor="middle">Block 2 (tok 32–47)</text>
+
+  <rect x="48" y="312" width="212" height="56" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="154" y="345" font-size="13" fill="#1E1B4B" text-anchor="middle">Block 3 (tok 48–63)</text>
+
+  <!-- arrow: logical container -> block table -->
+  <line x1="284" y1="220" x2="346" y2="220" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Block table -->
+  <rect x="348" y="180" width="200" height="80" rx="10" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <text x="448" y="212" font-size="14" fill="#334155" text-anchor="middle">Block table</text>
+  <text x="448" y="230" font-size="12" fill="#334155" text-anchor="middle">the valet ticket:</text>
+  <text x="448" y="246" font-size="12" fill="#334155" text-anchor="middle">logical → physical map</text>
+
+  <!-- arrow: block table -> physical VRAM -->
+  <line x1="548" y1="220" x2="610" y2="220" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Physical VRAM container -->
+  <rect x="612" y="80" width="564" height="200" rx="10" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="628" y="72" font-size="12" fill="#64748B">PHYSICAL VRAM — SCATTERED, FIXED-SIZE STALLS</text>
+
+  <!-- row 1 -->
+  <rect x="624" y="104" width="120" height="56" rx="10" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <text x="684" y="136" font-size="12" fill="#334155" text-anchor="middle">free</text>
+  <rect x="764" y="104" width="120" height="56" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="824" y="136" font-size="12" fill="#2E1065" text-anchor="middle">Blk 0</text>
+  <rect x="904" y="104" width="120" height="56" rx="10" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <text x="964" y="136" font-size="12" fill="#334155" text-anchor="middle">free</text>
+  <rect x="1044" y="104" width="120" height="56" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="1104" y="136" font-size="12" fill="#2E1065" text-anchor="middle">Blk 3</text>
+
+  <!-- row 2 -->
+  <rect x="624" y="192" width="120" height="56" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="684" y="224" font-size="12" fill="#2E1065" text-anchor="middle">Blk 2</text>
+  <rect x="764" y="192" width="120" height="56" rx="10" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <text x="824" y="224" font-size="12" fill="#334155" text-anchor="middle">free</text>
+  <rect x="904" y="192" width="120" height="56" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="964" y="224" font-size="12" fill="#2E1065" text-anchor="middle">Blk 1</text>
+  <rect x="1044" y="192" width="120" height="56" rx="10" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <text x="1104" y="224" font-size="12" fill="#334155" text-anchor="middle">free</text>
+
+  <text x="600" y="400" font-size="12" fill="#64748B" text-anchor="middle">Blocks 0–3 land in whatever stalls are free, in any order — the block table is the only thing that keeps track</text>
+</svg>

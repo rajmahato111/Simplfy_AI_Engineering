@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1184" height="312" viewBox="0 0 1184 312" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN (8px grid, 24px padding)
+Canvas 1184x312. Title center (592,44). Single row, 5px grid.
+
+Row (y=96..160, center=128):
+  "Prompt"          x=24   y=96 w=176 h=64 -> 24..200   (green data store)
+  "G rollouts"      x=264  y=96 w=176 h=64 -> 264..440  (yellow pipeline)
+  "Verifier"        x=504  y=96 w=176 h=64 -> 504..680  (red guardrail)
+  "Group z-score"   x=744  y=96 w=176 h=64 -> 744..920  (indigo service)
+  "Policy update"   x=984  y=96 w=176 h=64 -> 984..1160 (purple LLM)
+
+Arrows (straight horizontal, 0 bends):
+  Prompt(200,128)     -> Rollouts(264,128)
+  Rollouts(440,128)   -> Verifier(504,128)
+  Verifier(680,128)   -> ZScore(744,128)
+  ZScore(920,128)     -> Update(984,128)
+
+Note (neutral, standalone, no arrow, full row width):
+  x=24 y=224 w=1136 h=64 -> 24..1160, 224..288
+  "All-correct or all-wrong group -> std = 0, no gradient." / "DAPO resamples and filters these dead groups out."
+-->
+  <rect width="1184" height="312" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="592" y="44" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">GRPO: scoring a group of rollouts against itself</text>
+
+  <!-- Prompt -->
+  <rect x="24" y="96" width="176" height="64" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="112" y="123" font-size="14" fill="#064E3B" text-anchor="middle">Prompt<tspan x="112" dy="17" font-size="12">checkable answer</tspan></text>
+
+  <!-- G rollouts -->
+  <rect x="264" y="96" width="176" height="64" rx="10" fill="#FEFCE8" stroke="#CA8A04" stroke-width="1.5"/>
+  <text x="352" y="123" font-size="14" fill="#713F12" text-anchor="middle">G rollouts<tspan x="352" dy="17" font-size="12">sampled, same prompt</tspan></text>
+
+  <!-- Verifier -->
+  <rect x="504" y="96" width="176" height="64" rx="10" fill="#FEF2F2" stroke="#DC2626" stroke-width="1.5"/>
+  <text x="592" y="123" font-size="14" fill="#7F1D1D" text-anchor="middle">Verifier<tspan x="592" dy="17" font-size="12">pass / fail</tspan></text>
+
+  <!-- Group z-score -->
+  <rect x="744" y="96" width="176" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="832" y="123" font-size="14" fill="#1E1B4B" text-anchor="middle">Group z-score<tspan x="832" dy="17" font-size="12">free baseline</tspan></text>
+
+  <!-- Policy update -->
+  <rect x="984" y="96" width="176" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="1072" y="123" font-size="14" fill="#2E1065" text-anchor="middle">Policy update<tspan x="1072" dy="17" font-size="12">push via gradient</tspan></text>
+
+  <!-- Arrows -->
+  <line x1="200" y1="128" x2="264" y2="128" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="440" y1="128" x2="504" y2="128" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="680" y1="128" x2="744" y2="128" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="920" y1="128" x2="984" y2="128" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Note -->
+  <rect x="24" y="224" width="1136" height="64" rx="10" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <text x="592" y="249" font-size="12" fill="#334155" text-anchor="middle">All-correct or all-wrong group &#8594; std = 0, no gradient.<tspan x="592" dy="16">DAPO resamples and filters these dead groups out.</tspan></text>
+</svg>

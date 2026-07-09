@@ -1,69 +1,103 @@
 ---
-title: Serving Infrastructure
+title: "Serving Infrastructure: Running an Inference Fleet, Not Just a Model"
 slug: serving-infrastructure
 type: concept
 area: inference
 difficulty: intermediate
-tags:
-  - inference
-  - serving
-  - infrastructure
+tags: [inference, serving, infrastructure, tensor-parallelism, pipeline-parallelism, autoscaling, multi-tenancy]
 diagrams:
-  - diagrams/serving-infrastructure--overview.svg
-est_minutes: 5
-source_attribution: >-
-  Factual basis: AI System Design Guide (MIT) by Om Bharatiya; structured reader
-  edition with interview lens. See CREDITS.md.
-last_reviewed: '2026-07-04'
-status: draft
+  - diagrams/serving-infrastructure--gateway-and-parallelism.svg
+est_minutes: 13
+source_attribution: "Factual basis: AI System Design Guide (MIT) by Om Bharatiya; rewritten and expanded. See CREDITS.md."
+last_reviewed: 2026-07-09
+status: reviewed
 ---
+
 ## The 30-second version
 
-Deploying LLMs at scale requires a robust infrastructure layer that handles load balancing, model parallelism, and multi-tenant isolation. The focus has shifted from "serving a model" to "orchestrating an inference fleet."
+Serving one model to one user is a batching-and-latency problem, covered elsewhere (see [Batching Strategies](./batching-strategies.mdx) and [PagedAttention](./paged-attention.mdx)). Serving a fleet of models to thousands of concurrent tenants is a different problem entirely, and it's the one production teams actually operate: a gateway has to authenticate and route every request, a model too large for one GPU has to be split across several without destroying latency, dozens of tenants have to share that GPU capacity without one of them starving the rest, and the whole fleet has to grow and shrink automatically as demand moves — on a signal that reflects what's actually running out, not a proxy for it. Get the splitting strategy and the scaling signal wrong and you can burn a lot of expensive GPU-hours before anyone notices why latency is bad.
 
 ## The analogy
 
-Think of **Serving Infrastructure** like running a kitchen during rush hour: you cannot memorize every recipe change, so you keep reference cards (retrieval), a head chef who improvises within guardrails (the model), and a quality check before plates leave the pass (evaluation). The technical system mirrors that flow — separate what you **store**, what you **retrieve**, and what you **generate**.
+A container port doesn't move cargo one crate at a time from one ship to one truck. It runs berths, gantry cranes, and a harbor master's office that decides which ship ties up where, and none of that machinery cares about any single container — it's built to keep the whole port moving.
+
+The harbor master's office is the first thing any ship talks to: which berth is free, does this line have priority or a quota today, is this vessel flagged for extra inspection. Nothing gets unloaded until the harbor master has routed it somewhere.
+
+Some ships are too large for one gang of cranes to unload in reasonable time, so the port puts multiple gantry cranes on the *same* ship at once, each working a different bank of rows in parallel, radioing constantly so nobody swings a container into another crane's row. That tight coordination only works because the cranes are close together, wired into the same berth's control system — pull them apart onto different piers and the coordination overhead swamps the benefit.
+
+Other cargo takes a different path: unloaded at one yard, railed to a second for customs, then a third for onward loading. For any single shipment that's slower than the multi-crane approach — it sits idle while each stage finishes and the next one gets ready. This staged approach only earns its keep once many shipments move through at once, each entering a stage right as the one ahead clears out, so no stage sits idle.
+
+The port also runs several shipping lines through the same shared cranes, and if the harbor master let one line hog every crane during a surge, the rest would grind to a halt — so berth time gets rationed, not first-come-first-served without limit. And when a holiday surge floods the port with more vessels than the regular crew can turn around, the port doesn't hire based on how many ships are floating offshore — it watches how full the *staging yards* actually are, since that's the resource that actually runs out; ships can wait at anchor a while, but a full yard stops the whole port cold.
+
+| Container port | Serving infrastructure |
+|---|---|
+| Harbor master's office — routes every ship, enforces per-line quotas | Inference gateway — auth, rate limiting, request routing, model-version canaries |
+| Multiple cranes working the same ship at once, tightly coordinated | Tensor parallelism — splitting one layer's matrix multiply across GPUs on the same node, low latency, high interconnect bandwidth needed |
+| Cargo moving through sequential, separate yards (unload, customs, reload) | Pipeline parallelism — splitting a model's layers across GPUs or nodes, run in sequence |
+| A shipment idle while its yard-stage waits for the next one to be ready, unless other shipments fill the gap | Pipeline "bubble" time — idle GPU-stage time on a single request, hidden only when multiple requests are in flight |
+| Rationing crane time across shipping lines instead of first-come-first-served | Multi-tenant fair-share scheduling — preventing one tenant's traffic from starving the rest |
+| Scaling crew by how full the staging yards are, not how many ships are waiting offshore | Autoscaling on KV-cache occupancy, not raw request count or CPU |
+| Specialized terminals for different cargo — reefer, bulk, general container | Choosing a serving engine (vLLM, SGLang, TensorRT-LLM) suited to a specific workload |
 
 ## How it actually works
 
+![A request enters through the gateway to a shared GPU pool; inside the pool, tensor parallelism splits one model across GPUs for low latency while pipeline parallelism splits layers across nodes for models too large for one node; a scheduler enforces fairness and an autoscaler watches KV-cache occupancy to resize the pool](diagrams/serving-infrastructure--gateway-and-parallelism.svg)
 
-![Serving Infrastructure overview](diagrams/serving-infrastructure--overview.svg)
+Follow the diagram left to right, then into the two rows describing what happens inside the GPU pool. Every request passes through the **gateway** first: authentication, per-tenant rate limits, and routing to a specific model version — including holding a session's requests on the same GPU node so a cached prompt prefix (see [KV Cache and Context Caching](./kv-cache-and-context-caching.mdx)) doesn't have to be rebuilt on a different machine.
 
-Deploying LLMs at scale requires a robust infrastructure layer that handles load balancing, model parallelism, and multi-tenant isolation. The focus has shifted from "serving a model" to "orchestrating an inference fleet."
+Once a request reaches the GPU pool, how the model's weights get split across hardware depends on whether it fits on one node. **Tensor parallelism** splits each layer's matrix multiplication across multiple GPUs at once — GPU 1 computes half a layer's arithmetic, GPU 2 the other half, synchronizing (an all-reduce) after every layer over a fast interconnect like NVLink. Because every GPU works the *same* layer at the *same* time, a single request's latency drops roughly in proportion to GPU count, minus synchronization overhead — the standard choice within one node, and the reason a lone request gets faster, not just the fleet's aggregate throughput.
+
+**Pipeline parallelism** takes the opposite cut: it splits the stack of layers, putting layers 1–40 on one GPU and 41–80 on another, run in sequence. For a single lone request, this *adds* latency rather than dividing it, since the second GPU can't start until the first hands off, and one GPU sits idle in between. It only pays for itself once many requests stagger through it, so GPU 2 finishes one request's late layers while GPU 1 starts the next request's early ones — reserved for models too large to fit, or too slow to synchronize, across one node's GPUs.
+
+Underneath both sits a **continuous-batching scheduler** (see [Batching Strategies](./batching-strategies.mdx)) deciding, iteration by iteration, whose decode step runs next. Left unmanaged, one high-volume tenant can claim most of the KV-cache slots and decode iterations, starving everyone else — the "noisy neighbor" problem. Production schedulers fix this with iteration-level fairness, capping how much of the batch and cache any tenant can occupy per cycle, enforced partly at the gateway (token-bucket rate limits) and partly in the engine's scheduling policy.
+
+Finally, the **autoscaler** decides when to add or remove GPU replicas — and the signal it watches matters enormously. Request count or CPU utilization are poor proxies for what's actually running out during LLM serving; the resource under real pressure is usually the KV cache. A pool can look lightly loaded on CPU while its cache is nearly full, and adding GPUs based on request count alone can miss that entirely. Watching cache occupancy catches the real constraint before latency visibly degrades.
 
 ## A concrete example
 
-Deploying LLMs at scale requires a robust infrastructure layer that handles load balancing, model parallelism, and multi-tenant isolation. The focus has shifted from "serving a model" to "orchestrating an inference fleet."
+A 40B-parameter dense model needs roughly 80 GB just for FP16 weights — too much to leave enough headroom for KV cache alongside on a single 80 GB GPU at the concurrency the team needs, so it's split across 2 GPUs.
+
+**Tensor parallelism, 2 GPUs.** Suppose the full per-layer compute for one decode step, on a single hypothetical GPU, would take 30 ms across all 80 layers. Splitting the arithmetic across 2 GPUs brings each GPU's share to 15 ms, plus a synchronization cost over NVLink of ~0.05 ms/layer × 80 layers = 4 ms. Total: 15 + 4 = **19 ms per decode step**.
+
+**Pipeline parallelism, 2 GPUs, one lone request.** The same 30 ms is now split by *layer range*: GPU 1 does layers 1–40 (15 ms), hands off across a network hop (2 ms), and GPU 2 does layers 41–80 (15 ms). Total: 15 + 2 + 15 = **32 ms per decode step** — and for the whole step, one GPU sits idle waiting on the other.
+
+For a single stream of traffic, tensor parallelism is roughly 32 / 19 ≈ **1.7x lower latency**. Pipeline parallelism only closes that gap once enough concurrent requests stagger through it that GPU 1 works on request 2 while GPU 2 finishes request 1 — at which point idle time disappears and throughput, not single-request latency, is what matters.
+
+**Autoscaling on the right signal.** A fleet runs 6 replicas at 55% average KV-cache occupancy. A traffic spike pushes occupancy to 82% and holds there for 3 minutes, tripping the autoscaler's threshold. It adds 2 replicas, bringing the fleet to 8: new occupancy ≈ 55% × 6 / 8 ≈ **41%**, back inside the target band. An autoscaler watching request count instead might not have reacted at all — request count can stay flat while each request's context grows, which is exactly what drives cache occupancy up without touching the request-count metric.
 
 ## The tradeoffs that matter
 
-| Choice | Upside | Cost |
-|--------|--------|------|
-| Simpler design | Faster to ship | Less resilient |
-| Heavier retrieval | Better grounding | More latency |
-| Bigger model | Higher quality | Higher $/query |
+| Choice | What it buys | What it costs |
+|---|---|---|
+| Tensor parallelism | Lower per-request latency; the standard within one node | Needs fast interconnect (NVLink); communication overhead grows with GPU count |
+| Pipeline parallelism | Lets a model span multiple nodes at all | Adds latency for a lone request; only pays off under sustained concurrent load |
+| Strict per-tenant fairness | No tenant can starve the rest | Slightly lower peak throughput than a free-for-all scheduler |
+| Autoscaling on KV-cache occupancy | Catches the real constraint before latency visibly degrades | Requires the engine to expose that metric; more moving parts than scaling on CPU |
+| A single house serving engine for every workload | Simplicity, one thing to operate and patch | Leaves throughput on the table — different engines currently lead on different workload shapes (multimodal, structured output, raw NVIDIA throughput) |
 
 ## Where people go wrong
 
-- Skipping evaluation and hoping demos generalize
-- Ignoring latency/cost until production traffic arrives
-- Treating retrieval quality as a generation problem
+1. **Assuming pipeline parallelism parallelizes a single request.** It doesn't — without other requests staggered through the same GPUs, one is always idle, and latency is *worse* than tensor parallelism, not better.
+2. **Autoscaling on CPU or raw request count.** Neither reflects KV-cache pressure, usually the first real constraint; a calm-looking metric can hide a cache that's nearly full.
+3. **Treating serving engines as interchangeable, never re-benchmarking.** Engines gain and lose ground on specific workloads release to release, and now carry a CVE cadence worth tracking, not just a changelog.
+4. **Routing long-lived streams through a load balancer that only understands the connection, not the stream.** A layer-4 balancer can rebalance mid-response and break an in-progress token stream; this needs layer-7 awareness of where a turn ends.
+5. **Treating "the model" as the deployment artifact.** A model name alone doesn't pin down behavior — engine version, batch configuration, and hardware belong in the same manifest, since any one changing can shift latency or output.
 
 ## The interview lens
 
-### Q: Why is Tensor Parallelism preferred over Pipeline Parallelism for low-latency serving?
+Interviewers use this to check whether you can reason about a fleet under shared, contended resources — not just describe how one request flows through one GPU.
 
-**Strong answer:**
-Tensor Parallelism (TP) performs the matrix multiplications of a single layer across multiple GPUs simultaneously. This means the latency of that layer is reduced by the number of GPUs. Pipeline Parallelism (PP), conversely, processes different layers sequentially. While GPU 2 is working on layers 40-80, GPU 1 is idle unless you have a deep pipeline of multiple requests (batching). For a single user's request, PP adds the latency of all GPUs, whereas TP divides the latency across all GPUs.
+A strong sound bite: *"Tensor parallelism divides a single request's latency across GPUs; pipeline parallelism adds it, unless there's enough concurrent traffic to keep every stage busy. So before I split a model across nodes, I want to know whether the workload is latency-sensitive single requests or high-volume concurrent traffic — the right split is different for each."*
 
-### Q: How do you handle "Noisy Neighbors" in a multi-tenant LLM cluster?
+Likely follow-ups:
 
-**Strong answer:**
-We handle noisy neighbors through **Tiered Iteration-Level Scheduling**. Each tenant is assigned a "share" of the total GPU cycles. In the continuous batching loop, the scheduler ensures that a single tenant doesn't occupy 100% of the KV cache slots. If Tenant A is overwhelming the system, the scheduler will prioritize "Prefill" steps for Tenant B and C, or only process a subset of Tenant A's decode iterations per cycle. This is enforced at the Gateway via token-bucket rate limiting and at the serving engine via specific scheduling policies.
+- Why is tensor parallelism preferred for low-latency serving over pipeline parallelism? (It divides a layer's compute across GPUs working in parallel on the same request; pipeline parallelism processes layers in sequence, so a lone request pays the full latency of every stage plus idle time between them.)
+- How do you stop one tenant from starving others on a shared cluster? (Iteration-level fair-share scheduling that caps how much of the batch and the KV cache any tenant can claim per cycle, enforced at the gateway via rate limits and inside the engine via scheduling policy.)
+- What would make you switch serving engines? (A workload-specific throughput or feature gap — structured output, multimodal support, or raw hardware throughput — weighed against the operational cost of running and patching a second engine.)
 
 ## Go deeper
 
-- [Upstream chapter (Serving Infrastructure)](https://github.com/ombharatiya/ai-system-design-guide/blob/main/04-inference-optimization/06-serving-infrastructure.md)
-- Related questions in the [question bank](/questions)
-- Practice with [SPIDER walkthrough](/practice) or [mock interview](/mock)
+- [Batching Strategies](./batching-strategies.mdx) — the continuous-batching scheduler this fleet-level view sits on top of.
+- [PagedAttention](./paged-attention.mdx) — how the KV cache is actually stored, and why its occupancy is the metric worth autoscaling on.
+- [Cost Optimization Playbook](./cost-optimization-playbook.mdx) — turning this infrastructure's utilization into a dollar figure.
+- Upstream reference: [Serving Infrastructure — AI System Design Guide](https://github.com/ombharatiya/ai-system-design-guide/blob/main/04-inference-optimization/06-serving-infrastructure.md) (MIT; see [CREDITS](../../../CREDITS.md)).

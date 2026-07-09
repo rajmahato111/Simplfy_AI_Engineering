@@ -8,15 +8,7 @@
 
 | ID | Tool | Branch | Status | Paths (locks) |
 |----|------|--------|--------|---------------|
-| — | — | — | — | (none currently active) |
-
----
-
-## Open PRs (awaiting human review/merge)
-
-| PR | Task | Opened |
-|----|------|--------|
-| **#31** | Claude T-060–062: Foundations + Models cluster (10 rewritten chapters, reviewer-fixed) | 2026-07-08 |
+| T-070–T-073 | Claude Code | `claude/t070-training-inference-cluster` | `pr-open` | `content/concepts/training/**`, `content/concepts/inference/**` (17 chapters) |
 
 ---
 
@@ -24,6 +16,7 @@
 
 | PR | Task | Merged |
 |----|------|--------|
+| **#31** | Claude T-060–062: Foundations + Models cluster (10 rewritten chapters, reviewer-fixed) | 2026-07-08 |
 | **#30** | Claude T-030–032: Agents cluster (12 rewritten chapters, reviewer-fixed) + unrelated e2e/nav-label CI fix | 2026-07-04 |
 | **#27** | Claude T-020–022: RAG cluster (13 hand-written chapters) | 2026-07-04 |
 | **#26** | Content review program, metadata fixes, 3 retrieval rewrites | 2026-07-04 |
@@ -40,5 +33,5 @@
 
 | ID | Tool | Task |
 |----|------|------|
-| T-070+ | Claude Code | Training + Inference clusters (Phase 4 remainder, 17 chapters) |
-| T-052+ | Cursor | Remaining MDX rewrites (Prompting/Evals/Frameworks/Tool-use/etc.) |
+| T-080+ | Claude Code | Phase 5: Prompting/Evals/MLOps/Security/Reliability (~21 chapters) |
+| T-052+ | Cursor | Remaining MDX rewrites (Frameworks/Tool-use/Voice/Multimodal/etc.) |
