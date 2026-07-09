@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1064" height="408" viewBox="0 0 1064 408" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN (8px grid, 24px padding)
+Canvas 1064x408. Title center (532,44).
+
+Top row (y=96..160, center=128):
+  "Golden human data" x=280 y=96 w=232 h=64 -> 280..512 (green data store)
+
+Bottom row (y=224..288, center=256):
+  "Teacher model"        x=24  y=224 w=192 h=64 -> 24..216   (purple LLM)
+  "Raw synthetic"        x=280 y=224 w=192 h=64 -> 280..472  (green data store)
+  "Quality filter funnel" x=536 y=224 w=224 h=64 -> 536..760 (yellow pipeline)
+
+Right node (tall, spans both rows, 0 bends):
+  "Training-ready mix" x=824 y=96 w=216 h=192 -> 824..1040, 96..288 (green data store)
+
+Arrows (straight horizontal, 0 bends):
+  Teacher(216,256)      -> RawSynthetic(280,256)
+  RawSynthetic(472,256) -> QualityFilter(536,256)
+  QualityFilter(760,256)-> Merge(824,256)
+  GoldenData(512,128)   -> Merge(824,128)   [long straight arrow through empty top-right space]
+
+Note (neutral, standalone, no arrow):
+  x=24 y=320 w=1016 h=64 -> 24..1040, 320..384
+  "No golden slice, no verifier: synthetic-on-synthetic" / "training compounds the generator's own errors."
+-->
+  <rect width="1064" height="408" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="532" y="44" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">From teacher model to a training-ready data mix</text>
+
+  <!-- Golden human data -->
+  <rect x="280" y="96" width="232" height="64" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="396" y="123" font-size="14" fill="#064E3B" text-anchor="middle">Golden human data<tspan x="396" dy="17" font-size="12">~10% of mix</tspan></text>
+
+  <!-- Teacher model -->
+  <rect x="24" y="224" width="192" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="120" y="251" font-size="14" fill="#2E1065" text-anchor="middle">Teacher model<tspan x="120" dy="17" font-size="12">generates at scale</tspan></text>
+
+  <!-- Raw synthetic examples -->
+  <rect x="280" y="224" width="192" height="64" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="376" y="251" font-size="14" fill="#064E3B" text-anchor="middle">Raw synthetic<tspan x="376" dy="17" font-size="12">examples</tspan></text>
+
+  <!-- Quality filter funnel -->
+  <rect x="536" y="224" width="224" height="64" rx="10" fill="#FEFCE8" stroke="#CA8A04" stroke-width="1.5"/>
+  <text x="648" y="251" font-size="14" fill="#713F12" text-anchor="middle">Quality filter<tspan x="648" dy="17" font-size="12">funnel</tspan></text>
+
+  <!-- Training-ready mix -->
+  <rect x="824" y="96" width="216" height="192" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="932" y="185" font-size="14" fill="#064E3B" text-anchor="middle">Training-ready<tspan x="932" dy="17">mix</tspan></text>
+
+  <!-- Arrows -->
+  <line x1="216" y1="256" x2="280" y2="256" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="472" y1="256" x2="536" y2="256" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="760" y1="256" x2="824" y2="256" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="512" y1="128" x2="824" y2="128" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Note -->
+  <rect x="24" y="320" width="1016" height="64" rx="10" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <text x="532" y="345" font-size="12" fill="#334155" text-anchor="middle">No golden slice, no verifier: synthetic-on-synthetic<tspan x="532" dy="16">training compounds the generator's own errors.</tspan></text>
+</svg>

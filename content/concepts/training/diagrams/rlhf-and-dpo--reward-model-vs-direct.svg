@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1104" height="408" viewBox="0 0 1104 408" font-family="system-ui, -apple-system, 'Segoe UI', 'DejaVu Sans', sans-serif">
+<!--
+COORDINATE PLAN (8px grid, 24px padding)
+Canvas 1104x408. Title center (552,44).
+
+Left node (tall, spans both rows, 0 bends):
+  "Preference pairs" x=24 y=96 w=216 h=192 -> 24..240, 96..288 (green data store)
+
+Row top (y=96..160, center=128):
+  "Reward model"  x=304 y=96 w=216 h=64 -> 304..520 (indigo service)
+  "PPO update"    x=584 y=96 w=216 h=64 -> 584..800 (indigo service)
+
+Row bottom (y=224..288, center=256):
+  (ColB left empty on purpose: DPO skips the reward-model step)
+  "DPO loss"      x=584 y=224 w=216 h=64 -> 584..800 (indigo service)
+
+Right node (tall, spans both rows, 0 bends):
+  "Aligned policy" x=864 y=96 w=216 h=192 -> 864..1080, 96..288 (purple LLM)
+
+Arrows (straight horizontal, 0 bends):
+  Left(240,128)  -> RewardModel(304,128)
+  Left(240,256)  -> DPO(584,256)        [long straight arrow through empty ColB-bottom]
+  RewardModel(520,128) -> PPO(584,128)
+  PPO(800,128)   -> Right(864,128)
+  DPO(800,256)   -> Right(864,256)
+
+Note (neutral, standalone, no arrow):
+  x=304 y=320 w=496 h=64 -> 304..800, 320..384
+  "Both paths anchor to a frozen reference," / "so the policy can't drift too far, too fast."
+-->
+  <rect width="1104" height="408" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5"
+    orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker></defs>
+
+  <text x="552" y="44" font-size="16" font-weight="600" fill="#0F172A" text-anchor="middle">RLHF vs. DPO: two paths to an aligned policy</text>
+
+  <!-- Left: Preference pairs -->
+  <rect x="24" y="96" width="216" height="192" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+  <text x="132" y="185" font-size="14" fill="#064E3B" text-anchor="middle">Preference<tspan x="132" dy="17">pairs</tspan><tspan x="132" dy="17" font-size="12">chosen vs rejected</tspan></text>
+
+  <!-- Top lane: Reward model -->
+  <rect x="304" y="96" width="216" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="412" y="123" font-size="14" fill="#1E1B4B" text-anchor="middle">Reward model<tspan x="412" dy="17" font-size="12">learns to score</tspan></text>
+
+  <!-- Top lane: PPO update -->
+  <rect x="584" y="96" width="216" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="692" y="123" font-size="14" fill="#1E1B4B" text-anchor="middle">PPO update<tspan x="692" dy="17" font-size="12">vs reward + KL</tspan></text>
+
+  <!-- Bottom lane: DPO loss -->
+  <rect x="584" y="224" width="216" height="64" rx="10" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="692" y="251" font-size="14" fill="#1E1B4B" text-anchor="middle">DPO loss<tspan x="692" dy="17" font-size="12">vs frozen reference</tspan></text>
+
+  <!-- Right: Aligned policy -->
+  <rect x="864" y="96" width="216" height="192" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="972" y="185" font-size="14" fill="#2E1065" text-anchor="middle">Aligned<tspan x="972" dy="17">policy</tspan></text>
+
+  <!-- Arrows -->
+  <line x1="240" y1="128" x2="304" y2="128" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="240" y1="256" x2="584" y2="256" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="520" y1="128" x2="584" y2="128" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="800" y1="128" x2="864" y2="128" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="800" y1="256" x2="864" y2="256" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Note -->
+  <rect x="304" y="320" width="496" height="64" rx="10" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+  <text x="552" y="345" font-size="12" fill="#334155" text-anchor="middle">Both paths anchor to a frozen reference,<tspan x="552" dy="16">so the policy can't drift too far, too fast.</tspan></text>
+</svg>
