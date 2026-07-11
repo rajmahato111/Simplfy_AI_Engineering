@@ -1,11 +1,12 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { compileMDX } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
 import { getContentBySlug, listContentSlugs } from "@/lib/content";
 import { getAdjacentSlugs } from "@/lib/content-nav";
 import { prepareContentForRender } from "@/lib/content-audit";
-import { getCheatSheetForSlug } from "@/lib/cheatsheet";
+import { getCheatSheetForDoc } from "@/lib/cheatsheet";
 import { extractH2Headings } from "@/lib/headings";
 import { mdxComponents } from "@/lib/mdx-components";
 import { ArticleBreadcrumb, ArticleToc } from "@/components/article-chrome";
@@ -61,21 +62,27 @@ export default async function LearnDocPage({ params, searchParams }: Props) {
   if (!doc) notFound();
 
   const { view } = await searchParams;
-  const cheatSheet = getCheatSheetForSlug(slug);
-  const showCheatSheet = view === "cheatsheet" && cheatSheet !== null;
+  const hasCheatSheet = Boolean(doc.frontmatter.cheat_sheet);
+  const cheatSheet = view === "cheatsheet" && hasCheatSheet ? getCheatSheetForDoc(doc) : null;
 
-  const headings = extractH2Headings(doc.content);
-  const diagrams = doc.frontmatter.diagrams;
-  const source = prepareContentForRender(doc.content, diagrams);
-
-  const { content: MdxBody } = await compileMDX({
-    source,
-    components: mdxComponents(slug, headings),
-    options: {
-      parseFrontmatter: false,
-      mdxOptions: { remarkPlugins: [remarkGfm] },
-    },
-  });
+  // Only compile the MDX body and extract headings when the prose view is actually
+  // being shown — avoids wasted work and a stale-looking ToC when the cheat sheet renders.
+  let MdxBody: ReactNode = null;
+  let headings: { id: string; title: string }[] = [];
+  if (!cheatSheet) {
+    headings = extractH2Headings(doc.content);
+    const diagrams = doc.frontmatter.diagrams;
+    const source = prepareContentForRender(doc.content, diagrams);
+    const compiled = await compileMDX({
+      source,
+      components: mdxComponents(slug, headings),
+      options: {
+        parseFrontmatter: false,
+        mdxOptions: { remarkPlugins: [remarkGfm] },
+      },
+    });
+    MdxBody = compiled.content;
+  }
 
   const { title, type, area, difficulty, est_minutes, source_attribution, status } =
     doc.frontmatter;
@@ -102,7 +109,7 @@ export default async function LearnDocPage({ params, searchParams }: Props) {
 
         <div className="mt-8 grid gap-10 lg:grid-cols-[200px_minmax(0,1fr)_220px]">
           <aside className="lg:sticky lg:top-24 lg:self-start">
-            <ArticleToc headings={headings} />
+            {!cheatSheet && <ArticleToc headings={headings} />}
           </aside>
 
           <article className="min-w-0">
@@ -143,14 +150,14 @@ export default async function LearnDocPage({ params, searchParams }: Props) {
                   signedIn={Boolean(email)}
                 />
               </div>
-              {cheatSheet && (
-                <ViewTabs slug={slug} active={showCheatSheet ? "cheatsheet" : "read"} />
+              {hasCheatSheet && (
+                <ViewTabs slug={slug} active={cheatSheet ? "cheatsheet" : "read"} />
               )}
             </header>
 
-            {showCheatSheet && cheatSheet ? (
+            {cheatSheet ? (
               <div className="mx-auto mt-8 max-w-none px-1">
-                <CheatSheetView data={cheatSheet} />
+                <CheatSheetView data={cheatSheet} slug={slug} />
               </div>
             ) : (
               <div className="prose mx-auto mt-8 max-w-none px-1 pb-12">{MdxBody}</div>

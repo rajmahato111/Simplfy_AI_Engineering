@@ -1,7 +1,14 @@
 import type { MethodCard as MethodCardData } from "@/lib/cheatsheet-schema";
 import { cheatColorClasses } from "@/components/cheatsheet/colors";
 
-export function MethodCard({ card }: { card: MethodCardData }) {
+/** Mirrors lib/mdx-components.tsx's img resolution: content-relative paths route through /content-assets/. */
+function resolveDiagramSrc(slug: string, diagram: string) {
+  if (diagram.startsWith("http") || diagram.startsWith("/")) return diagram;
+  const asset = `${slug}/${diagram}`.replace(/\/+/g, "/");
+  return `/content-assets/${asset}`;
+}
+
+export function MethodCard({ card, slug }: { card: MethodCardData; slug: string }) {
   const classes = cheatColorClasses[card.color ?? "brand"];
   return (
     <div className={`rounded-xl border ${classes.border} bg-white p-5 shadow-sm`}>
@@ -15,7 +22,7 @@ export function MethodCard({ card }: { card: MethodCardData }) {
       {card.diagram && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={card.diagram}
+          src={resolveDiagramSrc(slug, card.diagram)}
           alt=""
           className="mt-3 w-full rounded-lg border border-zinc-200"
         />

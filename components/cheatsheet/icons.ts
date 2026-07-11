@@ -27,7 +27,13 @@ import {
 } from "lucide-react";
 import type { CheatIconName } from "@/lib/cheatsheet-schema";
 
-/** The only file that imports icon components from lucide-react — keeps the icon surface bounded. */
+/**
+ * The single lookup for icons that content authors select dynamically via a CheatIconName
+ * string (the icon/*.json fields validated by CHEAT_ICON_NAMES). Fixed, non-authorable icons
+ * used by a specific widget (e.g. StarRating's star, ChecklistBox's check, TakeawayList's
+ * sparkle) import directly from lucide-react instead, since routing them through this map
+ * would add indirection without giving authors any actual choice.
+ */
 export const cheatIcons: Record<CheatIconName, LucideIcon> = {
   zap: Zap,
   "dollar-sign": DollarSign,

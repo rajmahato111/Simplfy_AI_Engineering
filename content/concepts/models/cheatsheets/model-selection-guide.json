@@ -1,6 +1,7 @@
 {
   "title": "Model Selection: The Gates, Not the Leaderboard",
   "subtitle": "Five hard constraints eliminate candidates before quality ever gets a vote.",
+  "source_attribution": "Derived from this chapter's own reviewed prose; see the chapter's source_attribution for the underlying upstream reference. See CREDITS.md.",
   "methodCards": [
     {
       "id": "modela",
@@ -146,7 +147,6 @@
     "Re-run the gates periodically — prices, context windows, and tool-use quality all move quarter to quarter"
   ],
   "decisionTree": {
-    "orientation": "vertical",
     "nodes": [
       { "id": "g1", "label": "Latency budget", "sublabel": "Interactive vs. batch" },
       { "id": "g2", "label": "Compliance", "sublabel": "Can the provider touch this data?" },

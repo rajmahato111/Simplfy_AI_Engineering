@@ -31,7 +31,7 @@ function listMdxFiles(): { slug: string; filePath: string }[] {
 function resolveAsset(mdxFilePath: string, assetPath: string): string | null {
   const dir = path.dirname(mdxFilePath);
   const abs = path.normalize(path.join(dir, assetPath));
-  if (!abs.startsWith(CONTENT_DIR)) return null;
+  if (abs !== CONTENT_DIR && !abs.startsWith(CONTENT_DIR + path.sep)) return null;
   return abs;
 }
 

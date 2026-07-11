@@ -1,18 +1,18 @@
 import type { DecisionTree as DecisionTreeData, DecisionNode } from "@/lib/cheatsheet-schema";
+import { Badge } from "@/components/ui/badge";
 
 function findRoot(tree: DecisionTreeData): DecisionNode | null {
   const hasIncoming = new Set(tree.edges.map((e) => e.to));
   return tree.nodes.find((n) => !hasIncoming.has(n.id)) ?? null;
 }
 
+// validateCheatSheet guarantees every edge.to resolves to a real node (strict-tree check),
+// so this trusts that invariant rather than defensively re-filtering.
 function childrenOf(tree: DecisionTreeData, nodeId: string) {
+  const nodesById = new Map(tree.nodes.map((n) => [n.id, n]));
   return tree.edges
     .filter((e) => e.from === nodeId)
-    .map((e) => ({
-      node: tree.nodes.find((n) => n.id === e.to)!,
-      label: e.label,
-    }))
-    .filter((c) => c.node);
+    .map((e) => ({ node: nodesById.get(e.to)!, label: e.label }));
 }
 
 function NodeBox({ node }: { node: DecisionNode }) {
@@ -38,11 +38,7 @@ function Branch({ tree, nodeId }: { tree: DecisionTreeData; nodeId: string }) {
           <div className="flex flex-wrap items-start justify-center gap-6">
             {children.map(({ node: child, label }) => (
               <div key={child.id} className="flex flex-col items-center">
-                {label && (
-                  <span className="mb-1 rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600">
-                    {label}
-                  </span>
-                )}
+                {label && <Badge className="mb-1">{label}</Badge>}
                 <Branch tree={tree} nodeId={child.id} />
               </div>
             ))}

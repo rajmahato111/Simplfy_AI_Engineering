@@ -18,7 +18,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-export function CheatSheetView({ data }: { data: CheatSheet }) {
+export function CheatSheetView({ data, slug }: { data: CheatSheet; slug: string }) {
   return (
     <div className="pb-12">
       {data.subtitle && <p className="mb-6 text-sm text-zinc-500">{data.subtitle}</p>}
@@ -26,7 +26,7 @@ export function CheatSheetView({ data }: { data: CheatSheet }) {
       <Section title="At a glance">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {data.methodCards.map((card) => (
-            <MethodCard key={card.id} card={card} />
+            <MethodCard key={card.id} card={card} slug={slug} />
           ))}
         </div>
       </Section>

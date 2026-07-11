@@ -73,7 +73,6 @@ export type ChecklistItem = { text: string };
 export type DecisionNode = { id: string; label: string; sublabel?: string };
 export type DecisionEdge = { from: string; to: string; label?: string };
 export type DecisionTree = {
-  orientation?: "horizontal" | "vertical";
   nodes: DecisionNode[];
   edges: DecisionEdge[];
 };
@@ -81,6 +80,7 @@ export type DecisionTree = {
 export type CheatSheet = {
   title: string;
   subtitle?: string;
+  source_attribution?: string;
   methodCards: MethodCard[];
   compareTable: CompareTable;
   whenToChoose: IconCallout[];
@@ -127,6 +127,9 @@ export function validateCheatSheet(raw: unknown): CheatSheetValidation {
 
   if (!isNonEmptyString(raw.title)) {
     issues.push({ field: "title", message: "Required non-empty string" });
+  }
+  if (raw.source_attribution !== undefined && !isNonEmptyString(raw.source_attribution)) {
+    issues.push({ field: "source_attribution", message: "If present, must be a non-empty string" });
   }
 
   // methodCards
@@ -201,11 +204,16 @@ export function validateCheatSheet(raw: unknown): CheatSheetValidation {
     if (!Array.isArray(rowsRaw) || rowsRaw.length < 1) {
       issues.push({ field: "compareTable.rows", message: "Required array with at least 1 entry" });
     } else {
+      const rowLabels = new Set<string>();
       rowsRaw.forEach((row, i) => {
         if (!isRecord(row) || !isNonEmptyString(row.label) || !isRecord(row.cells)) {
           issues.push({ field: `compareTable.rows[${i}]`, message: "Requires non-empty label and a cells object" });
           return;
         }
+        if (rowLabels.has(row.label)) {
+          issues.push({ field: `compareTable.rows[${i}].label`, message: `Duplicate row label "${row.label}" (used as a React key — must be unique)` });
+        }
+        rowLabels.add(row.label);
         const cellKeys = new Set(Object.keys(row.cells));
         if (columnIds.size > 0) {
           const missing = [...columnIds].filter((id) => !cellKeys.has(id));
@@ -259,6 +267,12 @@ export function validateCheatSheet(raw: unknown): CheatSheetValidation {
       }
       if (item.color !== undefined && !isColorToken(item.color)) {
         issues.push({ field: `whenToChoose[${i}].color`, message: `Must be one of: ${CHEAT_COLOR_TOKENS.join(", ")}` });
+      }
+      if (item.body !== undefined && typeof item.body !== "string") {
+        issues.push({ field: `whenToChoose[${i}].body`, message: "Must be a string" });
+      }
+      if (item.bullets !== undefined && !isStringArray(item.bullets)) {
+        issues.push({ field: `whenToChoose[${i}].bullets`, message: "Must be a non-empty string array" });
       }
     });
     if (whenToChooseRaw.length > 4) warnings.push(`whenToChoose has ${whenToChooseRaw.length} entries (>4 may not lay out well)`);
@@ -397,9 +411,6 @@ export function validateCheatSheet(raw: unknown): CheatSheetValidation {
           }
         }
       }
-      if (dt.orientation !== undefined && dt.orientation !== "horizontal" && dt.orientation !== "vertical") {
-        issues.push({ field: "decisionTree.orientation", message: 'Must be "horizontal" or "vertical"' });
-      }
     }
   }
 
@@ -414,6 +425,7 @@ export function validateCheatSheet(raw: unknown): CheatSheetValidation {
     data: {
       title: raw.title as string,
       subtitle: typeof raw.subtitle === "string" ? raw.subtitle : undefined,
+      source_attribution: isNonEmptyString(raw.source_attribution) ? raw.source_attribution : undefined,
       methodCards,
       compareTable,
       whenToChoose: whenToChooseRaw as unknown as IconCallout[],

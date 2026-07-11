@@ -1,6 +1,7 @@
 {
   "title": "RLHF vs. DPO vs. Online DPO/RLOO",
   "subtitle": "Three ways to teach a model what you prefer — same objective, different machinery.",
+  "source_attribution": "Derived from this chapter's own reviewed prose; see the chapter's source_attribution for the underlying upstream reference. See CREDITS.md.",
   "methodCards": [
     {
       "id": "rlhf",

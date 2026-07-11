@@ -1,6 +1,7 @@
 {
   "title": "Full Fine-Tuning vs. LoRA vs. QLoRA",
   "subtitle": "Three ways to adapt a pretrained model — same weight matrix, three different update strategies.",
+  "source_attribution": "Derived from this chapter's own reviewed prose; see the chapter's source_attribution for the underlying upstream reference. See CREDITS.md.",
   "methodCards": [
     {
       "id": "fullft",
