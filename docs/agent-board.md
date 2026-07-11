@@ -16,6 +16,7 @@
 
 | PR | Task | Merged |
 |----|------|--------|
+| **#33** | Claude: Cheat-sheet companion view — pilot on 3 chapters (lora-qlora-peft, rlhf-and-dpo, model-selection-guide), 8-angle code-reviewed | 2026-07-11 |
 | **#32** | Claude T-070–073: Training + Inference cluster (17 rewritten chapters, reviewer-fixed) — Phase 4 complete | 2026-07-09 |
 | **#31** | Claude T-060–062: Foundations + Models cluster (10 rewritten chapters, reviewer-fixed) | 2026-07-08 |
 | **#30** | Claude T-030–032: Agents cluster (12 rewritten chapters, reviewer-fixed) + unrelated e2e/nav-label CI fix | 2026-07-04 |
@@ -36,3 +37,4 @@
 |----|------|------|
 | T-080+ | Claude Code | Phase 5: Prompting/Evals/MLOps/Security/Reliability (~21 chapters) |
 | T-052+ | Cursor | Remaining MDX rewrites (Frameworks/Tool-use/Voice/Multimodal/etc.) |
+| — | Human | Tier-A follow-up: fold the new `cheat_sheet:` frontmatter field and `content/**/cheatsheets/*.json` file type into `docs/content-style-guide.md` §2/§3 (flagged by PR #33's review, not applied — file is human-approval-only) |
