@@ -1,0 +1,166 @@
+{
+  "title": "Model Selection: The Gates, Not the Leaderboard",
+  "subtitle": "Five hard constraints eliminate candidates before quality ever gets a vote.",
+  "source_attribution": "Derived from this chapter's own reviewed prose; see the chapter's source_attribution for the underlying upstream reference. See CREDITS.md.",
+  "methodCards": [
+    {
+      "id": "modela",
+      "name": "Model A — Flagship",
+      "tagline": "$5.00 / $25.00 per 1M tokens",
+      "bullets": [
+        "Clears every gate: latency, compliance, context, tool-use",
+        "$0.0225/ticket → $4,500/month at 200K tickets",
+        "Loses to Model B on cost alone"
+      ],
+      "color": "rose"
+    },
+    {
+      "id": "modelb",
+      "name": "Model B — Smaller sibling",
+      "tagline": "$1.00 / $5.00 per 1M tokens",
+      "bullets": [
+        "Clears every gate, including the tool-use test",
+        "$0.0045/ticket → $900/month at 200K tickets",
+        "Wins by 5x — the cheapest survivor"
+      ],
+      "color": "emerald"
+    }
+  ],
+  "compareTable": {
+    "columns": [
+      { "id": "modela", "label": "Model A (Flagship)", "color": "rose" },
+      { "id": "modelb", "label": "Model B (Smaller)", "color": "emerald" }
+    ],
+    "rows": [
+      {
+        "label": "Gate 1 — Latency (p95 < 3s)",
+        "cells": {
+          "modela": { "type": "text", "value": "Passes" },
+          "modelb": { "type": "text", "value": "Passes" }
+        }
+      },
+      {
+        "label": "Gate 2 — EU compliance",
+        "cells": {
+          "modela": { "type": "text", "value": "Passes" },
+          "modelb": { "type": "text", "value": "Passes" }
+        }
+      },
+      {
+        "label": "Gate 3 — Context (~3,000 tok)",
+        "cells": {
+          "modela": { "type": "text", "value": "Passes" },
+          "modelb": { "type": "text", "value": "Passes" }
+        }
+      },
+      {
+        "label": "Gate 4 — Tool-use (100-ticket test)",
+        "cells": {
+          "modela": { "type": "text", "value": "Cleared" },
+          "modelb": { "type": "text", "value": "Cleared" }
+        }
+      },
+      {
+        "label": "Gate 5 — Cost at 200K tickets/month",
+        "cells": {
+          "modela": { "type": "bar", "value": 100, "color": "rose", "label": "$4,500/month" },
+          "modelb": { "type": "bar", "value": 20, "color": "emerald", "label": "$900/month" }
+        }
+      }
+    ]
+  },
+  "whenToChoose": [
+    {
+      "icon": "git-branch",
+      "heading": "Route by task complexity when",
+      "color": "indigo",
+      "bullets": [
+        "Task mix varies widely across your traffic",
+        "Your complexity classifier beats a coin flip"
+      ]
+    },
+    {
+      "icon": "shield",
+      "heading": "Self-host to clear compliance when",
+      "color": "emerald",
+      "bullets": [
+        "Data residency rules out every API provider",
+        "Volume justifies 0.5-1 FTE of on-call engineering"
+      ]
+    },
+    {
+      "icon": "zap",
+      "heading": "Stick with one flagship model when",
+      "color": "amber",
+      "bullets": [
+        "Volume is low enough that the cost gap is a rounding error",
+        "Routing logic would cost more to build than it saves"
+      ]
+    }
+  ],
+  "workedExample": {
+    "heading": "Customer-support agent: which model?",
+    "body": "200,000 tickets/month, PII can't leave EU infrastructure, p95 under 3 seconds, budget capped at $6,000/month. Gate 1 (latency) rules out extended-thinking tiers. Gate 2 (compliance) cuts the pool roughly in half. Gate 3 (context) eliminates nothing — the ~3,000-token working set is trivial for everyone left. Gate 4 (tool-use) eliminates the cheapest remaining candidate: it got the refund schema wrong 12% of the time on a 100-ticket test. Two survivors reach Gate 5 (cost): Model A at $4,500/month, Model B at $900/month. Both cleared every gate — Model B wins by 5x.",
+    "stat": {
+      "label": "Model B's cost as a share of the $6,000 budget",
+      "segments": [
+        { "label": "Model B actual cost ($900)", "value": 15, "color": "emerald" },
+        { "label": "Unused budget headroom", "value": 85, "color": "brand" }
+      ]
+    }
+  },
+  "coreIntuition": {
+    "heading": "Constraints eliminate before quality ever votes",
+    "body": "Latency, compliance, context length, and tool-use quality each eliminate candidates before cost or benchmark score gets a say. By the time you're comparing quality, you're only comparing whatever survived the gates that actually decide whether the system works in production."
+  },
+  "interviewQuestions": [
+    {
+      "question": "The client insists on the flagship model regardless of cost — how do you push back?",
+      "hint": "Show the gates it never needed to clear, propose routing."
+    },
+    {
+      "question": "Two models tie on your evaluation set — how do you break the tie?",
+      "hint": "Cost at real volume, then rate limits at P99, SDK maturity, provider reliability."
+    },
+    {
+      "question": "A regulatory change suddenly requires in-region processing — what breaks?",
+      "hint": "Whatever passed gate 2 before might not now."
+    }
+  ],
+  "productionConsiderations": [
+    { "icon": "wrench", "text": "Test tool-use quality on your own schema, not a generic benchmark — accuracy varies by how your tools are named and typed." },
+    { "icon": "database", "text": "Test effective context recall at your real document length — advertised max-context numbers overstate what's usable." },
+    { "icon": "shield", "text": "Treat compliance as gate 2, not an afterthought — if a candidate can't legally touch the data, it was never a candidate." },
+    { "icon": "clock", "text": "Re-run all five gates when volume, task mix, or pricing changes — a decision correct at launch can go wrong by next quarter." }
+  ],
+  "checklist": [
+    { "text": "Latency budget defined — interactive vs. batch, a real p95 target" },
+    { "text": "Compliance and data-residency requirements checked before quality" },
+    { "text": "Effective context tested at real document length, not the advertised max" },
+    { "text": "Tool-use accuracy tested on your own schema and tools" },
+    { "text": "Cost priced at real volume and token mix, not the sticker rate" }
+  ],
+  "keyTakeaways": [
+    "Model selection is a sequence of gates, not a leaderboard lookup — apply them in order",
+    "Whatever survives all five gates is your candidate pool; pick the cheapest one that clears your quality bar",
+    "Effective context and real tool-use accuracy routinely differ from what's advertised — test both yourself",
+    "Re-run the gates periodically — prices, context windows, and tool-use quality all move quarter to quarter"
+  ],
+  "decisionTree": {
+    "nodes": [
+      { "id": "g1", "label": "Latency budget", "sublabel": "Interactive vs. batch" },
+      { "id": "g2", "label": "Compliance", "sublabel": "Can the provider touch this data?" },
+      { "id": "g3", "label": "Context length", "sublabel": "Effective, not advertised" },
+      { "id": "g4", "label": "Tool-use quality", "sublabel": "Tested on your schema" },
+      { "id": "g5", "label": "Cost ceiling", "sublabel": "At real volume" },
+      { "id": "pick", "label": "Pick cheapest survivor", "sublabel": "That clears your quality bar" }
+    ],
+    "edges": [
+      { "from": "g1", "to": "g2", "label": "passes" },
+      { "from": "g2", "to": "g3", "label": "passes" },
+      { "from": "g3", "to": "g4", "label": "passes" },
+      { "from": "g4", "to": "g5", "label": "passes" },
+      { "from": "g5", "to": "pick", "label": "survives" }
+    ]
+  }
+}

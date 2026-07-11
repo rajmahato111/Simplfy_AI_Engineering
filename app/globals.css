@@ -6,6 +6,21 @@
   --color-brand-muted: #e8f5f3;
   --color-brand-text: #1d6b61;
   --font-sans: var(--font-inter), system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Cheat-sheet companion view — light-mode-only accent palette (site has no dark mode) */
+  --color-cheat-indigo: #4f46e5;
+  --color-cheat-indigo-muted: #eef2ff;
+  --color-cheat-indigo-text: #3730a3;
+  --color-cheat-amber: #d97706;
+  --color-cheat-amber-muted: #fffbeb;
+  --color-cheat-amber-text: #92400e;
+  --color-cheat-rose: #e11d48;
+  --color-cheat-rose-muted: #fff1f2;
+  --color-cheat-rose-text: #9f1239;
+  --color-cheat-emerald: #059669;
+  --color-cheat-emerald-muted: #ecfdf5;
+  --color-cheat-emerald-text: #065f46;
+  --color-cheat-star: #f59e0b;
 }
 
 html {

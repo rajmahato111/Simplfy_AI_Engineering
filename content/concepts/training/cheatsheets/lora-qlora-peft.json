@@ -1,0 +1,194 @@
+{
+  "title": "Full Fine-Tuning vs. LoRA vs. QLoRA",
+  "subtitle": "Three ways to adapt a pretrained model — same weight matrix, three different update strategies.",
+  "source_attribution": "Derived from this chapter's own reviewed prose; see the chapter's source_attribution for the underlying upstream reference. See CREDITS.md.",
+  "methodCards": [
+    {
+      "id": "fullft",
+      "name": "Full fine-tuning",
+      "tagline": "Update every weight in the model directly",
+      "formula": "ΔW ∈ R^(d×d) — d² trainable params",
+      "bullets": [
+        "All weights trainable, no frozen matrix",
+        "Maximum adaptation capacity",
+        "Highest compute, memory, and storage cost"
+      ],
+      "color": "rose"
+    },
+    {
+      "id": "lora",
+      "name": "LoRA",
+      "tagline": "Freeze W, learn a low-rank additive update",
+      "formula": "h = Wx + (BA)x · (α/r), r ≪ d",
+      "bullets": [
+        "Only A and B are trainable — 2×d×r params instead of d²",
+        "W never receives a gradient",
+        "One frozen base serves many hot-swappable adapters"
+      ],
+      "color": "indigo"
+    },
+    {
+      "id": "qlora",
+      "name": "QLoRA",
+      "tagline": "LoRA + a 4-bit quantized frozen base",
+      "formula": "W stored as NF4 (4-bit); A, B still full precision",
+      "bullets": [
+        "Frozen base needs no optimizer state at all",
+        "Fits a 7B fine-tune on a single 24 GB consumer GPU",
+        "Small quantization error; slower per-step (on-the-fly dequant)"
+      ],
+      "color": "emerald"
+    }
+  ],
+  "compareTable": {
+    "columns": [
+      { "id": "fullft", "label": "Full Fine-Tuning", "color": "rose" },
+      { "id": "lora", "label": "LoRA", "color": "indigo" },
+      { "id": "qlora", "label": "QLoRA", "color": "emerald" }
+    ],
+    "rows": [
+      {
+        "label": "Base weights",
+        "cells": {
+          "fullft": { "type": "text", "value": "Trainable" },
+          "lora": { "type": "text", "value": "Frozen" },
+          "qlora": { "type": "text", "value": "Frozen & 4-bit (NF4)" }
+        }
+      },
+      {
+        "label": "Trainable params (7B, q/v, 32 layers)",
+        "cells": {
+          "fullft": { "type": "text", "value": "1.074B (100%)" },
+          "lora": { "type": "text", "value": "8.39M (0.78%)" },
+          "qlora": { "type": "text", "value": "8.39M (0.78%)" }
+        }
+      },
+      {
+        "label": "VRAM to fine-tune a 7B model",
+        "cells": {
+          "fullft": { "type": "bar", "value": 100, "color": "rose", "label": "~112 GB" },
+          "lora": { "type": "bar", "value": 13, "color": "indigo", "label": "~14 GB" },
+          "qlora": { "type": "bar", "value": 3, "color": "emerald", "label": "~3.6 GB" }
+        }
+      },
+      {
+        "label": "Adaptation capacity",
+        "cells": {
+          "fullft": { "type": "stars", "value": 5 },
+          "lora": { "type": "stars", "value": 4 },
+          "qlora": { "type": "stars", "value": 4 }
+        }
+      },
+      {
+        "label": "Training complexity",
+        "cells": {
+          "fullft": { "type": "text", "value": "High" },
+          "lora": { "type": "text", "value": "Medium" },
+          "qlora": { "type": "text", "value": "Medium-High (quant overhead)" }
+        }
+      },
+      {
+        "label": "Best for",
+        "cells": {
+          "fullft": { "type": "text", "value": "Large domain shift, lots of compute" },
+          "lora": { "type": "text", "value": "Efficient adaptation, many adapters" },
+          "qlora": { "type": "text", "value": "Large models, one consumer GPU" }
+        }
+      }
+    ]
+  },
+  "whenToChoose": [
+    {
+      "icon": "zap",
+      "heading": "Choose full fine-tuning when",
+      "color": "rose",
+      "bullets": [
+        "You have multi-GPU datacenter hardware",
+        "The task needs a behavior shift too large for any adapter",
+        "You need the highest possible ceiling on quality"
+      ]
+    },
+    {
+      "icon": "layers",
+      "heading": "Choose LoRA when",
+      "color": "indigo",
+      "bullets": [
+        "The base model already performs reasonably well",
+        "You need many task-specific adapters on one shared base",
+        "You want fast, cheap experimentation and easy rollback"
+      ]
+    },
+    {
+      "icon": "cpu",
+      "heading": "Choose QLoRA when",
+      "color": "emerald",
+      "bullets": [
+        "The model doesn't fit in memory at bf16",
+        "You're limited to a single consumer-class GPU",
+        "A small quantization-error tradeoff is acceptable"
+      ]
+    }
+  ],
+  "workedExample": {
+    "heading": "Parameter count for a 7B model (query + value, 32 layers, rank 16)",
+    "body": "Each targeted 4,096×4,096 matrix is 16,777,216 params; across 64 matrices (q and v, 32 layers) that's ≈1.074B params for full fine-tuning. A rank-16 LoRA adapter replaces each matrix with A (16×4,096) and B (4,096×16) — 131,072 trainable params per matrix, 8.39M total across all 64 matrices. That's about 0.78% of what full fine-tuning would touch.",
+    "stat": {
+      "label": "Share of parameters actually trained",
+      "segments": [
+        { "label": "LoRA trainable (8.39M)", "value": 0.78, "color": "indigo" },
+        { "label": "Frozen base (1.074B)", "value": 99.22, "color": "brand" }
+      ]
+    }
+  },
+  "coreIntuition": {
+    "heading": "Why a low-rank update is enough",
+    "body": "Most useful weight updates during fine-tuning live in a much lower-dimensional subspace than the full weight matrix. A thin pair of matrices — A and B — can capture that subspace directly, so a fraction of a percent of the original parameter count can still shift behavior meaningfully. Why change every number in W when a few well-placed low-rank directions achieve the same effect?"
+  },
+  "interviewQuestions": [
+    {
+      "question": "Walk me through why a single LoRA adapter costs 2×d×r parameters rather than d².",
+      "hint": "And what happens to the total as you target more matrices across more layers?"
+    },
+    {
+      "question": "When would you reach for full-parameter fine-tuning instead of LoRA, even knowing it costs more?"
+    },
+    {
+      "question": "How does QLoRA keep training stable while the base model sits in 4-bit precision?",
+      "hint": "NF4, double quantization, paged optimizer states."
+    }
+  ],
+  "productionConsiderations": [
+    { "icon": "layers", "text": "Multi-adapter serving: batch requests bound for different adapters and apply each request's A/B matrices on the fly on one resident base model." },
+    { "icon": "scale", "text": "Alpha and rank move together — changing rank without adjusting alpha silently changes the effective update magnitude." },
+    { "icon": "clock", "text": "QLoRA's on-the-fly dequantization adds real per-step latency that bf16 LoRA doesn't pay." },
+    { "icon": "git-branch", "text": "Target-module choice (all linear layers vs. just query/value) trades stability and quality against adapter size." }
+  ],
+  "checklist": [
+    { "text": "Rank chosen to match task complexity, not picked arbitrarily" },
+    { "text": "Alpha scaled with rank (or RS-LoRA used at high rank)" },
+    { "text": "Target modules chosen deliberately, not defaulted" },
+    { "text": "VRAM budget checked against the actual GPU available" },
+    { "text": "Multi-adapter serving strategy planned before scaling adapter count" }
+  ],
+  "keyTakeaways": [
+    "LoRA freezes W and trains a 2×d×r-parameter low-rank update instead of d²",
+    "QLoRA compresses only the frozen base to 4-bit — adapters still train at full precision",
+    "Rank and alpha move together; retune alpha whenever you change rank",
+    "Multi-adapter serving on one shared base is LoRA's real production advantage, not just cheaper training"
+  ],
+  "decisionTree": {
+    "nodes": [
+      { "id": "r", "label": "Does the base model fit your GPU at bf16?" },
+      { "id": "a", "label": "QLoRA", "sublabel": "4-bit frozen base" },
+      { "id": "b", "label": "Does the task need a large behavior shift?" },
+      { "id": "c", "label": "Full fine-tuning", "sublabel": "Every weight trainable" },
+      { "id": "d", "label": "LoRA", "sublabel": "Low-rank adapter" }
+    ],
+    "edges": [
+      { "from": "r", "to": "a", "label": "No" },
+      { "from": "r", "to": "b", "label": "Yes" },
+      { "from": "b", "to": "c", "label": "Yes, big shift" },
+      { "from": "b", "to": "d", "label": "No, style/format" }
+    ]
+  }
+}

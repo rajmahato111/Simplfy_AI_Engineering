@@ -1,0 +1,167 @@
+{
+  "title": "RLHF vs. DPO vs. Online DPO/RLOO",
+  "subtitle": "Three ways to teach a model what you prefer — same objective, different machinery.",
+  "source_attribution": "Derived from this chapter's own reviewed prose; see the chapter's source_attribution for the underlying upstream reference. See CREDITS.md.",
+  "methodCards": [
+    {
+      "id": "rlhf",
+      "name": "RLHF",
+      "tagline": "Train a reward model, then run PPO against it",
+      "formula": "Policy + Reference + Reward model + Value network",
+      "bullets": [
+        "Reward model scores responses from human preference pairs",
+        "PPO nudges the policy toward higher-scoring responses",
+        "KL penalty (β) anchors the policy to a frozen reference"
+      ],
+      "color": "rose"
+    },
+    {
+      "id": "dpo",
+      "name": "DPO",
+      "tagline": "Skip the reward model — a closed-form loss on pairs",
+      "formula": "β × [(chosen gap) − (rejected gap)] → loss",
+      "bullets": [
+        "Only 2 models in memory: policy and reference",
+        "Supervised-style loss, no RL loop",
+        "The default for most teams, most of the time"
+      ],
+      "color": "indigo"
+    },
+    {
+      "id": "online",
+      "name": "Online DPO / RLOO",
+      "tagline": "Judge the current policy's own fresh samples",
+      "formula": "Sample from policy → judge ranks on the spot",
+      "bullets": [
+        "Self-correcting as the policy shifts",
+        "Fresh signal, graded on live samples, not stale pairs",
+        "Needs a judge (model or rule-based) every round"
+      ],
+      "color": "emerald"
+    }
+  ],
+  "compareTable": {
+    "columns": [
+      { "id": "rlhf", "label": "RLHF", "color": "rose" },
+      { "id": "dpo", "label": "DPO", "color": "indigo" },
+      { "id": "online", "label": "Online DPO / RLOO", "color": "emerald" }
+    ],
+    "rows": [
+      {
+        "label": "Models resident in memory",
+        "cells": {
+          "rlhf": { "type": "bar", "value": 100, "color": "rose", "label": "4 (policy, ref, reward, value)" },
+          "dpo": { "type": "bar", "value": 50, "color": "indigo", "label": "2 (policy, reference)" },
+          "online": { "type": "bar", "value": 50, "color": "emerald", "label": "2 + judge each step" }
+        }
+      },
+      {
+        "label": "Training stability",
+        "cells": {
+          "rlhf": { "type": "text", "value": "Sensitive to β; prone to collapse" },
+          "dpo": { "type": "text", "value": "Stable, supervised-style loss" },
+          "online": { "type": "text", "value": "Stable, self-correcting" }
+        }
+      },
+      {
+        "label": "Data freshness",
+        "cells": {
+          "rlhf": { "type": "text", "value": "Static unless you keep collecting" },
+          "dpo": { "type": "text", "value": "Static — goes stale as policy improves" },
+          "online": { "type": "text", "value": "Fresh — graded on current policy" }
+        }
+      },
+      {
+        "label": "Default choice for most teams",
+        "cells": {
+          "rlhf": { "type": "stars", "value": 2 },
+          "dpo": { "type": "stars", "value": 5 },
+          "online": { "type": "stars", "value": 3 }
+        }
+      }
+    ]
+  },
+  "whenToChoose": [
+    {
+      "icon": "scale",
+      "heading": "Choose RLHF when",
+      "color": "rose",
+      "bullets": [
+        "You need fine-grained reward shaping",
+        "You already run RL infrastructure"
+      ]
+    },
+    {
+      "icon": "zap",
+      "heading": "Choose DPO when",
+      "color": "indigo",
+      "bullets": [
+        "You want a stable, predictable, supervised-style loss",
+        "You don't need a separate reward model"
+      ]
+    },
+    {
+      "icon": "trending-up",
+      "heading": "Choose Online DPO / RLOO when",
+      "color": "emerald",
+      "bullets": [
+        "The policy has moved past what your offline pairs describe",
+        "You have a judge (model or rule-based) available each round"
+      ]
+    }
+  ],
+  "workedExample": {
+    "heading": "The DPO loss, worked through",
+    "body": "One pair partway through training: the chosen response's log-probability rose from −12.4 to −9.8 (+2.6 nats); the rejected response's fell from −11.0 to −13.5 (−2.5 nats). Scaled by β=0.1: 0.1 × [2.6 − (−2.5)] = 0.51. Through the sigmoid, −log σ(0.51) ≈ 0.47 — down from −log σ(0) = ln(2) ≈ 0.69 at the very start of training. That drop is DPO doing its job across a few epochs of 8,000 pairs."
+  },
+  "coreIntuition": {
+    "heading": "Same objective, fewer moving parts",
+    "body": "RLHF and DPO optimize the same objective — preferred responses more likely, rejected ones less likely, without drifting too far from the reference policy. DPO just derives a closed-form loss for that objective instead of fitting a reward model and running PPO against it: fewer moving parts, same target."
+  },
+  "interviewQuestions": [
+    {
+      "question": "Why does the KL penalty matter, and what happens if you remove it entirely from either method?"
+    },
+    {
+      "question": "When would you still reach for PPO-style RLHF over DPO, even knowing it costs more?",
+      "hint": "Fine-grained reward shaping, existing RL infra."
+    },
+    {
+      "question": "How would you detect reward hacking in an RLHF pipeline before it ships?"
+    }
+  ],
+  "productionConsiderations": [
+    { "icon": "wrench", "text": "Tune β whenever the model, data, or task changes — it's the knob between learning the preference and collapsing toward the reference." },
+    { "icon": "clock", "text": "Static preference data goes stale once the policy improves past whatever generated the pairs." },
+    { "icon": "alert-triangle", "text": "A model that got safer can have quietly lost ground on reasoning or coding — measure the alignment tax, don't assume it away." },
+    { "icon": "shield", "text": "Human preference isn't ground truth — where correctness is mechanically checkable, a verifier beats any judge." }
+  ],
+  "checklist": [
+    { "text": "DPO not dismissed as an inferior shortcut without checking your own evals" },
+    { "text": "β revisited whenever the model, data, or task changes" },
+    { "text": "Preference data refreshed instead of training offline forever on one static batch" },
+    { "text": "Capability regression measured alongside alignment metrics" },
+    { "text": "Correctness verified mechanically wherever the task allows it" }
+  ],
+  "keyTakeaways": [
+    "RLHF and DPO optimize the same objective; DPO reaches it with a closed-form loss instead of a reward model and PPO",
+    "DPO needs half the models in memory (2 vs. 4) and trains far more predictably",
+    "The frozen reference policy is the guardrail in both methods",
+    "Static preference data has a shelf life; online variants trade staleness for judge infrastructure"
+  ],
+  "decisionTree": {
+    "nodes": [
+      { "id": "r", "label": "Does the task have a mechanically checkable answer?" },
+      { "id": "v", "label": "Verifiable reward (RLVR)", "sublabel": "No reward model needed" },
+      { "id": "b", "label": "Has the policy moved past your preference data?" },
+      { "id": "d", "label": "DPO", "sublabel": "Default for most teams" },
+      { "id": "o", "label": "Online DPO / RLOO, or RLHF", "sublabel": "Fresh judged samples, or full reward-model infra" }
+    ],
+    "edges": [
+      { "from": "r", "to": "v", "label": "Yes" },
+      { "from": "r", "to": "b", "label": "No" },
+      { "from": "b", "to": "d", "label": "No, data is fresh" },
+      { "from": "b", "to": "o", "label": "Yes, or need reward shaping" }
+    ]
+  }
+}
