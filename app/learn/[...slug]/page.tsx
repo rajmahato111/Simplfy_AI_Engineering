@@ -5,6 +5,7 @@ import remarkGfm from "remark-gfm";
 import { getContentBySlug, listContentSlugs } from "@/lib/content";
 import { getAdjacentSlugs } from "@/lib/content-nav";
 import { prepareContentForRender } from "@/lib/content-audit";
+import { getCheatSheetForSlug } from "@/lib/cheatsheet";
 import { extractH2Headings } from "@/lib/headings";
 import { mdxComponents } from "@/lib/mdx-components";
 import { ArticleBreadcrumb, ArticleToc } from "@/components/article-chrome";
@@ -12,10 +13,15 @@ import { ArticlePrevNext } from "@/components/article-prev-next";
 import { ChapterProgress } from "@/components/chapter-progress";
 import { Badge, BadgeBrand } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ViewTabs } from "@/components/cheatsheet/view-tabs";
+import { CheatSheetView } from "@/components/cheatsheet/cheat-sheet-view";
 import { auth } from "@/auth";
 import { ensureUser, getProgressForUser, recordChapterView } from "@/lib/progress";
 
-type Props = { params: Promise<{ slug: string[] }> };
+type Props = {
+  params: Promise<{ slug: string[] }>;
+  searchParams: Promise<{ view?: string }>;
+};
 
 export function generateStaticParams() {
   return listContentSlugs().map((slug) => ({
@@ -48,11 +54,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function LearnDocPage({ params }: Props) {
+export default async function LearnDocPage({ params, searchParams }: Props) {
   const { slug: parts } = await params;
   const slug = parts.join("/");
   const doc = getContentBySlug(slug);
   if (!doc) notFound();
+
+  const { view } = await searchParams;
+  const cheatSheet = getCheatSheetForSlug(slug);
+  const showCheatSheet = view === "cheatsheet" && cheatSheet !== null;
 
   const headings = extractH2Headings(doc.content);
   const diagrams = doc.frontmatter.diagrams;
@@ -133,9 +143,18 @@ export default async function LearnDocPage({ params }: Props) {
                   signedIn={Boolean(email)}
                 />
               </div>
+              {cheatSheet && (
+                <ViewTabs slug={slug} active={showCheatSheet ? "cheatsheet" : "read"} />
+              )}
             </header>
 
-            <div className="prose mx-auto mt-8 max-w-none px-1 pb-12">{MdxBody}</div>
+            {showCheatSheet && cheatSheet ? (
+              <div className="mx-auto mt-8 max-w-none px-1">
+                <CheatSheetView data={cheatSheet} />
+              </div>
+            ) : (
+              <div className="prose mx-auto mt-8 max-w-none px-1 pb-12">{MdxBody}</div>
+            )}
             <ArticlePrevNext prev={prev} next={next} />
           </article>
 

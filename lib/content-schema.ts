@@ -20,6 +20,8 @@ export type ContentFrontmatter = {
   source_attribution: string;
   last_reviewed: string;
   status: ContentStatus;
+  /** Optional path to a companion cheat-sheet JSON file, relative to this chapter's directory. */
+  cheat_sheet?: string;
 };
 
 export type FrontmatterIssue = {
@@ -80,6 +82,7 @@ export function validateFrontmatter(
   const sourceAttribution = raw.source_attribution;
   const lastReviewed = raw.last_reviewed;
   const status = raw.status;
+  const cheatSheet = raw.cheat_sheet;
 
   const lastReviewedNorm = normalizeDate(lastReviewed);
 
@@ -110,6 +113,9 @@ export function validateFrontmatter(
   if (!isEnum(status, CONTENT_STATUSES)) {
     issues.push({ field: "status", message: `Must be one of: ${CONTENT_STATUSES.join(", ")}` });
   }
+  if (cheatSheet !== undefined && !isNonEmptyString(cheatSheet)) {
+    issues.push({ field: "cheat_sheet", message: "If present, must be a non-empty string" });
+  }
 
   if (opts?.fileSlug && isNonEmptyString(slug)) {
     const expected = opts.fileSlug.split("/").pop()!;
@@ -138,6 +144,7 @@ export function validateFrontmatter(
       source_attribution: sourceAttribution as string,
       last_reviewed: lastReviewedNorm!,
       status: status as ContentStatus,
+      cheat_sheet: isNonEmptyString(cheatSheet) ? cheatSheet : undefined,
     },
   };
 }
